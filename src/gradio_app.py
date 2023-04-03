@@ -15,7 +15,8 @@ buster: Buster = Buster(cfg=cfg.buster_cfg, retriever=retriever)
 USERNAME = os.getenv("AI4H_USERNAME")
 PASSWORD = os.getenv("AI4H_PASSWORD")
 
-PORT = int(os.getenv("PORT"))
+PORT = os.getenv("PORT")
+PORT = int(PORT) if PORT is not None else PORT
 
 # set openAI creds
 openai.api_key = os.getenv("OPENAI_API_KEY")
