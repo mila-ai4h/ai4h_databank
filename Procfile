@@ -1,1 +1,1 @@
-web: cd src && gradio gradio_app.py $PORT
+web: cd src && gradio gradio_app.py
