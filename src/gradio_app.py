@@ -1,4 +1,5 @@
 import cfg
+import os
 import gradio as gr
 
 from buster.busterbot import Buster
@@ -9,6 +10,11 @@ from buster.utils import get_retriever_from_extension
 retriever: Retriever = get_retriever_from_extension(cfg.documents_filepath)(cfg.documents_filepath)
 buster: Buster = Buster(cfg=cfg.buster_cfg, retriever=retriever)
 
+USERNAME = os.getenv("AI4H_USERNAME")
+PASSWORD = os.getenv("AI4H_PASSWORD")
+
+def check_auth(username, password):
+    return username == USERNAME and password == PASSWORD
 
 def chat(question, history):
     history = history or []
@@ -56,4 +62,4 @@ with block:
     message.submit(chat, inputs=[message, state], outputs=[chatbot, state])
 
 
-block.launch(debug=True, share=False)
+block.launch(debug=True, share=False, auth=check_auth)
