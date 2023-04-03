@@ -1,1 +1,1 @@
-web: cd src && python gradio_app.py $PORT
+web: cd src && source setup.sh && python gradio_app.py
