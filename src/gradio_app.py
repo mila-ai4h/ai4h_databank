@@ -1,10 +1,12 @@
 import cfg
 import os
 import gradio as gr
+import openai
 
 from buster.busterbot import Buster
 from buster.retriever import Retriever
 from buster.utils import get_retriever_from_extension
+
 
 # initialize buster with the config in config.py (adapt to your needs) ...
 retriever: Retriever = get_retriever_from_extension(cfg.documents_filepath)(cfg.documents_filepath)
@@ -12,6 +14,10 @@ buster: Buster = Buster(cfg=cfg.buster_cfg, retriever=retriever)
 
 USERNAME = os.getenv("AI4H_USERNAME")
 PASSWORD = os.getenv("AI4H_PASSWORD")
+
+# set openAI creds
+openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.organization = os.getenv("OPENAI_ORGANIZATION")
 
 def check_auth(username, password):
     return username == USERNAME and password == PASSWORD
