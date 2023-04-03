@@ -9,7 +9,9 @@ from buster.utils import get_retriever_from_extension
 
 
 # initialize buster with the config in config.py (adapt to your needs) ...
-retriever: Retriever = get_retriever_from_extension(cfg.documents_filepath)(cfg.documents_filepath)
+retriever: Retriever = get_retriever_from_extension(cfg.documents_filepath)(
+    cfg.documents_filepath
+)
 buster: Buster = Buster(cfg=cfg.buster_cfg, retriever=retriever)
 
 USERNAME = os.getenv("AI4H_USERNAME")
@@ -19,8 +21,10 @@ PASSWORD = os.getenv("AI4H_PASSWORD")
 openai.api_key = os.getenv("OPENAI_API_KEY")
 openai.organization = os.getenv("OPENAI_ORGANIZATION")
 
+
 def check_auth(username, password):
     return username == USERNAME and password == PASSWORD
+
 
 def chat(question, history):
     history = history or []
@@ -37,7 +41,9 @@ block = gr.Blocks(css="#chatbot .overflow-y-auto{height:500px}")
 
 with block:
     with gr.Row():
-        gr.Markdown("<h3><center>Buster 🤖: A Question-Answering Bot for your documentation</center></h3>")
+        gr.Markdown(
+            "<h3><center>Buster 🤖: A Question-Answering Bot for your documentation</center></h3>"
+        )
 
     chatbot = gr.Chatbot()
 
@@ -57,7 +63,9 @@ with block:
         inputs=message,
     )
 
-    gr.Markdown("This application uses GPT to search the docs for relevant info and answer questions.")
+    gr.Markdown(
+        "This application uses GPT to search the docs for relevant info and answer questions."
+    )
 
     gr.HTML("️<center> Created with ❤️ by @jerpint and @hadrienbertrand")
 
