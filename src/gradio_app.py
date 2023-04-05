@@ -1,22 +1,20 @@
-import os
 import logging
+import os
 
 import gradio as gr
 import openai
-from huggingface_hub import hf_hub_download
-
 from buster.busterbot import Buster
 from buster.retriever import Retriever
 from buster.utils import get_retriever_from_extension
+from huggingface_hub import hf_hub_download
+
 import cfg
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 # initialize buster with the config in config.py (adapt to your needs) ...
-retriever: Retriever = get_retriever_from_extension(cfg.documents_filepath)(
-    cfg.documents_filepath
-)
+retriever: Retriever = get_retriever_from_extension(cfg.documents_filepath)(cfg.documents_filepath)
 buster: Buster = Buster(cfg=cfg.buster_cfg, retriever=retriever)
 
 # auth information
@@ -68,9 +66,7 @@ block = gr.Blocks(css="#chatbot .overflow-y-auto{height:500px}")
 
 with block:
     with gr.Row():
-        gr.Markdown(
-            "<h3><center>Buster 🤖: A Question-Answering Bot for your documentation</center></h3>"
-        )
+        gr.Markdown("<h3><center>Buster 🤖: A Question-Answering Bot for your documentation</center></h3>")
 
     chatbot = gr.Chatbot()
 
@@ -90,9 +86,7 @@ with block:
         inputs=message,
     )
 
-    gr.Markdown(
-        "This application uses GPT to search the docs for relevant info and answer questions."
-    )
+    gr.Markdown("This application uses GPT to search the docs for relevant info and answer questions.")
 
     gr.HTML("️<center> Created with ❤️ by @jerpint and @hadrienbertrand")
 
