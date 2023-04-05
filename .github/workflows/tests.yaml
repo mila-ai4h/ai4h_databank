@@ -27,7 +27,7 @@ jobs:
       #     pytest
       # This is so that the heroku secrets get saved encrypted on the docker image
       - name: install Pass
-        run: apt-get install pass -y && echo '{"credsStore":"pass"}' >> ~/.docker/config.json
+        run: sudo apt-get install pass -y && echo '{"credsStore":"pass"}' >> ~/.docker/config.json
       - name: Login to Heroku Container registry
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
