@@ -29,7 +29,8 @@ jobs:
       # - name: install Pass
       #   run: sudo apt-get install pass jq moreutils -y && jq '. + {"credsStore":"pass"}' $HOME/.docker/config.json | sponge $HOME/.docker/config.json && cat $HOME/.docker/config.json
        # echo '{"credsStore" :"pass"}' >> /home/runner/.docker/config.json && cat /home/runner/.docker/config.json
-      - name: Login to Heroku Container registry
+      - name: Deploy to Heroku
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: heroku login && cat /home/runner/.docker/config.json
+        run: heroku git:remote -a ai4h-databank-dev && git push heroku $(git symbolic-ref --short HEAD):main
+        # run: heroku login && cat /home/runner/.docker/config.json
