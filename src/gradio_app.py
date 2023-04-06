@@ -19,7 +19,7 @@ buster: Buster = Buster(cfg=cfg.buster_cfg, retriever=retriever)
 
 # auth information
 USERNAME = os.getenv("AI4H_USERNAME")
-PASSWORD = os.getenv('AI4H_PASSWORD')
+PASSWORD = os.getenv("AI4H_PASSWORD")
 
 # hf hub information
 REPO_ID = "jerpint/databank-ai4h"
