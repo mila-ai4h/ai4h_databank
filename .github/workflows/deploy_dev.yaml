@@ -1,11 +1,13 @@
-name: Tests
+name: dev-ci
 
-on: [push, pull_request]
+on:
+  pull_request:
+    branches:
+      - '*'
 
 jobs:
   tests:
     runs-on: ubuntu-latest
-    environment: development
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -17,7 +19,7 @@ jobs:
         run: |
           pip install isort
           isort --profile black --check-only .
-      # TODO: Add some unit tests
+      # TODO: Add some meaningful unit tests
       # - name: unit tests
       #   env:
       #     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -25,3 +27,15 @@ jobs:
       #     python3 -m pip install --upgrade pip
       #     pip install -r requirements.txt
       #     pytest
+  deploy-dev:
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Deploy to Heroku
+        uses: akhileshns/heroku-deploy@v3.12.13 # This is the action
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: ${{secrets.HEROKU_DEV_SERVER}}
+          heroku_email: ${{secrets.HEROKU_EMAIL}}
