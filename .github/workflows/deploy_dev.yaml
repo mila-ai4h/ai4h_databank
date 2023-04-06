@@ -1,4 +1,4 @@
-name: deploy-dev
+name: dev-ci
 
 on: [push, pull_request]
 
@@ -16,7 +16,7 @@ jobs:
         run: |
           pip install isort
           isort --profile black --check-only .
-  deploy:
+  deploy-dev:
     needs: tests
     runs-on: ubuntu-latest
     steps:
