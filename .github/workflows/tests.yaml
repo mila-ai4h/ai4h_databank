@@ -32,5 +32,5 @@ jobs:
       - name: Deploy to Heroku
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: heroku git:remote -a ai4h-databank-dev && git push heroku $(git symbolic-ref --short HEAD):main
+        run: heroku login && heroku git:remote -a ai4h-databank-dev && git push heroku $(git symbolic-ref --short HEAD):main
         # run: heroku login && cat /home/runner/.docker/config.json
