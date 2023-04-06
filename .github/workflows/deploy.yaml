@@ -1,6 +1,6 @@
 # cat .github/workflows/deploy.yml
 name: deploy-dev
-on: [pull_request, push]
+on: [push, pull_request]
 
 jobs:
   tests:
