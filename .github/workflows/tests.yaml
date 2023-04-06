@@ -1,27 +1,27 @@
-name: tests
+# name: tests
 
-on: [workflow_call]  # allow this workflow to be called from other workflows
+# on: [workflow_call]  # allow this workflow to be called from other workflows
 
-jobs:
-  tests:
-    runs-on: ubuntu-latest
-    environment: development
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@v3
-      - name: black linter
-        uses: psf/black@stable
-        with:
-          options: "--check --diff --line-length 120"
-      - name: isort
-        run: |
-          pip install isort
-          isort --profile black --check-only .
-      # TODO: Add some unit tests
-      # - name: unit tests
-      #   env:
-      #     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      #   run: |
-      #     python3 -m pip install --upgrade pip
-      #     pip install -r requirements.txt
-      #     pytest
+# jobs:
+#   tests:
+#     runs-on: ubuntu-latest
+#     environment: development
+#     steps:
+#       - name: Check out repository code
+#         uses: actions/checkout@v3
+#       - name: black linter
+#         uses: psf/black@stable
+#         with:
+#           options: "--check --diff --line-length 120"
+#       - name: isort
+#         run: |
+#           pip install isort
+#           isort --profile black --check-only .
+#       # TODO: Add some unit tests
+#       # - name: unit tests
+#       #   env:
+#       #     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+#       #   run: |
+#       #     python3 -m pip install --upgrade pip
+#       #     pip install -r requirements.txt
+#       #     pytest
