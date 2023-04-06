@@ -5,11 +5,11 @@ on: [pull_request, push]
 jobs:
   tests:
     uses: ./.github/workflows/tests.yml  # use the callable tests job to run tests
-  deploy:
-    name: deploy-dev-env
-    needs: [tests]  # require tests to pass before deploy runs
-    uses: akhileshns/heroku-deploy@v3.12.13 # This is the action
-    with:
-      heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-      heroku_app_name: ${{secrets.HEROKU_DEV_SERVER}}
-      heroku_email: ${{secrets.HEROKU_EMAIL}}
+  # deploy:
+  #   name: deploy-dev-env
+  #   needs: [tests]  # require tests to pass before deploy runs
+  #   uses: akhileshns/heroku-deploy@v3.12.13 # This is the action
+  #   with:
+  #     heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+  #     heroku_app_name: ${{secrets.HEROKU_DEV_SERVER}}
+  #     heroku_email: ${{secrets.HEROKU_EMAIL}}
