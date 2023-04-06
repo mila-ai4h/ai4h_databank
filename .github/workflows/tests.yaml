@@ -17,6 +17,12 @@ jobs:
         run: |
           pip install isort
           isort --profile black --check-only .
+      - name: Deploy to Heroku
+        uses: akhileshns/heroku-deploy@v3.12.13 # This is the action
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: ${{secrets.HEROKU_DEV_SERVER}}
+          heroku_email: ${{secrets.HEROKU_EMAIL}}
       # TODO: Add some unit tests
       # - name: unit tests
       #   env:
@@ -29,12 +35,6 @@ jobs:
       # - name: install Pass
       #   run: sudo apt-get install pass jq moreutils -y && jq '. + {"credsStore":"pass"}' $HOME/.docker/config.json | sponge $HOME/.docker/config.json && cat $HOME/.docker/config.json
        # echo '{"credsStore" :"pass"}' >> /home/runner/.docker/config.json && cat /home/runner/.docker/config.json
-      - name: Deploy to Heroku
-      - uses: akhileshns/heroku-deploy@v3.12.13 # This is the action
-        with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: ${{secrets.HEROKU_DEV_SERVER}}
-          heroku_email: ${{secrets.HEROKU_EMAIL}}
       # - name: Deploy to Heroku
       #   env:
       #     HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
