@@ -86,3 +86,5 @@ buster_cfg = BusterConfig(
 )
 
 document_sources = ["LimeSurvey"]
+
+available_models = ["gpt-3.5-turbo", "gpt-4"]
