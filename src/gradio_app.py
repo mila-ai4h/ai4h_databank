@@ -1,100 +1,100 @@
 import logging
-import os
 
 import gradio as gr
-import openai
+import pandas as pd
 from buster.busterbot import Buster
-from buster.retriever import Retriever
-from buster.utils import get_retriever_from_extension
-from huggingface_hub import hf_hub_download
 
 import cfg
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-# initialize buster with the config in config.py (adapt to your needs) ...
-retriever: Retriever = get_retriever_from_extension(cfg.documents_filepath)(cfg.documents_filepath)
-buster: Buster = Buster(cfg=cfg.buster_cfg, retriever=retriever)
-
-# auth information
-USERNAME = os.getenv("AI4H_USERNAME")
-PASSWORD = os.getenv("AI4H_PASSWORD")
-
-# hf hub information
-REPO_ID = "jerpint/databank-ai4h"
-DB_FILE = "documents.db"
-HUB_TOKEN = os.environ.get("HUB_TOKEN")
-
-# set openAI creds
-openai.api_key = os.getenv("OPENAI_API_KEY")
-openai.organization = os.getenv("OPENAI_ORGANIZATION")
-
-
-# download the documents.db hosted on the dataset space
-logger.info(f"Downloading {DB_FILE} from hub...")
-hf_hub_download(
-    repo_id=REPO_ID,
-    repo_type="dataset",
-    filename=DB_FILE,
-    token=HUB_TOKEN,
-    local_dir=".",
-)
-logger.info(f"Downloaded.")
+buster: Buster = Buster(cfg=cfg.buster_cfg, retriever=cfg.retriever)
 
 
 def check_auth(username, password):
     """Basic auth, only supports a single user."""
     # TODO: update to better auth
-    is_auth = username == USERNAME and password == PASSWORD
+    is_auth = username == cfg.USERNAME and password == cfg.PASSWORD
     logger.info(f"Log-in attempted. {is_auth=}")
     return is_auth
 
 
-def chat(question, history):
+def format_sources(matched_documents: pd.DataFrame):
+    formatted_sources = ""
+
+    docs = matched_documents.content.to_list()
+    for idx, doc in enumerate(docs):
+        formatted_sources += f"### Source {idx + 1} 📝\n" + doc + "\n"
+
+    return formatted_sources
+
+
+def chat(question, history, document_source):
     history = history or []
-    answer = buster.process_input(question)
 
-    # formatting hack for code blocks to render properly every time
-    answer = answer.replace("```", "\n```\n")
+    cfg.buster_cfg.document_source = document_source
+    buster.update_cfg(cfg.buster_cfg)
 
+    response = buster.process_input(question)
+
+    answer = response.completion.text
     history.append((question, answer))
-    return history, history
+
+    sources = format_sources(response.matched_documents)
+
+    return history, history, sources
 
 
 block = gr.Blocks(css="#chatbot .overflow-y-auto{height:500px}")
 
 with block:
     with gr.Row():
-        gr.Markdown("<h3><center>Buster 🤖: A Question-Answering Bot for your documentation</center></h3>")
-
-    chatbot = gr.Chatbot()
+        gr.Markdown("<h1><center>LLawMa 🦙: A Question-Answering Bot for your documentation</center></h1>")
 
     with gr.Row():
-        message = gr.Textbox(
-            label="What's your question?",
-            placeholder="Ask a question to AI stackoverflow here...",
-            lines=1,
-        )
-        submit = gr.Button(value="Send", variant="secondary").style(full_width=False)
+        with gr.Column(scale=2):
+            gr.Markdown("#### Chatbot")
+            chatbot = gr.Chatbot()
+            message = gr.Textbox(
+                label="Chat with 🦙",
+                placeholder="Ask your question here...",
+                lines=1,
+            )
+            submit = gr.Button(value="Send", variant="secondary").style(full_width=False)
 
-    examples = gr.Examples(
-        examples=[
-            "How can I perform backpropagation?",
-            "How do I deal with noisy data?",
-        ],
-        inputs=message,
-    )
+            examples = gr.Examples(
+                examples=[
+                    "What's the state of AI in North America?",
+                ],
+                inputs=message,
+            )
+
+        with gr.Row():
+            with gr.Column(scale=1):
+                gr.Markdown("#### Sources")
+                case_names = sorted(cfg.document_sources)
+                source_dropdown = gr.Dropdown(
+                    choices=case_names,
+                    value=case_names[0],
+                    interactive=True,
+                    multiselect=False,
+                    label="Source",
+                    info="Select a source to query",
+                )
+            with gr.Column(scale=1, variant="panel"):
+                gr.Markdown("## References used")
+                sources_textbox = gr.Markdown()
 
     gr.Markdown("This application uses GPT to search the docs for relevant info and answer questions.")
 
-    gr.HTML("️<center> Created with ❤️ by @jerpint and @hadrienbertrand")
+    gr.HTML("️<center> Powered by Buster 🤖")
 
     state = gr.State()
     agent_state = gr.State()
 
-    submit.click(chat, inputs=[message, state], outputs=[chatbot, state])
-    message.submit(chat, inputs=[message, state], outputs=[chatbot, state])
+    submit.click(chat, inputs=[message, state, source_dropdown], outputs=[chatbot, state, sources_textbox])
+    message.submit(chat, inputs=[message, state, source_dropdown], outputs=[chatbot, state, sources_textbox])
 
 
 block.launch(debug=True, share=False, auth=check_auth)
