@@ -31,6 +31,7 @@ hf_hub_download(
     filename=DB_FILE,
     token=HUB_TOKEN,
     local_dir=".",
+    local_dir_use_symlinks=False,
 )
 logger.info("Downloaded.")
 
