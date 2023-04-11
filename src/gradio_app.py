@@ -30,10 +30,11 @@ def format_sources(matched_documents: pd.DataFrame):
     return formatted_sources
 
 
-def chat(question, history, document_source):
+def chat(question, history, document_source, model):
     history = history or []
 
     cfg.buster_cfg.document_source = document_source
+    cfg.buster_cfg.completion_cfg["completion_kwargs"]["model"] = model
     buster.update_cfg(cfg.buster_cfg)
 
     response = buster.process_input(question)
@@ -72,6 +73,9 @@ with block:
 
         with gr.Row():
             with gr.Column(scale=1):
+                gr.Markdown("#### Model")
+                model = gr.Radio(cfg.available_models, label="Model to use", value=cfg.available_models[0])
+            with gr.Column(scale=1):
                 gr.Markdown("#### Sources")
                 case_names = sorted(cfg.document_sources)
                 source_dropdown = gr.Dropdown(
@@ -93,8 +97,8 @@ with block:
     state = gr.State()
     agent_state = gr.State()
 
-    submit.click(chat, inputs=[message, state, source_dropdown], outputs=[chatbot, state, sources_textbox])
-    message.submit(chat, inputs=[message, state, source_dropdown], outputs=[chatbot, state, sources_textbox])
+    submit.click(chat, inputs=[message, state, source_dropdown, model], outputs=[chatbot, state, sources_textbox])
+    message.submit(chat, inputs=[message, state, source_dropdown, model], outputs=[chatbot, state, sources_textbox])
 
 
 block.launch(debug=True, share=False, auth=check_auth)
