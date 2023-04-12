@@ -1,9 +1,9 @@
-name: dev-ci
+name: prod-ci
 
 on:
-  pull_request:
+  push:
     branches:
-      - '*'
+      - 'main'
 
 jobs:
   tests:
@@ -27,7 +27,7 @@ jobs:
       #     python3 -m pip install --upgrade pip
       #     pip install -r requirements.txt
       #     pytest
-  deploy-dev:
+  deploy-prod:
     needs: tests
     runs-on: ubuntu-latest
     steps:
@@ -37,5 +37,5 @@ jobs:
         uses: akhileshns/heroku-deploy@v3.12.13 # This is the action
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: ${{ vars.HEROKU_DEV_SERVER }}
+          heroku_app_name: ${{ vars.HEROKU_PROD_SERVER }}
           heroku_email: ${{ vars.HEROKU_EMAIL }}
