@@ -15,7 +15,7 @@ buster: Buster = Buster(cfg=cfg.buster_cfg, retriever=cfg.retriever)
 MAX_TABS = cfg.buster_cfg.retriever_cfg["top_k"]
 
 
-def check_auth(username, password):
+def check_auth(username: str, password: str) -> bool:
     """Basic auth, only supports a single user."""
     # TODO: update to better auth
     is_auth = username == cfg.USERNAME and password == cfg.PASSWORD
@@ -23,13 +23,19 @@ def check_auth(username, password):
     return is_auth
 
 
-def format_sources(matched_documents: pd.DataFrame):
+def format_sources(matched_documents: pd.DataFrame) -> list[str]:
     formatted_sources = []
 
     for _, doc in matched_documents.iterrows():
         formatted_sources.append(f"### [{doc.title}]({doc.url})\n{doc.content}\n")
 
     return formatted_sources
+
+
+def pad_sources(sources: list[str]) -> list[str]:
+    """Pad sources with empty strings to ensure that the number of tabs is always MAX_TABS."""
+    k = len(sources)
+    return sources + [""] * (MAX_TABS - k)
 
 
 def chat(question, history, document_source, model):
@@ -45,9 +51,7 @@ def chat(question, history, document_source, model):
     history.append((question, answer))
 
     sources = format_sources(response.matched_documents)
-
-    k = len(sources)
-    sources = sources + [""] * (MAX_TABS - k)
+    sources = pad_sources(sources)
 
     return history, history, *sources
 
