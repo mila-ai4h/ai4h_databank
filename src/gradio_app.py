@@ -14,6 +14,7 @@ buster: Buster = Buster(cfg=cfg.buster_cfg, retriever=cfg.retriever)
 
 MAX_TABS = 3
 
+
 def check_auth(username, password):
     """Basic auth, only supports a single user."""
     # TODO: update to better auth
@@ -47,7 +48,7 @@ def chat(question, history, document_source, model):
     sources = format_sources(response.matched_documents)
 
     k = len(sources)
-    sources = sources + [""]*(MAX_TABS-k)
+    sources = sources + [""] * (MAX_TABS - k)
 
     return history, history, *sources
 
