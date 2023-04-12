@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 buster: Buster = Buster(cfg=cfg.buster_cfg, retriever=cfg.retriever)
 
 
-MAX_TABS = 3
+MAX_TABS = cfg.buster_cfg.retriever_cfg["top_k"]
 
 
 def check_auth(username, password):
@@ -26,8 +26,7 @@ def check_auth(username, password):
 def format_sources(matched_documents: pd.DataFrame):
     formatted_sources = []
 
-    for i in range(len(matched_documents)):
-        doc = matched_documents.iloc[i]
+    for _, doc in matched_documents.iterrows():
         formatted_sources.append(f"### [{doc.title}]({doc.url})\n{doc.content}\n")
 
     return formatted_sources
