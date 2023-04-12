@@ -12,6 +12,8 @@ logging.basicConfig(level=logging.INFO)
 buster: Buster = Buster(cfg=cfg.buster_cfg, retriever=cfg.retriever)
 
 
+MAX_TABS = 3
+
 def check_auth(username, password):
     """Basic auth, only supports a single user."""
     # TODO: update to better auth
@@ -21,11 +23,11 @@ def check_auth(username, password):
 
 
 def format_sources(matched_documents: pd.DataFrame):
-    formatted_sources = ""
+    formatted_sources = []
 
-    docs = matched_documents.content.to_list()
-    for idx, doc in enumerate(docs):
-        formatted_sources += f"### Source {idx + 1} 📝\n" + doc + "\n"
+    for i in range(len(matched_documents)):
+        doc = matched_documents.iloc[i]
+        formatted_sources.append(f"### [{doc.title}]({doc.url})\n{doc.content}\n")
 
     return formatted_sources
 
@@ -44,7 +46,10 @@ def chat(question, history, document_source, model):
 
     sources = format_sources(response.matched_documents)
 
-    return history, history, sources
+    k = len(sources)
+    sources = sources + [""]*(MAX_TABS-k)
+
+    return history, history, *sources
 
 
 block = gr.Blocks(css="#chatbot .overflow-y-auto{height:500px}")
@@ -91,7 +96,11 @@ with block:
                 )
             with gr.Column(scale=1, variant="panel"):
                 gr.Markdown("## References used")
-                sources_textbox = gr.Markdown()
+                sources_textboxes = []
+                for i in range(MAX_TABS):
+                    with gr.Tab(f"Source {i + 1} 📝"):
+                        t = gr.Markdown()
+                    sources_textboxes.append(t)
 
     gr.Markdown("This application uses GPT to search the docs for relevant info and answer questions.")
 
@@ -100,8 +109,8 @@ with block:
     state = gr.State()
     agent_state = gr.State()
 
-    submit.click(chat, inputs=[message, state, source_dropdown, model], outputs=[chatbot, state, sources_textbox])
-    message.submit(chat, inputs=[message, state, source_dropdown, model], outputs=[chatbot, state, sources_textbox])
+    submit.click(chat, inputs=[message, state, source_dropdown, model], outputs=[chatbot, state, *sources_textboxes])
+    message.submit(chat, inputs=[message, state, source_dropdown, model], outputs=[chatbot, state, *sources_textboxes])
 
 
 block.launch(debug=True, share=False, auth=check_auth)
