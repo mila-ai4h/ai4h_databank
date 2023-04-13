@@ -99,10 +99,7 @@ def submit_feedback(feedback_radio: str, feedback_info: str, user_responses: lis
 
     logger.info(feedback_json)
     try:
-        # mongo_db["feedback"].insert_one(feedback_json)
         mongo_db["feedback"].replace_one({"_id": session_id}, feedback_json, upsert=True)
-        # collection.replace_one({'Student': student, 'Date': date}, record, upsert=True)
-
         logger.info("response logged to mondogb")
     except Exception as err:
         logger.exception("Something went wrong logging to mongodb")
