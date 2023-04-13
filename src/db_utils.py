@@ -31,6 +31,8 @@ def init_db():
 
 @dataclass
 class Feedback:
-    response: Response
-    feedback: str
-    feedback_extra: str
+    good_bad: str
+    extra_info: str
+    relevant_answer: str
+    relevant_length: str
+    relevant_sources: str

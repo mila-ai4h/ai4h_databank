@@ -9,7 +9,7 @@ from buster.busterbot import Buster
 from fastapi.encoders import jsonable_encoder
 
 import cfg
-from db_utils import init_db
+from db_utils import Feedback, init_db
 
 mongo_db = init_db()
 
@@ -86,20 +86,35 @@ def user_responses_formatted(user_responses):
     return responses_copy
 
 
-def submit_feedback(feedback_radio: str, feedback_info: str, user_responses: list, session_id: int):
+def submit_feedback(
+    user_responses,
+    session_id,
+    feedback_good_bad,
+    feedback_relevant_length,
+    feedback_relevant_answer,
+    feedback_relevant_sources,
+    feedback_info,
+):
     dict_responses = user_responses_formatted(user_responses)
+    user_feedback = Feedback(
+        good_bad=feedback_good_bad,
+        extra_info=feedback_info,
+        relevant_answer=feedback_relevant_answer,
+        relevant_length=feedback_relevant_length,
+        relevant_sources=feedback_relevant_sources,
+    )
     feedback = {
-        "_id": session_id,
+        "session_id": session_id,
         "user_responses": dict_responses,
-        "feedback": feedback_radio,
-        "feedback_extra": feedback_info,
+        "feedback": user_feedback,
         "time": get_utc_time(),
     }
     feedback_json = jsonable_encoder(feedback)
 
     logger.info(feedback_json)
     try:
-        mongo_db["feedback"].replace_one({"_id": session_id}, feedback_json, upsert=True)
+        # mongo_db["feedback"].replace_one({"_id": session_id}, feedback_json, upsert=True)
+        mongo_db["feedback"].insert_one(feedback_json)
         logger.info("response logged to mondogb")
     except Exception as err:
         logger.exception("Something went wrong logging to mongodb")
@@ -139,7 +154,7 @@ with block:
             gr.Markdown("#### Feedback form\nHelp us improve Buster!")
             with gr.Row():
                 with gr.Row():
-                    feedback_radio = gr.Radio(choices=["👍", "👎"], label="How did buster do?")
+                    feedback_good_bad = gr.Radio(choices=["👍", "👎"], label="How did buster do?")
                     feedback_relevant_length = gr.Radio(
                         choices=["Too Long", "Just Right", "Too Short"], label="How was the answer length?"
                     )
@@ -161,13 +176,23 @@ with block:
                         placeholder="Enter more helpful information for us here...",
                     )
 
+                    # feedback_elems = [feedback_good_bad, feedback_relevant_length, feedback_relevant_answer, feedback_relevant_sources, feedback_info]
+
             submit_feedback_btn = gr.Button("Submit Feedback!")
             with gr.Column(visible=False) as feedback_submitted_message:
                 gr.Markdown("Feedback recorded, thank you! 📝")
 
             submit_feedback_btn.click(
                 submit_feedback,
-                inputs=[feedback_radio, feedback_info, user_responses, session_id],
+                inputs=[
+                    user_responses,
+                    session_id,
+                    feedback_good_bad,
+                    feedback_relevant_length,
+                    feedback_relevant_answer,
+                    feedback_relevant_sources,
+                    feedback_info,
+                ],
                 outputs=feedback_submitted_message,
             )
 
