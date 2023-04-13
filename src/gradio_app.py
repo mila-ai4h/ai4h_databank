@@ -113,7 +113,6 @@ def submit_feedback(
 
     logger.info(feedback_json)
     try:
-        # mongo_db["feedback"].replace_one({"_id": session_id}, feedback_json, upsert=True)
         mongo_db["feedback"].insert_one(feedback_json)
         logger.info("response logged to mondogb")
     except Exception as err:
@@ -175,8 +174,6 @@ with block:
                         lines=10,
                         placeholder="Enter more helpful information for us here...",
                     )
-
-                    # feedback_elems = [feedback_good_bad, feedback_relevant_length, feedback_relevant_answer, feedback_relevant_sources, feedback_info]
 
             submit_feedback_btn = gr.Button("Submit Feedback!")
             with gr.Column(visible=False) as feedback_submitted_message:
@@ -241,5 +238,4 @@ with block:
     )
 
 
-# block.launch(debug=True, share=False, auth=check_auth)
-block.launch(debug=True, share=False)  # , auth=check_auth)
+block.launch(debug=True, share=False, auth=check_auth)
