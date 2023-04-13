@@ -140,21 +140,36 @@ with block:
             with gr.Row():
                 with gr.Row():
                     feedback_radio = gr.Radio(choices=["👍", "👎"], label="How did buster do?")
+                    feedback_relevant_length = gr.Radio(
+                        choices=["Too Long", "Just Right", "Too Short"], label="How was the answer length?"
+                    )
+                    feedback_relevant_answer = gr.Slider(
+                        minimum=1, maximum=5, label="How relevant was the answer?", interactive=True, value="-", step=1
+                    )
+                    feedback_relevant_sources = gr.Slider(
+                        minimum=1,
+                        maximum=5,
+                        label="How relevant were the sources?",
+                        interactive=True,
+                        value="-",
+                        step=1,
+                    )
                 with gr.Row():
-                    feedback_info = gr.Textbox(label="Enter additional information")
-                with gr.Row():
-                    # feedback_info = gr.Textbox(label="Enter additional information")
+                    feedback_info = gr.Textbox(
+                        label="Enter additional information (optional)",
+                        lines=10,
+                        placeholder="Enter more helpful information for us here...",
+                    )
 
-                    submit_feedback_btn = gr.Button("Submit Feedback!")
-                    # feedback_bad = gr.Button("👎")
-                    with gr.Column(visible=False) as feedback_submitted_message:
-                        gr.Markdown("Feedback recorded, thank you! 📝")
+            submit_feedback_btn = gr.Button("Submit Feedback!")
+            with gr.Column(visible=False) as feedback_submitted_message:
+                gr.Markdown("Feedback recorded, thank you! 📝")
 
-                submit_feedback_btn.click(
-                    submit_feedback,
-                    inputs=[feedback_radio, feedback_info, user_responses, session_id],
-                    outputs=feedback_submitted_message,
-                )
+            submit_feedback_btn.click(
+                submit_feedback,
+                inputs=[feedback_radio, feedback_info, user_responses, session_id],
+                outputs=feedback_submitted_message,
+            )
 
         with gr.Row():
             with gr.Column(scale=1):
@@ -201,4 +216,5 @@ with block:
     )
 
 
-block.launch(debug=True, share=False, auth=check_auth)
+# block.launch(debug=True, share=False, auth=check_auth)
+block.launch(debug=True, share=False)  # , auth=check_auth)
