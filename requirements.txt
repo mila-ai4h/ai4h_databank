@@ -1,4 +1,4 @@
-git+https://github.com/jerpint/buster@v1.0.2
+git+https://github.com/jerpint/buster@v1.0.3
 gradio
 huggingface-hub
 pymongo
