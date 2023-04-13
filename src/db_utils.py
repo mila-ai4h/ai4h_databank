@@ -1,12 +1,11 @@
 # Setup mongoDB
-from dataclasses import dataclass
-import os
 import logging
-
-from pymongo import MongoClient
-from fastapi.encoders import jsonable_encoder
+import os
+from dataclasses import dataclass
 
 from buster.busterbot import Response
+from fastapi.encoders import jsonable_encoder
+from pymongo import MongoClient
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
