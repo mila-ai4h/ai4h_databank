@@ -1,4 +1,5 @@
 import copy
+import json
 import logging
 import uuid
 from datetime import datetime, timezone
@@ -72,8 +73,7 @@ def chat(question, history, document_source, model, user_responses):
 
 
 def user_responses_formatted(user_responses):
-    import json
-
+    """Format user responses so that the matched_documents are in easily jsonable dict format."""
     responses_copy = copy.deepcopy(user_responses)
     for response in responses_copy:
         # go to json and back to dict so that all int entries are now strings in a dict...
