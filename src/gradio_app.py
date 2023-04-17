@@ -93,6 +93,7 @@ def submit_feedback(
     feedback_relevant_length,
     feedback_relevant_answer,
     feedback_relevant_sources,
+    feedback_length_sources,
     feedback_info,
 ):
     dict_responses = user_responses_formatted(user_responses)
@@ -102,6 +103,7 @@ def submit_feedback(
         relevant_answer=feedback_relevant_answer,
         relevant_length=feedback_relevant_length,
         relevant_sources=feedback_relevant_sources,
+        length_sources=feedback_length_sources,
     )
     feedback = {
         "session_id": session_id,
@@ -135,7 +137,7 @@ with block:
 
     with gr.Row():
         with gr.Column(scale=2):
-            gr.Markdown("#### Chatbot")
+            gr.Markdown("## Chatbot")
             chatbot = gr.Chatbot()
             message = gr.Textbox(
                 label="Chat with 🦙",
@@ -150,34 +152,51 @@ with block:
                 ],
                 inputs=message,
             )
-            gr.Markdown("#### Feedback form\nHelp us improve Buster!")
-            with gr.Row():
+
+            # Feedback
+            with gr.Column(variant="panel"):
+                gr.Markdown("## Feedback form\nHelp us improve LLawMa 🦙!")
                 with gr.Row():
                     feedback_good_bad = gr.Radio(choices=["👍", "👎"], label="How did buster do?")
+
+                with gr.Row():
+                    feedback_relevant_answer = gr.Radio(
+                        choices=[
+                            "1 - I lost time because the answer was wrong.",
+                            "2 - I lost time because the answer was unclear.",
+                            "3 - No time was saved or lost (over searching by other means).",
+                            "4 - I saved time because the answer was clear and correct.",
+                            "5 - The answer was perfect and can be used as a reference.",
+                        ],
+                        label="How much time did you save?",
+                    )
                     feedback_relevant_length = gr.Radio(
                         choices=["Too Long", "Just Right", "Too Short"], label="How was the answer length?"
                     )
-                    feedback_relevant_answer = gr.Slider(
-                        minimum=1, maximum=5, label="How relevant was the answer?", interactive=True, value="-", step=1
-                    )
-                    feedback_relevant_sources = gr.Slider(
-                        minimum=1,
-                        maximum=5,
-                        label="How relevant were the sources?",
-                        interactive=True,
-                        value="-",
-                        step=1,
-                    )
+
                 with gr.Row():
-                    feedback_info = gr.Textbox(
-                        label="Enter additional information (optional)",
-                        lines=10,
-                        placeholder="Enter more helpful information for us here...",
+                    feedback_relevant_sources = gr.Radio(
+                        choices=[
+                            "1 - The sources were irrelevant.",
+                            "2 - The sources were relevant but others could have been better.",
+                            "3 - The sources were relevant and the best ones available.",
+                        ],
+                        label="How relevant were the sources?",
                     )
 
-            submit_feedback_btn = gr.Button("Submit Feedback!")
-            with gr.Column(visible=False) as feedback_submitted_message:
-                gr.Markdown("Feedback recorded, thank you! 📝")
+                    feedback_length_sources = gr.Radio(
+                        choices=["Too few", "Just right", "Too many"], label="How was the amount of sources?"
+                    )
+
+                feedback_info = gr.Textbox(
+                    label="Enter additional information (optional)",
+                    lines=10,
+                    placeholder="Enter more helpful information for us here...",
+                )
+
+                submit_feedback_btn = gr.Button("Submit Feedback!")
+                with gr.Column(visible=False) as feedback_submitted_message:
+                    gr.Markdown("Feedback recorded, thank you! 📝")
 
             submit_feedback_btn.click(
                 submit_feedback,
@@ -188,6 +207,7 @@ with block:
                     feedback_relevant_length,
                     feedback_relevant_answer,
                     feedback_relevant_sources,
+                    feedback_length_sources,
                     feedback_info,
                 ],
                 outputs=feedback_submitted_message,
@@ -195,13 +215,13 @@ with block:
 
         with gr.Row():
             with gr.Column(scale=1):
-                gr.Markdown("#### Model")
+                gr.Markdown("## Model")
                 # TODO: remove interactive=False flag when deployed model gets access to GPT4
                 model = gr.Radio(
                     cfg.available_models, label="Model to use", value=cfg.available_models[0], interactive=False
                 )
             with gr.Column(scale=1):
-                gr.Markdown("#### Sources")
+                gr.Markdown("## Sources")
                 case_names = sorted(cfg.document_sources)
                 source_dropdown = gr.Dropdown(
                     choices=case_names,
@@ -221,7 +241,7 @@ with block:
 
     gr.Markdown("This application uses GPT to search the docs for relevant info and answer questions.")
 
-    gr.HTML("️<center> Powered by Buster 🤖")
+    gr.HTML("️<center> Powered by <a href='https://github.com/jerpint/buster'>Buster</a> 🤖</center>")
 
     state = gr.State()
     agent_state = gr.State()
