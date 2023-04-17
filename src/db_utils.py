@@ -36,3 +36,4 @@ class Feedback:
     relevant_answer: str
     relevant_length: str
     relevant_sources: str
+    length_sources: str
