@@ -19,6 +19,9 @@ logging.basicConfig(level=logging.INFO)
 
 
 MAX_TABS = cfg.buster_cfg.retriever_cfg["top_k"]
+RELEVANT_QUESTIONS = pd.read_csv("Questions dataset - Relevant.csv", header=None)[0].to_list()
+IRRELEVANT_QUESTIONS = pd.read_csv("Questions dataset - Irrelevant.csv", header=None)[0].to_list()
+TRICK_QUESTIONS = pd.read_csv("Questions dataset - Trick.csv", header=None)[0].to_list()
 
 
 def get_utc_time() -> str:
@@ -146,12 +149,26 @@ with block:
             )
             submit = gr.Button(value="Send", variant="secondary").style(full_width=False)
 
-            examples = gr.Examples(
-                examples=[
-                    "What's the state of AI in North America?",
-                ],
-                inputs=message,
-            )
+            with gr.Column(variant="panel"):
+                gr.Markdown("## Example questions")
+                with gr.Tab("Relevant questions"):
+                    gr.Examples(
+                        examples=RELEVANT_QUESTIONS,
+                        inputs=message,
+                        label="Questions users could ask.",
+                    )
+                with gr.Tab("Irrelevant questions"):
+                    gr.Examples(
+                        examples=IRRELEVANT_QUESTIONS,
+                        inputs=message,
+                        label="Questions with no relevance to the OECD AI Policy Observatory.",
+                    )
+                with gr.Tab("Trick questions"):
+                    gr.Examples(
+                        examples=TRICK_QUESTIONS,
+                        inputs=message,
+                        label="Questions about non-existing AI policies and laws.",
+                    )
 
             # Feedback
             with gr.Column(variant="panel"):
@@ -241,7 +258,7 @@ with block:
 
     gr.Markdown("This application uses GPT to search the docs for relevant info and answer questions.")
 
-    gr.HTML("️<center> Powered by <a href='https://github.com/jerpint/buster'>Buster</a> 🤖</center>")
+    gr.HTML("<center> Powered by <a href='https://github.com/jerpint/buster'>Buster</a> 🤖</center>")
 
     state = gr.State()
     agent_state = gr.State()
