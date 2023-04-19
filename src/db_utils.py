@@ -37,3 +37,4 @@ class Feedback:
     relevant_length: str
     relevant_sources: str
     length_sources: str
+    timeliness_sources: str

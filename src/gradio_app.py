@@ -97,6 +97,7 @@ def submit_feedback(
     feedback_relevant_answer,
     feedback_relevant_sources,
     feedback_length_sources,
+    feedback_timeliness_sources,
     feedback_info,
 ):
     dict_responses = user_responses_formatted(user_responses)
@@ -107,6 +108,7 @@ def submit_feedback(
         relevant_length=feedback_relevant_length,
         relevant_sources=feedback_relevant_sources,
         length_sources=feedback_length_sources,
+        timeliness_sources=feedback_timeliness_sources,
     )
     feedback = {
         "session_id": session_id,
@@ -201,9 +203,14 @@ with block:
                         label="How relevant were the sources?",
                     )
 
-                    feedback_length_sources = gr.Radio(
-                        choices=["Too few", "Just right", "Too many"], label="How was the amount of sources?"
-                    )
+                    with gr.Column():
+                        feedback_length_sources = gr.Radio(
+                            choices=["Too few", "Just right", "Too many"], label="How was the amount of sources?"
+                        )
+
+                        feedback_timeliness_sources = gr.Radio(
+                            choices=["Obsolete", "Old", "Recent"], label="How timely were the sources?"
+                        )
 
                 feedback_info = gr.Textbox(
                     label="Enter additional information (optional)",
@@ -225,6 +232,7 @@ with block:
                     feedback_relevant_answer,
                     feedback_relevant_sources,
                     feedback_length_sources,
+                    feedback_timeliness_sources,
                     feedback_info,
                 ],
                 outputs=feedback_submitted_message,
