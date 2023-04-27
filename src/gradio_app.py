@@ -70,6 +70,10 @@ def chat(question, history, document_source, model, user_responses):
     sources = format_sources(response.matched_documents)
     sources = pad_sources(sources)
 
+    logger.info(f"{response=}")
+    logger.info(f"{answer=}")
+    logger.info(f"{sources=}")
+
     user_responses.append(response)
 
     return history, history, user_responses, *sources
