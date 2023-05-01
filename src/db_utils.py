@@ -2,6 +2,7 @@
 import logging
 import os
 from dataclasses import dataclass
+from urllib.parse import quote_plus
 
 from buster.busterbot import Response
 from fastapi.encoders import jsonable_encoder
@@ -10,23 +11,34 @@ from pymongo import MongoClient
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-MONGODB_PASSWORD = os.getenv("MONGODB_AI4H_PASSWORD")
-MONGODB_USERNAME = os.getenv("MONGODB_AI4H_USERNAME")
-MONGODB_DB_NAME = os.getenv("MONGODB_AI4H_DB_NAME")
-ATLAS_URI = f"mongodb+srv://{MONGODB_USERNAME}:{MONGODB_PASSWORD}@{MONGODB_DB_NAME}.m0zt2w2.mongodb.net/?retryWrites=true&w=majority"
-
 
 def init_db():
-    if all(v is not None for v in [MONGODB_PASSWORD, MONGODB_USERNAME, MONGODB_DB_NAME]):
-        mongodb_client = MongoClient(ATLAS_URI)
-        database = mongodb_client[MONGODB_DB_NAME]
-        logger.info("Connected to the MongoDB database!")
+    """Initialize mongodb database."""
 
-    else:
-        database = None
-        logger.warning("Didn't connect to MongoDB database, check auth.")
+    username = os.getenv("AI4H_MONGODB_USERNAME")
+    password = os.getenv("AI4H_MONGODB_PASSWORD")
+    cluster = os.getenv("AI4H_MONGODB_CLUSTER")
+    db_name = os.getenv("AI4H_MONGODB_DB_NAME")
 
-    return database
+    if all(v is not None for v in [username, password, cluster]):
+        try:
+            uri = (
+                "mongodb+srv://"
+                + quote_plus(username)
+                + ":"
+                + quote_plus(password)
+                + "@"
+                + cluster
+                + "/?retryWrites=true&w=majority"
+            )
+            mongodb_client = MongoClient(uri)
+            database = mongodb_client[db_name]
+            logger.info("Succesfully connected to the MongoDB database")
+            return database
+        except Exception as e:
+            logger.exception("Something went wrong connecting to mongodb")
+
+    logger.warning("Didn't connect to MongoDB database, check auth.")
 
 
 @dataclass
