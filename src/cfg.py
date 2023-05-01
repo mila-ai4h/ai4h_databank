@@ -46,6 +46,7 @@ buster_cfg = BusterConfig(
     retriever_cfg={
         "top_k": 3,
         "thresh": 0.7,
+        "max_tokens": 3000,
     },
     completion_cfg={
         "name": "ChatGPT",
@@ -55,7 +56,7 @@ buster_cfg = BusterConfig(
         },
     },
     prompt_cfg={
-        "max_words": 3000,
+        "max_tokens": 3500,
         "text_before_documents": (
             "You are a chatbot assistant answering questions about artificial intelligence (AI) policies and laws. "
             "You represent the OECD AI Policy Observatory. "
