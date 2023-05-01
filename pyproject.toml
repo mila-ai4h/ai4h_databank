@@ -30,3 +30,6 @@ log_cli_level = "INFO"
 addopts = [
     "--import-mode=importlib",
 ]
+
+[tool.hatch.metadata]
+allow-direct-references = true
