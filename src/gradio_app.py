@@ -287,4 +287,4 @@ with block:
     )
 
 
-block.launch(debug=True, share=False, auth=check_auth)
+block.launch(share=False, auth=check_auth)
