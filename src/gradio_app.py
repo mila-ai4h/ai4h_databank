@@ -136,7 +136,6 @@ def submit_feedback(
     return {feedback_submitted_message: gr.update(visible=True)}
 
 
-
 # hf hub information
 REPO_ID = "jerpint/databank-ai4h"
 DB_FILE = "documents_oecd.db"
