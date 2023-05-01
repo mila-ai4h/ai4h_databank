@@ -1,13 +1,17 @@
 import copy
 import json
 import logging
+import os
 import uuid
 from datetime import datetime, timezone
 
 import gradio as gr
 import pandas as pd
 from buster.busterbot import Buster
+from buster.retriever import Retriever
+from buster.utils import get_retriever_from_extension
 from fastapi.encoders import jsonable_encoder
+from huggingface_hub import hf_hub_download
 
 import cfg
 from db_utils import Feedback, init_db
@@ -131,6 +135,26 @@ def submit_feedback(
     # update visibility for extra form
     return {feedback_submitted_message: gr.update(visible=True)}
 
+
+
+# hf hub information
+REPO_ID = "jerpint/databank-ai4h"
+DB_FILE = "documents_oecd.db"
+HUB_TOKEN = os.environ.get("HUB_TOKEN")
+# download the documents.db hosted on the dataset space
+logger.info(f"Downloading {DB_FILE} from hub...")
+hf_hub_download(
+    repo_id=REPO_ID,
+    repo_type="dataset",
+    filename=DB_FILE,
+    token=HUB_TOKEN,
+    local_dir=".",
+    local_dir_use_symlinks=False,
+)
+logger.info("Downloaded.")
+
+# setup retriever
+retriever: Retriever = get_retriever_from_extension(DB_FILE)(DB_FILE)
 
 block = gr.Blocks(css="#chatbot .overflow-y-auto{height:500px}")
 
