@@ -1,4 +1,22 @@
+"""Performance tests for the bot.
+
+We have 3 categories of questions:
+- Relevant
+- Irrelevant
+- Trick
+
+We want to test the following:
+- The bot should answer relevant questions
+- The bot should NOT answer irrelevant questions
+- The bot should NOT answer trick questions
+
+We detect whether the bot answered or not using the unknown embedding.
+As artifacts, we generate two files:
+- results_detailed.csv: contains the questions, the answers and whether it was judged relevant or not.
+- results_summary.csv: aggregated results per category.
+"""
 import logging
+import random
 
 import pandas as pd
 import pytest
@@ -7,11 +25,20 @@ from buster.busterbot import Buster
 from src import cfg
 
 
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+
+
+EMBEDDING_LENGTH = 1536
+
+
 @pytest.fixture
 def busterbot(monkeypatch, run_expensive):
     if not run_expensive:
+        random.seed(42)
+
         # Patch embedding call
-        monkeypatch.setattr(Buster, "get_embedding", lambda s, x, engine: [0.1] * 1536)
+        monkeypatch.setattr(Buster, "get_embedding", lambda s, x, engine: [random.random() for _ in range(EMBEDDING_LENGTH)])
 
     buster = Buster(cfg=cfg.buster_cfg, retriever=cfg.retriever)
     return buster
@@ -60,7 +87,7 @@ def test_summary(results_dir):
     results.reset_index().to_csv("results_detailed.csv", index=False)
     results.drop(columns=["answer"], inplace=True)
 
-    logging.info(results.head())
+    logger.info(results.head())
     summary = results.groupby("Category").agg({"is_relevant": ["sum", "count"]}).reset_index()
     summary.columns = ["_".join(col).strip() for col in summary.columns.values]
     summary.rename(columns={"Category_": "Category"}, inplace=True)
@@ -74,5 +101,5 @@ def test_summary(results_dir):
     summary.drop(columns=["is_relevant_sum", "is_relevant_count"], inplace=True)
     summary.set_index("Category", inplace=True)
 
-    logging.info(summary)
+    logger.info(summary)
     summary.to_csv("results_summary.csv")
