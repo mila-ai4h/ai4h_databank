@@ -3,6 +3,9 @@ import os
 
 import openai
 from buster.busterbot import BusterConfig
+from buster.retriever import Retriever
+from buster.utils import get_retriever_from_extension
+from huggingface_hub import hf_hub_download
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -14,6 +17,28 @@ PASSWORD = os.getenv("AI4H_PASSWORD")
 # set openAI creds
 openai.api_key = os.getenv("OPENAI_API_KEY")
 openai.organization = os.getenv("OPENAI_ORGANIZATION")
+
+
+# hf hub information
+DB_FILE = "documents_oecd.db"
+if not os.path.exists(DB_FILE):
+    REPO_ID = "jerpint/databank-ai4h"
+    HUB_TOKEN = os.environ.get("HUB_TOKEN")
+    # download the documents.db hosted on the dataset space
+    logger.info(f"Downloading {DB_FILE} from hub...")
+    hf_hub_download(
+        repo_id=REPO_ID,
+        repo_type="dataset",
+        filename=DB_FILE,
+        token=HUB_TOKEN,
+        local_dir=".",
+        local_dir_use_symlinks=False,
+    )
+    logger.info("Downloaded.")
+
+# setup retriever
+retriever: Retriever = get_retriever_from_extension(DB_FILE)(DB_FILE)
+
 
 buster_cfg = BusterConfig(
     embedding_model="text-embedding-ada-002",
