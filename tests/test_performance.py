@@ -24,7 +24,6 @@ from buster.busterbot import Buster
 
 from src import cfg
 
-
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
@@ -38,7 +37,9 @@ def busterbot(monkeypatch, run_expensive):
         random.seed(42)
 
         # Patch embedding call
-        monkeypatch.setattr(Buster, "get_embedding", lambda s, x, engine: [random.random() for _ in range(EMBEDDING_LENGTH)])
+        monkeypatch.setattr(
+            Buster, "get_embedding", lambda s, x, engine: [random.random() for _ in range(EMBEDDING_LENGTH)]
+        )
 
     buster = Buster(cfg=cfg.buster_cfg, retriever=cfg.retriever)
     return buster
