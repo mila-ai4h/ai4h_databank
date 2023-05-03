@@ -22,6 +22,7 @@ jobs:
       - name: unit tests
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          HUB_TOKEN: ${{ secrets.HUB_TOKEN }}
         run: |
           python3 -m pip install --upgrade pip
           pip install -e .[tests]
