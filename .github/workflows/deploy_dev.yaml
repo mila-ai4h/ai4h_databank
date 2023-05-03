@@ -19,14 +19,14 @@ jobs:
         run: |
           pip install isort
           isort --profile black --check-only .
-      # TODO: Add some meaningful unit tests
-      # - name: unit tests
-      #   env:
-      #     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      #   run: |
-      #     python3 -m pip install --upgrade pip
-      #     pip install -r requirements.txt
-      #     pytest
+      - name: unit tests
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          HUB_TOKEN: ${{ secrets.HUB_TOKEN }}
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install -e .[tests]
+          pytest
   deploy-dev:
     needs: tests
     runs-on: ubuntu-latest
