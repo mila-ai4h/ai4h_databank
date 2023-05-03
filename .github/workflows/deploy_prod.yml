@@ -27,16 +27,13 @@ jobs:
           python3 -m pip install --upgrade pip
           pip install -e .[tests]
           pytest --run_expensive
-      - name: Save detailed results
+      - name: Save performance results
         uses: actions/upload-artifact@v3
         with:
-          name: results_detailed
-          path: results_detailed.csv
-      - name: Save summary of results
-        uses: actions/upload-artifact@v3
-        with:
-          name: results_summary
-          path: results_summary.csv
+          name: results
+          path: |
+            results_detailed.csv
+            results_summary.csv
   deploy-prod:
     needs: tests
     runs-on: ubuntu-latest

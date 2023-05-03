@@ -27,16 +27,6 @@ jobs:
           python3 -m pip install --upgrade pip
           pip install -e .[tests]
           pytest
-      - name: Save detailed results
-        uses: actions/upload-artifact@v3
-        with:
-          name: results_detailed
-          path: results_detailed.csv
-      - name: Save summary of results
-        uses: actions/upload-artifact@v3
-        with:
-          name: results_summary
-          path: results_summary.csv
   deploy-dev:
     needs: tests
     runs-on: ubuntu-latest
