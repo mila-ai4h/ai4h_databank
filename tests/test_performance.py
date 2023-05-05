@@ -95,10 +95,10 @@ def test_summary(results_dir):
     column_order = ["Category"] + [col for col in summary.columns if col not in ["Category"]]
     summary = summary.loc[:, column_order]
 
-    summary["Score"] = summary.apply(lambda x: f"{x['is_relevant_sum']} / {x['is_relevant_count']}", axis=1)
-    summary["Score (%)"] = (summary["is_relevant_sum"] / summary["is_relevant_count"]).apply(
-        lambda x: f"{x * 100:04.2f} %"
+    summary["Answered questions"] = summary.apply(
+        lambda x: f"{x['is_relevant_sum']} / {x['is_relevant_count']}", axis=1
     )
+    summary["(%)"] = (summary["is_relevant_sum"] / summary["is_relevant_count"]).apply(lambda x: f"{x * 100:04.2f} %")
     summary.drop(columns=["is_relevant_sum", "is_relevant_count"], inplace=True)
     summary.set_index("Category", inplace=True)
 
