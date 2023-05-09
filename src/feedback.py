@@ -6,8 +6,7 @@ from typing import Any
 
 import pandas as pd
 import pymongo
-from buster.busterbot import Response
-from buster.completers.base import Completion
+from buster.busterbot import BusterAnswer
 from fastapi.encoders import jsonable_encoder
 
 logger = logging.getLogger(__name__)
@@ -25,6 +24,9 @@ class FeedbackForm:
     timeliness_sources: str
     version: int = 0
 
+    def to_json(self) -> Any:
+        return jsonable_encoder(self)
+
     @classmethod
     def from_dict(cls, feedback_dict: dict) -> FeedbackForm:
         # Backwards compatibility
@@ -36,22 +38,10 @@ class FeedbackForm:
 @dataclass
 class Feedback:
     session_id: str
-    user_responses: list[Response]
+    user_responses: list[BusterAnswer]
     feedback_form: FeedbackForm
     time: str
     version: int = 1
-
-    def to_json(self) -> Any:
-        def encode_df(df: pd.DataFrame) -> str:
-            if "embedding" in df.columns:
-                df = df.drop(columns=["embedding"])
-            return df.to_json(orient="index")
-
-        custom_encoder = {
-            # Converts the matched_documents in the user_responses to json
-            pd.DataFrame: encode_df,
-        }
-        return jsonable_encoder(self, custom_encoder=custom_encoder)
 
     def send(self, mongo_db: pymongo.database.Database):
         feedback_json = self.to_json()
@@ -62,6 +52,24 @@ class Feedback:
             logger.info("response logged to mondogb")
         except Exception as err:
             logger.exception("Something went wrong logging to mongodb")
+
+    def to_json(self) -> Any:
+        def encode_answer(answer: BusterAnswer) -> dict:
+            return answer.to_json()
+
+        custom_encoder = {
+            # Converts the matched_documents in the user_responses to json
+            BusterAnswer: encode_answer,
+        }
+
+        to_encode = {
+            "session_id": self.session_id,
+            "user_responses": self.user_responses,
+            "feedback_form": self.feedback_form.to_json(),
+            "time": self.time,
+            "version": self.version,
+        }
+        return jsonable_encoder(to_encode, custom_encoder=custom_encoder)
 
     @classmethod
     def from_dict(cls, feedback_dict: dict) -> Feedback:
@@ -75,13 +83,7 @@ class Feedback:
         del feedback_dict["_id"]
         feedback_dict["feedback_form"] = FeedbackForm.from_dict(feedback_dict["feedback_form"])
 
-        # TODO move into buster Response and Completion as from_dict classmethod
-        def response_from_dict(response_dict):
-            response_dict["matched_documents"] = pd.DataFrame(response_dict["matched_documents"])
-            response_dict["completion"] = Completion(**response_dict["completion"])
-            return Response(**response_dict)
-
-        feedback_dict["user_responses"] = [response_from_dict(r) for r in feedback_dict["user_responses"]]
+        feedback_dict["user_responses"] = [BusterAnswer.from_dict(r) for r in feedback_dict["user_responses"]]
 
         return cls(**feedback_dict)
 
@@ -131,6 +133,6 @@ def flatten_feedback(feedback: Feedback) -> dict:
     if len(feedback_dict["matched_documents"]) > 0:
         for k in feedback_dict["matched_documents"].keys():
             feedback_dict[f"matched_documents_{k}"] = feedback_dict["matched_documents"][k].values
-        del feedback_dict["matched_documents"]
+    del feedback_dict["matched_documents"]
 
     return feedback_dict
