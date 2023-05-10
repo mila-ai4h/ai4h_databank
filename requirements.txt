@@ -1,0 +1,4 @@
+git+https://github.com/jerpint/buster@v1.0.6
+gradio
+huggingface-hub
+pymongo
