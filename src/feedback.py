@@ -54,12 +54,9 @@ class Feedback:
             logger.exception("Something went wrong logging to mongodb")
 
     def to_json(self) -> Any:
-        def encode_answer(answer: BusterAnswer) -> dict:
-            return answer.to_json()
-
         custom_encoder = {
             # Converts the matched_documents in the user_responses to json
-            BusterAnswer: encode_answer,
+            BusterAnswer: lambda answer: answer.to_json(),
         }
 
         to_encode = {
@@ -104,7 +101,7 @@ def read_feedback(mongo_db: pymongo.database.Database, filters: dict = None) -> 
         return feedback
     except Exception as err:
         logger.exception("Something went wrong reading from mongodb")
-        return []
+        return pd.DataFrame()
 
 
 def flatten_feedback(feedback: Feedback) -> dict:
@@ -126,7 +123,7 @@ def flatten_feedback(feedback: Feedback) -> dict:
     del feedback_dict["feedback_form"]
 
     # Flatten matched documents
-    feedback_dict["matched_documents"] = feedback.user_responses[-1].matched_documents.T
+    feedback_dict["matched_documents"] = feedback.user_responses[-1].matched_documents
     feedback_dict["matched_documents"].reset_index(inplace=True)
     feedback_dict["matched_documents"].drop(columns=["index"], inplace=True)
     feedback_dict["matched_documents"] = feedback_dict["matched_documents"].T

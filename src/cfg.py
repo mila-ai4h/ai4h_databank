@@ -41,13 +41,16 @@ retriever: Retriever = get_retriever_from_extension(DB_FILE)(DB_FILE)
 
 
 buster_cfg = BusterConfig(
-    embedding_model="text-embedding-ada-002",
-    unknown_prompt="I'm sorry, but I am an AI language model trained to assist with questions related to AI. I cannot answer that question as it is not relevant to the library or its usage. Is there anything else I can assist you with?",
-    unknown_threshold=0.85,
+    validator_cfg={
+        "unknown_prompt": "I'm sorry, but I am an AI language model trained to assist with questions related to AI. I cannot answer that question as it is not relevant to the library or its usage. Is there anything else I can assist you with?",
+        "unknown_threshold": 0.85,
+        "embedding_model": "text-embedding-ada-002",
+    },
     retriever_cfg={
         "top_k": 3,
         "thresh": 0.7,
         "max_tokens": 3000,
+        "embedding_model": "text-embedding-ada-002",
     },
     completion_cfg={
         "name": "ChatGPT",
