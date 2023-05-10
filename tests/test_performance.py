@@ -98,7 +98,9 @@ def test_summary(results_dir):
     summary["Answered questions"] = summary.apply(
         lambda x: f"{x['documents_relevant_sum']} / {x['documents_relevant_count']}", axis=1
     )
-    summary["(%)"] = (summary["documents_relevant_sum"] / summary["documents_relevant_count"]).apply(lambda x: f"{x * 100:04.2f} %")
+    summary["(%)"] = (summary["documents_relevant_sum"] / summary["documents_relevant_count"]).apply(
+        lambda x: f"{x * 100:04.2f} %"
+    )
     summary.drop(columns=["documents_relevant_sum", "documents_relevant_count"], inplace=True)
     summary.set_index("Category", inplace=True)
 
