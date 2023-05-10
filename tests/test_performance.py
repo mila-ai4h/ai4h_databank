@@ -54,9 +54,9 @@ def process_questions(busterbot, questions: list[str]) -> pd.DataFrame:
     results = []
     for question in questions:
         result = busterbot.process_input(question)
-        results.append((question, result.is_relevant, result.completion.text))
+        results.append((question, result.documents_relevant, result.completion.text))
 
-    return pd.DataFrame(results, columns=["question", "is_relevant", "answer"])
+    return pd.DataFrame(results, columns=["question", "documents_relevant", "answer"])
 
 
 @pytest.mark.parametrize(
