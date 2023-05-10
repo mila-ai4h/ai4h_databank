@@ -57,6 +57,7 @@ buster_cfg = BusterConfig(
         "completion_kwargs": {
             "model": "gpt-3.5-turbo",
             "temperature": 0,
+            "stream": True,
         },
     },
     prompt_cfg={
