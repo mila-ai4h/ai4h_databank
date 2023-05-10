@@ -60,28 +60,40 @@ def pad_sources(sources: list[str]) -> list[str]:
     return sources + [""] * (MAX_TABS - k)
 
 
-def chat(question, history, document_source, model, user_responses):
-    history = history or []
+def add_sources(response):
+    documents_relevant = response.documents_relevant
 
-    cfg.buster_cfg.document_source = document_source
-    cfg.buster_cfg.completion_cfg["completion_kwargs"]["model"] = model
-    buster.update_cfg(cfg.buster_cfg)
+    if documents_relevant:
+        # add sources
+        formatted_sources = format_sources(response.matched_documents)
+    else:
+        formatted_sources = [""]
+    formatted_sources = pad_sources(formatted_sources)
 
-    response = buster.process_input(question)
+    return formatted_sources
 
-    answer = response.completion.text
-    history.append((question, answer))
 
-    sources = format_sources(response.matched_documents)
-    sources = pad_sources(sources)
-
-    logger.info(f"{response=}")
-    logger.info(f"{answer=}")
-    logger.info(f"{sources=}")
-
+def append_response(response, user_responses):
     user_responses.append(response)
+    return user_responses
 
-    return history, history, user_responses, *sources
+
+def user(user_input, history):
+    """Adds user's question immediately to the chat."""
+    return "", history + [[user_input, None]]
+
+
+def chat(history):
+    user_input = history[-1][0]
+
+    response = buster.process_input(user_input)
+
+    history[-1][1] = ""
+
+    for token in response.completion.completor:
+        history[-1][1] += token
+
+        yield history, response
 
 
 def submit_feedback(
@@ -117,6 +129,11 @@ block = gr.Blocks(css="#chatbot .overflow-y-auto{height:500px}")
 
 with block:
     buster: Buster = Buster(cfg=cfg.buster_cfg, retriever=cfg.retriever)
+
+    # TODO: trigger a proper change to update
+    cfg.buster_cfg.document_source = cfg.document_sources[0]
+    cfg.buster_cfg.completion_cfg["completion_kwargs"]["model"] = cfg.available_models[0]
+    buster.update_cfg(cfg.buster_cfg)
 
     # state variables are client-side and are reset every time a client refreshes the page
     user_responses = gr.State([])
@@ -253,19 +270,23 @@ with block:
 
     gr.HTML("<center> Powered by <a href='https://github.com/jerpint/buster'>Buster</a> 🤖</center>")
 
-    state = gr.State()
-    agent_state = gr.State()
+    response = gr.State()
 
-    submit.click(
+    submit.click(user, [message, chatbot], [message, chatbot]).then(
         chat,
-        inputs=[message, state, source_dropdown, model, user_responses],
-        outputs=[chatbot, state, user_responses, *sources_textboxes],
+        inputs=[chatbot],
+        outputs=[chatbot, response],
+    ).then(add_sources, inputs=[response], outputs=[*sources_textboxes]).then(
+        append_response, inputs=[response, user_responses], outputs=[user_responses]
     )
-    message.submit(
+    message.submit(user, [message, chatbot], [message, chatbot]).then(
         chat,
-        inputs=[message, state, source_dropdown, model, user_responses],
-        outputs=[chatbot, state, user_responses, *sources_textboxes],
+        inputs=[chatbot],
+        outputs=[chatbot, response],
+    ).then(add_sources, inputs=[response], outputs=[*sources_textboxes]).then(
+        append_response, inputs=[response, user_responses], outputs=[user_responses]
     )
 
-
-block.launch(share=False, auth=check_auth)
+block.queue(concurrency_count=16)
+block.launch(share=False)
+# block.launch(share=False, auth=check_auth)
