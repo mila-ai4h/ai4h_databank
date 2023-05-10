@@ -53,6 +53,36 @@ class Feedback:
         except Exception as err:
             logger.exception("Something went wrong logging to mongodb")
 
+    def flatten(self) -> dict:
+        """Flatten feedback object into a dict for easier reading."""
+        feedback_dict = self.to_json()
+
+        # Flatten user responses, only keep the most recent interaction
+        if len(feedback_dict["user_responses"]) > 0:
+            feedback_dict.update(feedback_dict["user_responses"][-1])
+
+            for k in feedback_dict["completion"].keys():
+                feedback_dict[f"completion_{k}"] = feedback_dict["completion"][k]
+            del feedback_dict["completion"]
+        del feedback_dict["user_responses"]
+
+        # Flatten feedback form
+        for k in feedback_dict["feedback_form"].keys():
+            feedback_dict[f"feedback_{k}"] = feedback_dict["feedback_form"][k]
+        del feedback_dict["feedback_form"]
+
+        # Flatten matched documents
+        feedback_dict["matched_documents"] = self.user_responses[-1].matched_documents
+        feedback_dict["matched_documents"].reset_index(inplace=True)
+        feedback_dict["matched_documents"].drop(columns=["index"], inplace=True)
+        feedback_dict["matched_documents"] = feedback_dict["matched_documents"].T
+        if len(feedback_dict["matched_documents"]) > 0:
+            for k in feedback_dict["matched_documents"].keys():
+                feedback_dict[f"matched_documents_{k}"] = feedback_dict["matched_documents"][k].values
+        del feedback_dict["matched_documents"]
+
+        return feedback_dict
+
     def to_json(self) -> Any:
         custom_encoder = {
             # Converts the matched_documents in the user_responses to json
@@ -93,8 +123,7 @@ def read_feedback(mongo_db: pymongo.database.Database, filters: dict = None) -> 
     """
     try:
         feedback = mongo_db["feedback"].find(filters)
-        feedback = [Feedback.from_dict(f) for f in feedback]
-        feedback = [flatten_feedback(f) for f in feedback]
+        feedback = [Feedback.from_dict(f).flatten() for f in feedback]
         feedback = pd.DataFrame(feedback)
         feedback = feedback.drop_duplicates(subset=["session_id", "user_input"], keep="last")
 
@@ -102,34 +131,3 @@ def read_feedback(mongo_db: pymongo.database.Database, filters: dict = None) -> 
     except Exception as err:
         logger.exception("Something went wrong reading from mongodb")
         return pd.DataFrame()
-
-
-def flatten_feedback(feedback: Feedback) -> dict:
-    """Flatten feedback object into a dict for easier reading."""
-    feedback_dict = feedback.to_json()
-
-    # Flatten user responses, only keep the most recent interaction
-    if len(feedback_dict["user_responses"]) > 0:
-        feedback_dict.update(feedback_dict["user_responses"][-1])
-
-        for k in feedback_dict["completion"].keys():
-            feedback_dict[f"completion_{k}"] = feedback_dict["completion"][k]
-        del feedback_dict["completion"]
-    del feedback_dict["user_responses"]
-
-    # Flatten feedback form
-    for k in feedback_dict["feedback_form"].keys():
-        feedback_dict[f"feedback_{k}"] = feedback_dict["feedback_form"][k]
-    del feedback_dict["feedback_form"]
-
-    # Flatten matched documents
-    feedback_dict["matched_documents"] = feedback.user_responses[-1].matched_documents
-    feedback_dict["matched_documents"].reset_index(inplace=True)
-    feedback_dict["matched_documents"].drop(columns=["index"], inplace=True)
-    feedback_dict["matched_documents"] = feedback_dict["matched_documents"].T
-    if len(feedback_dict["matched_documents"]) > 0:
-        for k in feedback_dict["matched_documents"].keys():
-            feedback_dict[f"matched_documents_{k}"] = feedback_dict["matched_documents"][k].values
-    del feedback_dict["matched_documents"]
-
-    return feedback_dict
