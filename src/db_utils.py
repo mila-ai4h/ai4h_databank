@@ -1,24 +1,16 @@
 # Setup mongoDB
 import logging
-import os
-from dataclasses import dataclass
 from urllib.parse import quote_plus
 
-from buster.busterbot import Response
-from fastapi.encoders import jsonable_encoder
+import pymongo
 from pymongo import MongoClient
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
-def init_db():
+def init_db(username: str, password: str, cluster: str, db_name: str) -> pymongo.database.Database:
     """Initialize mongodb database."""
-
-    username = os.getenv("AI4H_MONGODB_USERNAME")
-    password = os.getenv("AI4H_MONGODB_PASSWORD")
-    cluster = os.getenv("AI4H_MONGODB_CLUSTER")
-    db_name = os.getenv("AI4H_MONGODB_DB_NAME")
 
     if all(v is not None for v in [username, password, cluster]):
         try:
@@ -39,14 +31,3 @@ def init_db():
             logger.exception("Something went wrong connecting to mongodb")
 
     logger.warning("Didn't connect to MongoDB database, check auth.")
-
-
-@dataclass
-class Feedback:
-    good_bad: str
-    extra_info: str
-    relevant_answer: str
-    relevant_length: str
-    relevant_sources: str
-    length_sources: str
-    timeliness_sources: str

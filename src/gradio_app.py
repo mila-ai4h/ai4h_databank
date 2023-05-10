@@ -1,18 +1,23 @@
 import copy
 import json
 import logging
+import os
 import uuid
 from datetime import datetime, timezone
 
 import gradio as gr
 import pandas as pd
 from buster.busterbot import Buster
-from fastapi.encoders import jsonable_encoder
 
 import cfg
-from db_utils import Feedback, init_db
+from db_utils import init_db
+from feedback import Feedback, FeedbackForm
 
-mongo_db = init_db()
+username = os.getenv("AI4H_MONGODB_USERNAME")
+password = os.getenv("AI4H_MONGODB_PASSWORD")
+cluster = os.getenv("AI4H_MONGODB_CLUSTER")
+db_name = os.getenv("AI4H_MONGODB_DB_NAME")
+mongo_db = init_db(username, password, cluster, db_name)
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -79,20 +84,6 @@ def chat(question, history, document_source, model, user_responses):
     return history, history, user_responses, *sources
 
 
-def user_responses_formatted(user_responses):
-    """Format user responses so that the matched_documents are in easily jsonable dict format."""
-    responses_copy = copy.deepcopy(user_responses)
-    for response in responses_copy:
-        # go to json and back to dict so that all int entries are now strings in a dict...
-        response.matched_documents = json.loads(
-            response.matched_documents.drop(columns=["embedding"]).to_json(orient="index")
-        )
-
-    logger.info(responses_copy)
-
-    return responses_copy
-
-
 def submit_feedback(
     user_responses,
     session_id,
@@ -104,8 +95,7 @@ def submit_feedback(
     feedback_timeliness_sources,
     feedback_info,
 ):
-    dict_responses = user_responses_formatted(user_responses)
-    user_feedback = Feedback(
+    feedback_form = FeedbackForm(
         good_bad=feedback_good_bad,
         extra_info=feedback_info,
         relevant_answer=feedback_relevant_answer,
@@ -114,20 +104,11 @@ def submit_feedback(
         length_sources=feedback_length_sources,
         timeliness_sources=feedback_timeliness_sources,
     )
-    feedback = {
-        "session_id": session_id,
-        "user_responses": dict_responses,
-        "feedback": user_feedback,
-        "time": get_utc_time(),
-    }
-    feedback_json = jsonable_encoder(feedback)
+    feedback = Feedback(
+        session_id=session_id, user_responses=user_responses, feedback_form=feedback_form, time=get_utc_time()
+    )
+    feedback.send(mongo_db)
 
-    logger.info(feedback_json)
-    try:
-        mongo_db["feedback"].insert_one(feedback_json)
-        logger.info("response logged to mondogb")
-    except Exception as err:
-        logger.exception("Something went wrong logging to mongodb")
     # update visibility for extra form
     return {feedback_submitted_message: gr.update(visible=True)}
 

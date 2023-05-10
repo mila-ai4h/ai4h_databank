@@ -54,9 +54,9 @@ def process_questions(busterbot, questions: list[str]) -> pd.DataFrame:
     results = []
     for question in questions:
         result = busterbot.process_input(question)
-        results.append((question, result.is_relevant, result.completion.text))
+        results.append((question, result.documents_relevant, result.completion.text))
 
-    return pd.DataFrame(results, columns=["question", "is_relevant", "answer"])
+    return pd.DataFrame(results, columns=["question", "documents_relevant", "answer"])
 
 
 @pytest.mark.parametrize(
@@ -89,17 +89,19 @@ def test_summary(results_dir):
     results.drop(columns=["answer"], inplace=True)
 
     logger.info(results.head())
-    summary = results.groupby("Category").agg({"is_relevant": ["sum", "count"]}).reset_index()
+    summary = results.groupby("Category").agg({"documents_relevant": ["sum", "count"]}).reset_index()
     summary.columns = ["_".join(col).strip() for col in summary.columns.values]
     summary.rename(columns={"Category_": "Category"}, inplace=True)
     column_order = ["Category"] + [col for col in summary.columns if col not in ["Category"]]
     summary = summary.loc[:, column_order]
 
-    summary["Score"] = summary.apply(lambda x: f"{x['is_relevant_sum']} / {x['is_relevant_count']}", axis=1)
-    summary["Score (%)"] = (summary["is_relevant_sum"] / summary["is_relevant_count"]).apply(
+    summary["Answered questions"] = summary.apply(
+        lambda x: f"{x['documents_relevant_sum']} / {x['documents_relevant_count']}", axis=1
+    )
+    summary["(%)"] = (summary["documents_relevant_sum"] / summary["documents_relevant_count"]).apply(
         lambda x: f"{x * 100:04.2f} %"
     )
-    summary.drop(columns=["is_relevant_sum", "is_relevant_count"], inplace=True)
+    summary.drop(columns=["documents_relevant_sum", "documents_relevant_count"], inplace=True)
     summary.set_index("Category", inplace=True)
 
     logger.info(summary)
