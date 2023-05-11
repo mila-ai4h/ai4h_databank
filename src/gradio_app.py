@@ -272,21 +272,36 @@ with block:
 
     response = gr.State()
 
-    submit.click(user, [message, chatbot], [message, chatbot]).then(
+    # fmt: off
+    submit.click(
+        user, [message, chatbot], [message, chatbot]
+    ).then(
         chat,
         inputs=[chatbot],
         outputs=[chatbot, response],
-    ).then(add_sources, inputs=[response], outputs=[*sources_textboxes]).then(
-        append_response, inputs=[response, user_responses], outputs=[user_responses]
+    ).then(
+        add_sources,
+        inputs=[response],
+        outputs=[*sources_textboxes]
+    ).then(
+        append_response,
+        inputs=[response, user_responses], outputs=[user_responses]
     )
-    message.submit(user, [message, chatbot], [message, chatbot]).then(
+    message.submit(
+        user, [message, chatbot], [message, chatbot]
+    ).then(
         chat,
         inputs=[chatbot],
         outputs=[chatbot, response],
-    ).then(add_sources, inputs=[response], outputs=[*sources_textboxes]).then(
-        append_response, inputs=[response, user_responses], outputs=[user_responses]
+    ).then(
+        add_sources,
+        inputs=[response],
+        outputs=[*sources_textboxes]
+    ).then(
+        append_response,
+        inputs=[response, user_responses], outputs=[user_responses]
     )
+    # fmt: on
 
 block.queue(concurrency_count=16)
-block.launch(share=False)
-# block.launch(share=False, auth=check_auth)
+block.launch(share=False, auth=check_auth)
