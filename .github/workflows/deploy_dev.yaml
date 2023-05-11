@@ -28,7 +28,7 @@ jobs:
           pip install -e .[tests]
           pytest
       - name: Update summary
-        run: cat results_summary.csv >> $GITHUB_STEP_SUMMARY
+        run: cat results_summary.md >> $GITHUB_STEP_SUMMARY
   deploy-dev:
     needs: tests
     runs-on: ubuntu-latest
