@@ -41,6 +41,7 @@ def busterbot(monkeypatch, run_expensive):
             Buster, "get_embedding", lambda s, x, engine: [random.random() for _ in range(EMBEDDING_LENGTH)]
         )
 
+    cfg.buster_cfg.completion_cfg["completion_kwargs"]["stream"] = False
     buster = Buster(cfg=cfg.buster_cfg, retriever=cfg.retriever)
     return buster
 
