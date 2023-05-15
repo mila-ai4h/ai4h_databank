@@ -34,6 +34,8 @@ jobs:
           path: |
             results_detailed.csv
             results_summary.csv
+      - name: Update summary
+        run: cat results_summary.md >> $GITHUB_STEP_SUMMARY
   deploy-prod:
     needs: tests
     runs-on: ubuntu-latest
