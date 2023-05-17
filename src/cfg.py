@@ -69,7 +69,7 @@ buster_cfg = BusterConfig(
             "<DOCUMENTS> "
         ),
         "text_before_prompt": (
-            "<\DOCUMENTS>\n"
+            "<\\DOCUMENTS>\n"
             "REMEMBER:\n"
             "You are a chatbot assistant answering questions about artificial intelligence (AI) policies and laws. "
             "You represent the OECD AI Policy Observatory. "
