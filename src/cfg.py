@@ -5,7 +5,6 @@ import openai
 from buster.busterbot import BusterConfig
 from buster.retriever import Retriever, ServiceRetriever
 from buster.utils import get_retriever_from_extension
-from huggingface_hub import hf_hub_download
 
 from src.db_utils import make_uri
 
@@ -31,23 +30,6 @@ mongo_password = os.getenv("AI4H_MONGODB_PASSWORD")
 mongo_cluster = os.getenv("AI4H_MONGODB_CLUSTER")
 mongo_uri = make_uri(mongo_username, mongo_password, mongo_cluster)
 mongo_db_name = os.getenv("AI4H_MONGODB_DB_DATA")
-
-# hf hub information
-# DB_FILE = "documents_oecd.db"
-# if not os.path.exists(DB_FILE):
-#     REPO_ID = "jerpint/databank-ai4h"
-#     HUB_TOKEN = os.environ.get("HUB_TOKEN")
-#     # download the documents.db hosted on the dataset space
-#     logger.info(f"Downloading {DB_FILE} from hub...")
-#     hf_hub_download(
-#         repo_id=REPO_ID,
-#         repo_type="dataset",
-#         filename=DB_FILE,
-#         token=HUB_TOKEN,
-#         local_dir=".",
-#         local_dir_use_symlinks=False,
-#     )
-#     logger.info("Downloaded.")
 
 # setup retriever
 retriever: Retriever = ServiceRetriever(pinecone_api_key, pinecone_env, pinecone_index, mongo_uri, mongo_db_name)
