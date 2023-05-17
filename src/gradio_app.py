@@ -249,7 +249,7 @@ with block:
                 )
             with gr.Column(scale=1):
                 gr.Markdown("## Sources")
-                case_names = sorted(cfg.document_sources)
+                case_names = cfg.document_sources
                 source_dropdown = gr.Dropdown(
                     choices=case_names,
                     value=case_names[0],
