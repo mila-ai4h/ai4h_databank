@@ -87,9 +87,7 @@ buster_cfg = BusterConfig(
             "Now answer the following question:\n"
         ),
     },
-    document_source="LimeSurvey v2",
+    document_source="",
 )
-
-document_sources = ["LimeSurvey v2", "Laura v2", "Orsolya"]
 
 available_models = ["gpt-3.5-turbo", "gpt-4"]

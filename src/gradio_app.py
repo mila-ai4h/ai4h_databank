@@ -131,7 +131,6 @@ with block:
     buster: Buster = Buster(cfg=cfg.buster_cfg, retriever=cfg.retriever)
 
     # TODO: trigger a proper change to update
-    cfg.buster_cfg.document_source = cfg.document_sources[0]
     cfg.buster_cfg.completion_cfg["completion_kwargs"]["model"] = cfg.available_models[0]
     buster.update_cfg(cfg.buster_cfg)
 
@@ -174,97 +173,86 @@ with block:
                         label="Questions about non-existing AI policies and laws.",
                     )
 
-            # Feedback
-            with gr.Column(variant="panel"):
-                gr.Markdown("## Feedback form\nHelp us improve LLawMa 🦙!")
-                with gr.Row():
-                    feedback_good_bad = gr.Radio(choices=["👍", "👎"], label="How did buster do?")
-
-                with gr.Row():
-                    feedback_relevant_answer = gr.Radio(
-                        choices=[
-                            "1 - I lost time because the answer was wrong.",
-                            "2 - I lost time because the answer was unclear.",
-                            "3 - No time was saved or lost (over searching by other means).",
-                            "4 - I saved time because the answer was clear and correct.",
-                            "5 - The answer was perfect and can be used as a reference.",
-                        ],
-                        label="How much time did you save?",
-                    )
-                    feedback_relevant_length = gr.Radio(
-                        choices=["Too Long", "Just Right", "Too Short"], label="How was the answer length?"
-                    )
-
-                with gr.Row():
-                    feedback_relevant_sources = gr.Radio(
-                        choices=[
-                            "1 - The sources were irrelevant.",
-                            "2 - The sources were relevant but others could have been better.",
-                            "3 - The sources were relevant and the best ones available.",
-                        ],
-                        label="How relevant were the sources?",
-                    )
-
-                    with gr.Column():
-                        feedback_length_sources = gr.Radio(
-                            choices=["Too few", "Just right", "Too many"], label="How was the amount of sources?"
-                        )
-
-                        feedback_timeliness_sources = gr.Radio(
-                            choices=["Obsolete", "Old", "Recent"], label="How timely were the sources?"
-                        )
-
-                feedback_info = gr.Textbox(
-                    label="Enter additional information (optional)",
-                    lines=10,
-                    placeholder="Enter more helpful information for us here...",
-                )
-
-                submit_feedback_btn = gr.Button("Submit Feedback!")
-                with gr.Column(visible=False) as feedback_submitted_message:
-                    gr.Markdown("Feedback recorded, thank you! 📝")
-
-            submit_feedback_btn.click(
-                submit_feedback,
-                inputs=[
-                    user_responses,
-                    session_id,
-                    feedback_good_bad,
-                    feedback_relevant_length,
-                    feedback_relevant_answer,
-                    feedback_relevant_sources,
-                    feedback_length_sources,
-                    feedback_timeliness_sources,
-                    feedback_info,
-                ],
-                outputs=feedback_submitted_message,
-            )
-
         with gr.Row():
-            with gr.Column(scale=1):
+            with gr.Column():
                 gr.Markdown("## Model")
                 # TODO: remove interactive=False flag when deployed model gets access to GPT4
                 model = gr.Radio(
                     cfg.available_models, label="Model to use", value=cfg.available_models[0], interactive=False
                 )
-            with gr.Column(scale=1):
-                gr.Markdown("## Sources")
-                case_names = cfg.document_sources
-                source_dropdown = gr.Dropdown(
-                    choices=case_names,
-                    value=case_names[0],
-                    interactive=True,
-                    multiselect=False,
-                    label="Source",
-                    info="Select a source to query",
-                )
-            with gr.Column(scale=1, variant="panel"):
+            with gr.Column(variant="panel"):
                 gr.Markdown("## References used")
                 sources_textboxes = []
                 for i in range(MAX_TABS):
                     with gr.Tab(f"Source {i + 1} 📝"):
                         t = gr.Markdown()
                     sources_textboxes.append(t)
+
+    # Feedback
+    with gr.Column(variant="panel"):
+        gr.Markdown("## Feedback form\nHelp us improve LLawMa 🦙!")
+        with gr.Row():
+            feedback_good_bad = gr.Radio(choices=["👍", "👎"], label="How did buster do?")
+
+        with gr.Row():
+            feedback_relevant_answer = gr.Radio(
+                choices=[
+                    "1 - I lost time because the answer was wrong.",
+                    "2 - I lost time because the answer was unclear.",
+                    "3 - No time was saved or lost (over searching by other means).",
+                    "4 - I saved time because the answer was clear and correct.",
+                    "5 - The answer was perfect and can be used as a reference.",
+                ],
+                label="How much time did you save?",
+            )
+            feedback_relevant_length = gr.Radio(
+                choices=["Too Long", "Just Right", "Too Short"], label="How was the answer length?"
+            )
+
+        with gr.Row():
+            feedback_relevant_sources = gr.Radio(
+                choices=[
+                    "1 - The sources were irrelevant.",
+                    "2 - The sources were relevant but others could have been better.",
+                    "3 - The sources were relevant and the best ones available.",
+                ],
+                label="How relevant were the sources?",
+            )
+
+            with gr.Column():
+                feedback_length_sources = gr.Radio(
+                    choices=["Too few", "Just right", "Too many"], label="How was the amount of sources?"
+                )
+
+                feedback_timeliness_sources = gr.Radio(
+                    choices=["Obsolete", "Old", "Recent"], label="How timely were the sources?"
+                )
+
+        feedback_info = gr.Textbox(
+            label="Enter additional information (optional)",
+            lines=10,
+            placeholder="Enter more helpful information for us here...",
+        )
+
+        submit_feedback_btn = gr.Button("Submit Feedback!")
+        with gr.Column(visible=False) as feedback_submitted_message:
+            gr.Markdown("Feedback recorded, thank you! 📝")
+
+    submit_feedback_btn.click(
+        submit_feedback,
+        inputs=[
+            user_responses,
+            session_id,
+            feedback_good_bad,
+            feedback_relevant_length,
+            feedback_relevant_answer,
+            feedback_relevant_sources,
+            feedback_length_sources,
+            feedback_timeliness_sources,
+            feedback_info,
+        ],
+        outputs=feedback_submitted_message,
+    )
 
     gr.Markdown("This application uses GPT to search the docs for relevant info and answer questions.")
 
