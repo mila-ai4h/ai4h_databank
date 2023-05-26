@@ -22,6 +22,7 @@ mongo_db = init_db(username, password, cluster, db_name)
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
+buster = Buster(retriever=cfg.retriever, completer=cfg.completer, validator=cfg.validator)
 
 MAX_TABS = cfg.buster_cfg.retriever_cfg["top_k"]
 RELEVANT_QUESTIONS = pd.read_csv("Questions dataset - Relevant.csv", header=None)[0].to_list()
@@ -60,15 +61,16 @@ def pad_sources(sources: list[str]) -> list[str]:
     return sources + [""] * (MAX_TABS - k)
 
 
-def add_sources(response):
-    documents_relevant = response.documents_relevant
+def add_sources(completion):
+    completion = buster.postprocess_completion(completion)
 
-    if documents_relevant:
+    if completion.answer_relevant:
         # add sources
-        formatted_sources = format_sources(response.matched_documents)
+        formatted_sources = format_sources(completion.matched_documents)
+
     else:
         formatted_sources = [""]
-    formatted_sources = pad_sources(formatted_sources)
+        formatted_sources = pad_sources(formatted_sources)
 
     return formatted_sources
 
@@ -87,10 +89,11 @@ def chat(history):
     user_input = history[-1][0]
 
     response = buster.process_input(user_input)
+    print(response)
 
     history[-1][1] = ""
 
-    for token in response.completion.completor:
+    for token in response.completor:
         history[-1][1] += token
 
         yield history, response
@@ -128,11 +131,7 @@ def submit_feedback(
 block = gr.Blocks(css="#chatbot .overflow-y-auto{height:500px}")
 
 with block:
-    buster: Buster = Buster(cfg=cfg.buster_cfg, retriever=cfg.retriever)
-
     # TODO: trigger a proper change to update
-    cfg.buster_cfg.completion_cfg["completion_kwargs"]["model"] = cfg.available_models[0]
-    buster.update_cfg(cfg.buster_cfg)
 
     # state variables are client-side and are reset every time a client refreshes the page
     user_responses = gr.State([])
