@@ -10,7 +10,7 @@ from buster.retriever import Retriever, ServiceRetriever
 from buster.tokenizers import GPTTokenizer
 from buster.validators.base import Validator
 
-from db_utils import make_uri
+from src.db_utils import make_uri
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)

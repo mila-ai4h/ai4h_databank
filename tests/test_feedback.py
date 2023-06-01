@@ -1,6 +1,5 @@
 import pandas as pd
-from buster.busterbot import BusterAnswer
-from buster.completers.base import Completion
+from buster.completers import Completion
 
 from src.feedback import Feedback, FeedbackForm
 
@@ -36,10 +35,10 @@ def test_read_write_feedbackform():
 
 def test_read_write_feedback():
     n_samples = 3
-    b = BusterAnswer(
+    b = Completion(
+        error=False,
         user_input="This is my input",
-        completion=Completion(error=False, completor="This is my completed answer"),
-        validator=MockValidator(),
+        completor="This is my completed answer",
         matched_documents=pd.DataFrame.from_dict(
             {
                 "title": ["test"] * n_samples,
@@ -83,12 +82,10 @@ def test_read_write_feedback():
     assert f.feedback_form.length_sources == f_back.feedback_form.length_sources
     assert f.feedback_form.timeliness_sources == f_back.feedback_form.timeliness_sources
     assert len(f.user_responses) == len(f_back.user_responses)
-    assert f.user_responses[0].version == f_back.user_responses[0].version
     assert f.user_responses[0].user_input == f_back.user_responses[0].user_input
-    assert f.user_responses[0].completion.error == f_back.user_responses[0].completion.error
-    assert f.user_responses[0].completion.text == f_back.user_responses[0].completion.text
-    assert f.user_responses[0].completion.version == f_back.user_responses[0].completion.version
-    assert f.user_responses[0].documents_relevant == f_back.user_responses[0].documents_relevant
+    assert f.user_responses[0].error == f_back.user_responses[0].error
+    assert f.user_responses[0].text == f_back.user_responses[0].text
+    assert f.user_responses[0].answer_relevant == f_back.user_responses[0].answer_relevant
     for col in f_back.user_responses[0].matched_documents.columns.tolist():
         assert col in f.user_responses[0].matched_documents.columns.tolist()
         assert (
