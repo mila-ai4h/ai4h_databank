@@ -3,16 +3,12 @@ import os
 
 import openai
 from buster.busterbot import BusterConfig
-from buster.retriever import Retriever, ServiceRetriever
-from buster.utils import get_retriever_from_extension
-from buster.busterbot import Buster
 from buster.completers.base import ChatGPTCompleter, Completer
 from buster.formatters.documents import DocumentsFormatter
 from buster.formatters.prompts import PromptFormatter
-from buster.retriever import Retriever, SQLiteRetriever
+from buster.retriever import Retriever, ServiceRetriever
 from buster.tokenizers import GPTTokenizer
 from buster.validators.base import Validator
-
 
 from db_utils import make_uri
 
