@@ -15,12 +15,14 @@ As artifacts, we generate two files:
 - results_detailed.csv: contains the questions, the answers and whether it was judged relevant or not.
 - results_summary.csv: aggregated results per category.
 """
+import copy
 import logging
 import random
 
 import pandas as pd
 import pytest
 from buster.busterbot import Buster
+from buster.retriever import Retriever, ServiceRetriever
 
 from src import cfg
 
@@ -33,16 +35,23 @@ EMBEDDING_LENGTH = 1536
 
 @pytest.fixture
 def busterbot(monkeypatch, run_expensive):
+    buster_cfg = copy.deepcopy(cfg.buster_cfg)
     if not run_expensive:
         random.seed(42)
 
-        # Patch embedding call
+        # Patch embedding call to avoid computing embeddings
         monkeypatch.setattr(
-            Buster, "get_embedding", lambda s, x, engine: [random.random() for _ in range(EMBEDDING_LENGTH)]
+            ServiceRetriever, "get_embedding", lambda s, x, engine: [random.random() for _ in range(EMBEDDING_LENGTH)]
         )
+        # set thresh = 1 to be sure that no documents get retrieved
+        buster_cfg.retriever_cfg["thresh"] = 1
+        retriever = ServiceRetriever(**buster_cfg.retriever_cfg)
 
-    cfg.buster_cfg.completion_cfg["completion_kwargs"]["stream"] = False
-    buster = Buster(cfg=cfg.buster_cfg, retriever=cfg.retriever)
+    else:
+        retriever = cfg.retriever
+
+    buster_cfg.completion_cfg["completion_kwargs"]["stream"] = False
+    buster = Buster(completer=cfg.completer, retriever=retriever, validator=cfg.validator)
     return buster
 
 
@@ -54,10 +63,10 @@ def results_dir(tmp_path_factory):
 def process_questions(busterbot, questions: list[str]) -> pd.DataFrame:
     results = []
     for question in questions:
-        result = busterbot.process_input(question)
-        results.append((question, result.documents_relevant, result.completion.text))
+        completion = busterbot.process_input(question)
+        results.append((question, completion.answer_relevant, completion.text))
 
-    return pd.DataFrame(results, columns=["question", "documents_relevant", "answer"])
+    return pd.DataFrame(results, columns=["question", "answer_relevant", "answer"])
 
 
 @pytest.mark.parametrize(
