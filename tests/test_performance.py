@@ -99,19 +99,19 @@ def test_summary(results_dir):
     results.drop(columns=["answer"], inplace=True)
 
     logger.info(results.head())
-    summary = results.groupby("Category").agg({"documents_relevant": ["sum", "count"]}).reset_index()
+    summary = results.groupby("Category").agg({"answer_relevant": ["sum", "count"]}).reset_index()
     summary.columns = ["_".join(col).strip() for col in summary.columns.values]
     summary.rename(columns={"Category_": "Category"}, inplace=True)
     column_order = ["Category"] + [col for col in summary.columns if col not in ["Category"]]
     summary = summary.loc[:, column_order]
 
     summary["Answered questions"] = summary.apply(
-        lambda x: f"{x['documents_relevant_sum']} / {x['documents_relevant_count']}", axis=1
+        lambda x: f"{x['answer_relevant_sum']} / {x['answer_relevant_count']}", axis=1
     )
-    summary["(%)"] = (summary["documents_relevant_sum"] / summary["documents_relevant_count"]).apply(
+    summary["(%)"] = (summary["answer_relevant_sum"] / summary["answer_relevant_count"]).apply(
         lambda x: f"{x * 100:04.2f} %"
     )
-    summary.drop(columns=["documents_relevant_sum", "documents_relevant_count"], inplace=True)
+    summary.drop(columns=["answer_relevant_sum", "answer_relevant_count"], inplace=True)
     summary.set_index("Category", inplace=True)
 
     logger.info(summary)
