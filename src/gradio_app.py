@@ -89,7 +89,6 @@ def chat(history):
     user_input = history[-1][0]
 
     response = buster.process_input(user_input)
-    print(response)
 
     history[-1][1] = ""
 
