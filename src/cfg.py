@@ -3,8 +3,12 @@ import os
 
 import openai
 from buster.busterbot import BusterConfig
+from buster.completers.base import ChatGPTCompleter, Completer
+from buster.formatters.documents import DocumentsFormatter
+from buster.formatters.prompts import PromptFormatter
 from buster.retriever import Retriever, ServiceRetriever
-from buster.utils import get_retriever_from_extension
+from buster.tokenizers import GPTTokenizer
+from buster.validators.base import Validator
 
 from src.db_utils import make_uri
 
@@ -31,33 +35,43 @@ mongo_cluster = os.getenv("AI4H_MONGODB_CLUSTER")
 mongo_uri = make_uri(mongo_username, mongo_password, mongo_cluster)
 mongo_db_name = os.getenv("AI4H_MONGODB_DB_DATA")
 
-# setup retriever
-retriever: Retriever = ServiceRetriever(pinecone_api_key, pinecone_env, pinecone_index, mongo_uri, mongo_db_name)
-
 
 buster_cfg = BusterConfig(
     validator_cfg={
         "unknown_prompt": "I'm sorry, but I am an AI language model trained to assist with questions related to AI. I cannot answer that question as it is not relevant to the library or its usage. Is there anything else I can assist you with?",
         "unknown_threshold": 0.85,
         "embedding_model": "text-embedding-ada-002",
+        "use_reranking": True,
     },
     retriever_cfg={
+        "pinecone_api_key": pinecone_api_key,
+        "pinecone_env": pinecone_env,
+        "pinecone_index": pinecone_index,
+        "mongo_uri": mongo_uri,
+        "mongo_db_name": mongo_db_name,
         "top_k": 3,
         "thresh": 0.7,
         "max_tokens": 3000,
         "embedding_model": "text-embedding-ada-002",
     },
     completion_cfg={
-        "name": "ChatGPT",
         "completion_kwargs": {
             "model": "gpt-3.5-turbo",
-            "temperature": 0,
             "stream": True,
+            "temperature": 0,
         },
+        "no_documents_message": "No documents are available for this question.",
     },
-    prompt_cfg={
+    tokenizer_cfg={
+        "model_name": "gpt-3.5-turbo",
+    },
+    documents_formatter_cfg={
         "max_tokens": 3500,
-        "text_before_documents": (
+        "formatter": "{content}",
+    },
+    prompt_formatter_cfg={
+        "max_tokens": 3500,
+        "text_before_docs": (
             "You are a chatbot assistant answering questions about artificial intelligence (AI) policies and laws. "
             "You represent the OECD AI Policy Observatory. "
             "You can only respond to a question if the content necessary to answer the question is contained in the following provided documents. "
@@ -68,7 +82,7 @@ buster_cfg = BusterConfig(
             "Here is the documentation:\n"
             "<DOCUMENTS> "
         ),
-        "text_before_prompt": (
+        "text_after_docs": (
             "<\\DOCUMENTS>\n"
             "REMEMBER:\n"
             "You are a chatbot assistant answering questions about artificial intelligence (AI) policies and laws. "
@@ -87,7 +101,18 @@ buster_cfg = BusterConfig(
             "Now answer the following question:\n"
         ),
     },
-    document_source="",
 )
+
+
+# setup retriever
+retriever: Retriever = ServiceRetriever(**buster_cfg.retriever_cfg)
+tokenizer = GPTTokenizer(**buster_cfg.tokenizer_cfg)
+completer: Completer = ChatGPTCompleter(
+    documents_formatter=DocumentsFormatter(tokenizer=tokenizer, **buster_cfg.documents_formatter_cfg),
+    prompt_formatter=PromptFormatter(tokenizer=tokenizer, **buster_cfg.prompt_formatter_cfg),
+    **buster_cfg.completion_cfg,
+)
+validator: Validator = Validator(**buster_cfg.validator_cfg)
+
 
 available_models = ["gpt-3.5-turbo", "gpt-4"]

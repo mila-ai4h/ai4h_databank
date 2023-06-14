@@ -6,7 +6,7 @@ from typing import Any
 
 import pandas as pd
 import pymongo
-from buster.busterbot import BusterAnswer
+from buster.completers.base import Completion
 from fastapi.encoders import jsonable_encoder
 
 logger = logging.getLogger(__name__)
@@ -38,7 +38,7 @@ class FeedbackForm:
 @dataclass
 class Feedback:
     session_id: str
-    user_responses: list[BusterAnswer]
+    user_responses: list[Completion]
     feedback_form: FeedbackForm
     time: str
     version: int = 1
@@ -86,7 +86,7 @@ class Feedback:
     def to_json(self) -> Any:
         custom_encoder = {
             # Converts the matched_documents in the user_responses to json
-            BusterAnswer: lambda answer: answer.to_json(),
+            Completion: lambda answer: answer.to_json(),
         }
 
         to_encode = {
@@ -110,7 +110,7 @@ class Feedback:
         del feedback_dict["_id"]
         feedback_dict["feedback_form"] = FeedbackForm.from_dict(feedback_dict["feedback_form"])
 
-        feedback_dict["user_responses"] = [BusterAnswer.from_dict(r) for r in feedback_dict["user_responses"]]
+        feedback_dict["user_responses"] = [Completion.from_dict(r) for r in feedback_dict["user_responses"]]
 
         return cls(**feedback_dict)
 
