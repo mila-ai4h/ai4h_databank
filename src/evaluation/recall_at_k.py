@@ -1,7 +1,7 @@
 import pandas as pd
+from buster.retriever import Retriever
 from tqdm import tqdm
 
-from buster.retriever import Retriever
 from src.cfg import retriever
 
 # get access to pandas tqdm progress bar
