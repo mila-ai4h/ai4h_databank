@@ -9,6 +9,7 @@ from buster.formatters.prompts import PromptFormatter
 from buster.retriever import Retriever, ServiceRetriever
 from buster.tokenizers import GPTTokenizer
 from buster.validators.base import Validator
+from openai.embeddings_utils import cosine_similarity
 
 from src.db_utils import make_uri
 
@@ -36,10 +37,58 @@ mongo_uri = make_uri(mongo_username, mongo_password, mongo_cluster)
 mongo_db_name = os.getenv("AI4H_MONGODB_DB_DATA")
 
 
+class AI4HValidator(Validator):
+    def __init__(self, embedding_model: str, unknown_threshold: float, unknown_prompts: list[str], use_reranking: bool):
+        self.embedding_model = embedding_model
+        self.unknown_threshold = unknown_threshold
+        self.unknown_prompts = unknown_prompts
+        self.use_reranking = use_reranking
+
+    def check_answer_relevance(self, answer) -> bool:
+        """Check to see if a generated answer is relevant to the chatbot's knowledge or not.
+
+        We assume we've prompt-engineered our bot to say a response is unrelated to the context if it isn't relevant.
+        Here, we compare the embedding of the response to the embedding of the prompt-engineered "I don't know" embedding.
+
+        unk_threshold can be a value between [-1,1]. Usually, 0.85 is a good value.
+        """
+        logger.info("Checking for answer relevance...")
+
+        if answer == "":
+            raise ValueError("Cannot compute embedding of an empty string.")
+
+        # if unknown_prompt is None:
+        unknown_prompts = self.unknown_prompts
+
+        unknown_embeddings = [
+            self.get_embedding(
+                unknown_prompt,
+                engine=self.embedding_model,
+            )
+            for unknown_prompt in unknown_prompts
+        ]
+
+        answer_embedding = self.get_embedding(
+            answer,
+            engine=self.embedding_model,
+        )
+        unknown_similarity_scores = [
+            cosine_similarity(answer_embedding, unknown_embedding) for unknown_embedding in unknown_embeddings
+        ]
+        logger.info(f"{unknown_similarity_scores=}")
+
+        # Likely that the answer is meaningful, add the top sources
+        return False if any(score > self.unknown_threshold for score in unknown_similarity_scores) else True
+
+
 buster_cfg = BusterConfig(
     validator_cfg={
-        "unknown_prompt": "I'm sorry, but I am an AI language model trained to assist with questions related to AI. I cannot answer that question as it is not relevant to the library or its usage. Is there anything else I can assist you with?",
-        "unknown_threshold": 0.85,
+        "unknown_prompts": [
+            "I'm sorry, but I am an AI language model trained to assist with questions related to AI. I cannot answer that question as it is not relevant to the library or its usage. Is there anything else I can assist you with?",
+            "I cannot answer this question based on the information I have available",
+            "The provided documents do not contain information on your given topic",
+        ],
+        "unknown_threshold": 0.84,
         "embedding_model": "text-embedding-ada-002",
         "use_reranking": True,
     },
@@ -98,6 +147,8 @@ buster_cfg = BusterConfig(
             "For example:\n"
             "Q: What is the meaning of life for a qa bot?\n"
             "A: I'm sorry, but I am an AI language model trained to assist with questions related to AI policies and laws. I cannot answer that question as it is not relevant to AI policies and laws. Is there anything else I can assist you with?\n"
+            "7) If the provided documents do not directly adress the question, simply state that the provided documents don't answer the question. Do not summarize what they do contain. "
+            "For example: 'I cannot answer this question based on the information I have available'."
             "Now answer the following question:\n"
         ),
     },
@@ -112,7 +163,7 @@ completer: Completer = ChatGPTCompleter(
     prompt_formatter=PromptFormatter(tokenizer=tokenizer, **buster_cfg.prompt_formatter_cfg),
     **buster_cfg.completion_cfg,
 )
-validator: Validator = Validator(**buster_cfg.validator_cfg)
+validator: Validator = AI4HValidator(**buster_cfg.validator_cfg)
 
 
 available_models = ["gpt-3.5-turbo", "gpt-4"]
