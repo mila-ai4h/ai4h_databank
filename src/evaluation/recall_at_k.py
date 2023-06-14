@@ -1,45 +1,62 @@
 import pandas as pd
+from tqdm import tqdm
 
+from buster.retriever import Retriever
 from src.cfg import retriever
 
+# get access to pandas tqdm progress bar
+tqdm.pandas()
+
+
 def recall_at_k(df, k: int):
-    """Computers average recall at K for a given df. Assumes only 1 positive document per retrieval."""
-    # keep only positive results, -1 to be ignored
-    df = df[df.results >= 0]
-    return sum(df.results <= k) / len(df)
+    """Computes average recall at K over all samples in given df. Assumes only 1 positive document per retrieval."""
+    return sum(df.doc_rank <= k) / len(df)
 
-def get_top_k(matched_documents: pd.DataFrame, target_document) -> int:
-    """For documents, find which k rank the target document is in. If not found, returns -1."""
-    if any(contains_target := (matched_documents.content == target_document)):
+
+def get_document_rank(x, top_k: int, retriever: Retriever) -> int | float:
+    """Computes the rank at which a given document was retrieved.
+
+    x is a pandas row, which should contain a question, x.question and document, x.document to be retrieved.
+
+    If the document is not found in the retrieved top_k documents, it is considered inf.
+    """
+
+    # retrieve the top_k matched documents
+    matched_documents = retriever.get_topk_documents(x.question, source=None, top_k=top_k)
+
+    # find rank of known document
+    if any(contains_target := (matched_documents.content == x.document)):
         # Find the first index where the value is True
-        top_k = contains_target.idxmax()
+        rank = contains_target.idxmax()
     else:
-        top_k = -1
-    return top_k
+        rank = float("inf")
+    return rank
 
-# args
-questions_csv = "questions.csv"
-max_k = 50
 
-df = pd.read_csv(questions_csv)
-top_k_results = []
-for _, row in df.iterrows():
-    question_text = row.question
-    target_document = row.document
+def main():
+    # args
+    questions_csv = "questions.csv"  # generated questions using the generate_questions.py script
+    top_k = 50  # max number of documents to retrieve
 
-    matched_documents = retriever.get_topk_documents(row.question, source=None, top_k=max_k)
+    # load the questions
+    df = pd.read_csv(questions_csv)
+    print(f"Computing Recall@K for {questions_csv}. Found {len(questions_csv)} questions.")
 
-    top_k = get_top_k(matched_documents, target_document=row.document)
+    # Computes the retrieved document's rank.
+    # progress_apply replaces apply with a pandas tqdm wrapper
+    df["doc_rank"] = df.progress_apply(get_document_rank, args=(top_k, retriever), axis=1)
 
-    top_k_results.append(top_k)
+    df.to_csv("results.csv", index=False)
 
-df["results"] = top_k_results
+    print(df.doc_rank)
 
-df.to_csv("results.csv", index=False)
+    # Prints the frequency of a given count
+    rank_counts = df.doc_rank.value_counts().sort_index()
+    print(rank_counts)
 
-top_k_counts = pd.Series(top_k_results).value_counts().sort_index()
-print(top_k_results)
-print(top_k_counts)
+    recall_at_k_results = {k: recall_at_k(df, k) for k in range(top_k)}
+    print(f"{recall_at_k_results}")
 
-recall_at_k = {k: recall_at_k(df, k) for k in range(max_k)}
-print(recall_at_k)
+
+if __name__ == "__main__":
+    main()
