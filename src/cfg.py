@@ -36,15 +36,65 @@ mongo_cluster = os.getenv("AI4H_MONGODB_CLUSTER")
 mongo_uri = make_uri(mongo_username, mongo_password, mongo_cluster)
 mongo_db_name = os.getenv("AI4H_MONGODB_DB_DATA")
 
+from buster.completers import ChatGPTCompleter
+
 
 class AI4HValidator(Validator):
-    def __init__(self, embedding_model: str, unknown_threshold: float, unknown_prompts: list[str], use_reranking: bool):
+    def __init__(
+        self,
+        embedding_model: str,
+        unknown_threshold: float,
+        unknown_prompts: list[str],
+        use_reranking: bool,
+        invalid_question_response: str,
+    ):
         self.embedding_model = embedding_model
         self.unknown_threshold = unknown_threshold
         self.unknown_prompts = unknown_prompts
         self.use_reranking = use_reranking
+        self.invalid_question_response = invalid_question_response
 
-    def check_answer_relevance(self, answer) -> bool:
+    def check_question_relevance(self, question: str) -> bool:
+        """Determines wether a question is relevant or not for our given framework."""
+
+        prompt = """You are an chatbot answering questions on behalf of the OECD specifically on AI policies.
+        Your first job is to determine wether or not a question is valid, and should be answered.
+        For a question to be considered valid, it must be related to AI and policies.
+        More general questions are not considered valid, even if you might know the response.
+        You can only respond with one of ["Valid", "Not Valid"]. Please respect the puncutation.
+
+        For example:
+        Q: What policies did countries like Canada put in place with respect to artificial intelligence?
+        Valid
+
+        Q: What policies are put in place to ensure the wellbeing of agricultre?
+        Not Valid
+
+        A user will submit a question. Only respond with one of ["Valid", "Not Valid"].
+        """
+
+        completion_kwargs = {
+            "model": "gpt-3.5-turbo",
+            "stream": False,
+            "temperature": 0,
+        }
+        outputs = completer.complete(prompt, user_input=question, **completion_kwargs)
+
+        logger.info(f"Question relevance: {outputs}")
+
+        # remove trailing periods, happens sometimes...
+        outputs = outputs.strip(".")
+
+        if outputs == "Valid":
+            question_relevance = True
+        elif outputs == "Not Valid":
+            question_relevance = False
+        else:
+            logger.warning(f"the question validation returned an unexpeced value: {outputs}. Assuming Invalid...")
+            question_relevance = False
+        return question_relevance
+
+    def check_answer_relevance(self, answer: str) -> bool:
         """Check to see if a generated answer is relevant to the chatbot's knowledge or not.
 
         We assume we've prompt-engineered our bot to say a response is unrelated to the context if it isn't relevant.
@@ -78,7 +128,10 @@ class AI4HValidator(Validator):
         logger.info(f"{unknown_similarity_scores=}")
 
         # Likely that the answer is meaningful, add the top sources
-        return False if any(score > self.unknown_threshold for score in unknown_similarity_scores) else True
+        answer_relevant: bool = (
+            False if any(score > self.unknown_threshold for score in unknown_similarity_scores) else True
+        )
+        return answer_relevant
 
 
 buster_cfg = BusterConfig(
@@ -91,6 +144,7 @@ buster_cfg = BusterConfig(
         "unknown_threshold": 0.84,
         "embedding_model": "text-embedding-ada-002",
         "use_reranking": True,
+        "invalid_question_response": "This question does not seem relevant to AI policy questions.",
     },
     retriever_cfg={
         "pinecone_api_key": pinecone_api_key,
