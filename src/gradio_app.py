@@ -64,10 +64,7 @@ def pad_sources(sources: list[str]) -> list[str]:
 def add_sources(completion):
     completion = buster.postprocess_completion(completion)
 
-    print(completion)
-
     if any(arg is False for arg in [completion.question_relevant, completion.answer_relevant]):
-        print("Here?")
         # Question was not relevant, don't bother doing anything else...
         formatted_sources = [""]
         formatted_sources = pad_sources(formatted_sources)
