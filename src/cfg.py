@@ -54,7 +54,7 @@ class AI4HValidator(Validator):
         self.use_reranking = use_reranking
         self.invalid_question_response = invalid_question_response
 
-    def check_question_relevance(self, question: str) -> bool:
+    def check_question_relevance(self, question: str) -> tuple[bool, str]:
         """Determines wether a question is relevant or not for our given framework."""
 
         prompt = """You are an chatbot answering questions on behalf of the OECD specifically on AI policies.
@@ -80,6 +80,12 @@ class AI4HValidator(Validator):
         }
         outputs = completer.complete(prompt, user_input=question, **completion_kwargs)
 
+        if completer.error:
+            # something went wrong during generation, outputs will return typical error messages to user
+            logger.warning("Something went wrong during question relevance detection...")
+            question_relevance = False
+            return question_relevance, outputs
+
         logger.info(f"Question relevance: {outputs}")
 
         # remove trailing periods, happens sometimes...
@@ -92,7 +98,7 @@ class AI4HValidator(Validator):
         else:
             logger.warning(f"the question validation returned an unexpeced value: {outputs}. Assuming Invalid...")
             question_relevance = False
-        return question_relevance
+        return question_relevance, self.invalid_question_response
 
     def check_answer_relevance(self, answer: str) -> bool:
         """Check to see if a generated answer is relevant to the chatbot's knowledge or not.
