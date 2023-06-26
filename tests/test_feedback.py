@@ -54,6 +54,7 @@ def test_read_write_feedback():
     f = Feedback(
         session_id="session_id",
         user_responses=[b],
+        username="unit_test",
         feedback_form=FeedbackForm(
             good_bad="good",
             extra_info="extra",
