@@ -39,10 +39,16 @@ def get_session_id() -> str:
 
 
 def check_auth(username: str, password: str) -> bool:
-    """Basic auth, only supports a single user."""
-    # TODO: update to better auth
-    is_auth = username == cfg.USERNAME and password == cfg.PASSWORD
-    logger.info(f"Log-in attempted. {is_auth=}")
+    """Check if authentication succeeds or not.
+
+    The authentication leverages the built-in gradio authentication. We use a shared password among users.
+    It is temporary for developing the PoC. Proper authentication needs to be implemented in the future.
+    We allow a valid username to be any username beginning with 'databank-', this will allow us to differentiate between users easily.
+    """
+    valid_user = username.startswith("databank-") or username == cfg.USERNAME
+    valid_password = password == cfg.PASSWORD
+    is_auth = valid_user and valid_password
+    logger.info(f"Log-in attempted by {username=}. {is_auth=}")
     return is_auth
 
 
@@ -108,6 +114,7 @@ def submit_feedback(
     feedback_length_sources,
     feedback_timeliness_sources,
     feedback_info,
+    request: gr.Request,
 ):
     feedback_form = FeedbackForm(
         good_bad=feedback_good_bad,
@@ -119,7 +126,11 @@ def submit_feedback(
         timeliness_sources=feedback_timeliness_sources,
     )
     feedback = Feedback(
-        session_id=session_id, user_responses=user_responses, feedback_form=feedback_form, time=get_utc_time()
+        session_id=session_id,
+        user_responses=user_responses,
+        feedback_form=feedback_form,
+        time=get_utc_time(),
+        username=request.username,
     )
     feedback.send(mongo_db)
 
@@ -134,7 +145,7 @@ with block:
 
     # state variables are client-side and are reset every time a client refreshes the page
     user_responses = gr.State([])
-    session_id = gr.State(get_session_id())
+    session_id = gr.State(get_session_id)
 
     with gr.Row():
         gr.Markdown("<h1><center>LLawMa 🦙: A Question-Answering Bot for your documentation</center></h1>")
