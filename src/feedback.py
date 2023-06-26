@@ -84,9 +84,10 @@ class Feedback:
         return feedback_dict
 
     def to_json(self) -> Any:
+
         custom_encoder = {
             # Converts the matched_documents in the user_responses to json
-            Completion: lambda answer: answer.to_json(),
+            Completion: lambda completion: completion.to_json(columns_to_ignore=["embedding", "_id"]),
         }
 
         to_encode = {
