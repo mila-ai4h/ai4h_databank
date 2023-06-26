@@ -38,6 +38,7 @@ class FeedbackForm:
 @dataclass
 class Feedback:
     session_id: str
+    username: str
     user_responses: list[Completion]
     feedback_form: FeedbackForm
     time: str
@@ -90,6 +91,7 @@ class Feedback:
         }
 
         to_encode = {
+            "username": self.username,
             "session_id": self.session_id,
             "user_responses": self.user_responses,
             "feedback_form": self.feedback_form.to_json(),
