@@ -135,8 +135,9 @@ def submit_feedback(
     )
     feedback.send(mongo_db)
 
-    # update visibility for extra form
-    return {feedback_submitted_message: gr.update(visible=True)}
+
+def toggle_feedback_visible(visible: bool):
+    return {feedback_submitted_message: gr.update(visible=visible)}
 
 
 block = gr.Blocks(css="#chatbot .overflow-y-auto{height:500px}")
@@ -261,6 +262,9 @@ with block:
             feedback_timeliness_sources,
             feedback_info,
         ],
+    ).success(
+        toggle_feedback_visible,
+        inputs=gr.State(True),
         outputs=feedback_submitted_message,
     )
 
@@ -273,6 +277,10 @@ with block:
     # fmt: off
     submit.click(
         user, [message, chatbot], [message, chatbot]
+    ).then(
+        toggle_feedback_visible,
+        inputs=gr.State(False),
+        outputs=feedback_submitted_message,
     ).then(
         chat,
         inputs=[chatbot],
@@ -287,6 +295,10 @@ with block:
     )
     message.submit(
         user, [message, chatbot], [message, chatbot]
+    ).then(
+        toggle_feedback_visible,
+        inputs=gr.State(False),
+        outputs=feedback_submitted_message,
     ).then(
         chat,
         inputs=[chatbot],
