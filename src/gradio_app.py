@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 import gradio as gr
 import pandas as pd
 from buster.busterbot import Buster
+from buster.completers import Completion
 
 import cfg
 from db_utils import init_db
@@ -64,13 +65,13 @@ def pad_sources(sources: list[str]) -> list[str]:
 def add_sources(completion):
     completion = buster.postprocess_completion(completion)
 
-    if completion.answer_relevant:
-        # add sources
-        formatted_sources = format_sources(completion.matched_documents)
-
-    else:
+    if any(arg is False for arg in [completion.question_relevant, completion.answer_relevant]):
+        # Question was not relevant, don't bother doing anything else...
         formatted_sources = [""]
         formatted_sources = pad_sources(formatted_sources)
+        return formatted_sources
+
+    formatted_sources = format_sources(completion.matched_documents)
 
     return formatted_sources
 
