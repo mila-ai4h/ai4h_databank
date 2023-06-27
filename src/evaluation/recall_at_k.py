@@ -1,3 +1,5 @@
+import json
+
 import pandas as pd
 from buster.retriever import Retriever
 from tqdm import tqdm
@@ -71,18 +73,27 @@ def main():
 
     # Computes the retrieved document's rank.
     # progress_apply replaces apply with a pandas tqdm wrapper
-    df["doc_rank"] = df.progress_apply(get_document_rank, args=(top_k, retriever), axis=1)
+    doc_rank_column = "doc_rank"
+    df[doc_rank_column] = df.progress_apply(get_document_rank, args=(top_k, retriever), axis=1)
 
-    df.to_csv("results.csv", index=False)
+    # Display the results
+    print(df)
 
-    print(df.doc_rank)
+    # save the result to .csv
+    df.to_csv("results_tmp.csv", index=False)
 
-    # Prints the frequency of a given count
-    rank_counts = df.doc_rank.value_counts().sort_index()
+    # Compute and display the frequency of a rank
+    rank_counts = df[doc_rank_column].value_counts().sort_index()
     print(rank_counts)
 
-    recall_at_k_results = {k: recall_at_k(df, k, column="doc_rank") for k in range(top_k)}
+    # compute the recall at k results
+    recall_at_k_results = {k: recall_at_k(df, k, column=doc_rank_column) for k in range(top_k)}
     print(f"{recall_at_k_results}")
+
+    # Dump the results to a .json file
+    with open("recall_at_k_results.json", "w") as file:
+        json.dump(recall_at_k_results, file)
+
 
 
 if __name__ == "__main__":
