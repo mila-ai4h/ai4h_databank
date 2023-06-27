@@ -34,15 +34,15 @@ jobs:
           python3 -m pip install --upgrade pip
           pip install -e .[tests]
           pytest --run_expensive
-      - name: Save performance results
-        uses: actions/upload-artifact@v3
-        with:
-          name: results
-          path: |
-            results_detailed.csv
-            results_summary.csv
-      - name: Update summary
-        run: cat results_summary.md >> $GITHUB_STEP_SUMMARY
+      # - name: Save performance results
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: results
+      #     path: |
+      #       results_detailed.csv
+      #       results_summary.csv
+      # - name: Update summary
+      #   run: cat results_summary.md >> $GITHUB_STEP_SUMMARY
   deploy-prod:
     needs: tests
     runs-on: ubuntu-latest
