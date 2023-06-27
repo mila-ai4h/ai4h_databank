@@ -83,11 +83,13 @@ def generate_questions_from_summary(document: str, completer):
 
 def main():
     # to declare beforehand
-    documents_file = "documents.csv"
-    outputs_file = "questions.csv"
-    num_documents = 50
+    documents_file = "documents.csv"  # csv containing all chunks, or documents, to draw questions from
+    outputs_file = "questions.csv"  # Where to save the generated questions to
+    num_documents = 50  # Number of documents to use (generates 3 questions per doc)
+    model = "gpt-4"  # chatGPT model to use
 
     if not os.path.isfile(documents_file):
+        # If the document isn't already found localoly, it will fetch it from mongodb and save a local copy
         df = retriever.get_documents()
         df = df.sort_values(by=["source", "title", "country", "year"])
         df.to_csv(documents_file, index=False)
@@ -100,7 +102,7 @@ def main():
     completer = ChatGPTCompleter(
         documents_formatter=None,
         prompt_formatter=None,
-        completion_kwargs={"model": "gpt-4", "stream": False, "temperature": 0},
+        completion_kwargs={"model": model, "stream": False, "temperature": 0},
     )
 
     results = {

@@ -66,10 +66,12 @@ def main():
     # args
     questions_csv = "questions.csv"  # generated questions using the generate_questions.py script
     top_k = 50  # max number of documents to retrieve
+    rank_results_file = "ranking_results.csv"
+    recall_results_file = "recall_at_k_results.json"  # save results after computation
 
     # load the questions
     df = pd.read_csv(questions_csv)
-    print(f"Computing Recall@K for {questions_csv}. Found {len(questions_csv)} questions.")
+    print(f"Computing Recall@K for {questions_csv}. Found {len(df)} questions.")
 
     # Computes the retrieved document's rank.
     # progress_apply replaces apply with a pandas tqdm wrapper
@@ -80,7 +82,7 @@ def main():
     print(df)
 
     # save the result to .csv
-    df.to_csv("results_tmp.csv", index=False)
+    df.to_csv(rank_results_file, index=False)
 
     # Compute and display the frequency of a rank
     rank_counts = df[doc_rank_column].value_counts().sort_index()
@@ -91,7 +93,7 @@ def main():
     print(f"{recall_at_k_results}")
 
     # Dump the results to a .json file
-    with open("recall_at_k_results.json", "w") as file:
+    with open(recall_results_file, "w") as file:
         json.dump(recall_at_k_results, file)
 
 
