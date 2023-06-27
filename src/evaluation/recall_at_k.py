@@ -41,8 +41,6 @@ def get_document_rank(x, top_k: int, retriever: Retriever) -> int | float:
                      in the retrieved top_k documents, it is considered as infinity (inf).
     """
 
-
-
     # retrieve the top_k matched documents
     matched_documents = retriever.get_topk_documents(x.question, source=None, top_k=top_k)
 
@@ -95,7 +93,6 @@ def main():
     # Dump the results to a .json file
     with open(recall_results_file, "w") as file:
         json.dump(recall_at_k_results, file)
-
 
 
 if __name__ == "__main__":
