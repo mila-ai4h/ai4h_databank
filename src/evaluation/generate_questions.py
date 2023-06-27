@@ -18,15 +18,20 @@ openai.organization = None  #  os.getenv("OPENAI_ORGANIZATION")
 
 
 def split_questions(text: str):
-    """Splits raw text of questions into separate questions.
+    """Splits a raw text containing multiple questions into separate questions.
 
-    e.g.
 
-    1) question 1
-    2) question 2
-    3) question 3
+    Args:
+        text (str): The raw text containing multiple questions.
 
-    [question 1, question 2, question 3]
+    Returns:
+        list: A list of individual questions extracted from the input text.
+
+    Example:
+        >>> text = '1) What is your name?\n2) How old are you?\n3) Where do you live?\n'
+        >>> split_questions(text)
+        ['What is your name?', 'How old are you?', 'Where do you live?']
+
     """
     # This pattern matches the question number followed by ') ' and captures the rest of the line as the question text. Thanks ChatGPT
     pattern = r"\d+\)\s+(.*)"
@@ -35,6 +40,8 @@ def split_questions(text: str):
 
 
 def generate_questions(document: str, completer):
+    """Generates questions based on the provided documents using a language model."""
+
     prompt = """You generate questions based on the documents provided by the user.
     Questions should be in the style of a typical person interested in AI policies.
     They can be general, or specific, but should be answered by the documents provided.
@@ -53,6 +60,8 @@ def generate_questions(document: str, completer):
 
 
 def generate_questions_from_summary(document: str, completer):
+    """Generates a summary of a document, then generates a question using a language model."""
+
     # summarize the document
     prompt = "Summarize the content of the following document. Keep it high level"
     summary = completer.complete(prompt, user_input=document, **completer.completion_kwargs)
