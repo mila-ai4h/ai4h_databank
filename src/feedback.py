@@ -15,13 +15,9 @@ logging.basicConfig(level=logging.INFO)
 
 @dataclass
 class FeedbackForm:
-    good_bad: str
-    extra_info: str
     relevant_answer: str
-    relevant_length: str
     relevant_sources: str
-    length_sources: str
-    timeliness_sources: str
+    extra_info: str
     version: int = 0
 
     def to_json(self) -> Any:
@@ -37,7 +33,6 @@ class FeedbackForm:
 
 @dataclass
 class Feedback:
-    session_id: str
     username: str
     user_responses: list[Completion]
     feedback_form: FeedbackForm
@@ -92,7 +87,6 @@ class Feedback:
 
         to_encode = {
             "username": self.username,
-            "session_id": self.session_id,
             "user_responses": self.user_responses,
             "feedback_form": self.feedback_form.to_json(),
             "time": self.time,
@@ -121,13 +115,13 @@ def read_feedback(mongo_db: pymongo.database.Database, filters: dict = None) -> 
     """Read feedback from mongodb.
 
     By default, return all feedback. If filters are provided, return only feedback that matches the filters.
-    For example, to get just the feedback from a specific session, use filters={"session_id": <session_id>}.
+    For example, to get just the feedback from a specific session, use filters={"username": <username>}.
     """
     try:
         feedback = mongo_db["feedback"].find(filters)
         feedback = [Feedback.from_dict(f).flatten() for f in feedback]
         feedback = pd.DataFrame(feedback)
-        feedback = feedback.drop_duplicates(subset=["session_id", "user_input"], keep="last")
+        feedback = feedback.drop_duplicates(subset=["username", "user_input"], keep="last")
 
         return feedback
     except Exception as err:

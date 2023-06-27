@@ -1,14 +1,10 @@
-import copy
-import json
 import logging
 import os
-import uuid
 from datetime import datetime, timezone
 
 import gradio as gr
 import pandas as pd
 from buster.busterbot import Buster
-from buster.completers import Completion
 
 import cfg
 from db_utils import init_db
@@ -33,10 +29,6 @@ TRICK_QUESTIONS = pd.read_csv("Questions dataset - Trick.csv", header=None)[0].t
 
 def get_utc_time() -> str:
     return str(datetime.now(timezone.utc))
-
-
-def get_session_id() -> str:
-    return str(uuid.uuid1())
 
 
 def check_auth(username: str, password: str) -> bool:
@@ -107,27 +99,17 @@ def chat(history):
 
 def submit_feedback(
     user_responses,
-    session_id,
-    feedback_good_bad,
-    feedback_relevant_length,
-    feedback_relevant_answer,
     feedback_relevant_sources,
-    feedback_length_sources,
-    feedback_timeliness_sources,
+    feedback_relevant_answer,
     feedback_info,
     request: gr.Request,
 ):
     feedback_form = FeedbackForm(
-        good_bad=feedback_good_bad,
         extra_info=feedback_info,
         relevant_answer=feedback_relevant_answer,
-        relevant_length=feedback_relevant_length,
         relevant_sources=feedback_relevant_sources,
-        length_sources=feedback_length_sources,
-        timeliness_sources=feedback_timeliness_sources,
     )
     feedback = Feedback(
-        session_id=session_id,
         user_responses=user_responses,
         feedback_form=feedback_form,
         time=get_utc_time(),
@@ -147,7 +129,6 @@ with block:
 
     # state variables are client-side and are reset every time a client refreshes the page
     user_responses = gr.State([])
-    session_id = gr.State(get_session_id)
 
     with gr.Row():
         gr.Markdown("<h1><center>LLawMa 🦙: A Question-Answering Bot for your documentation</center></h1>")
@@ -203,41 +184,11 @@ with block:
     with gr.Column(variant="panel"):
         gr.Markdown("## Feedback form\nHelp us improve LLawMa 🦙!")
         with gr.Row():
-            feedback_good_bad = gr.Radio(choices=["👍", "👎"], label="How did buster do?")
-
-        with gr.Row():
-            feedback_relevant_answer = gr.Radio(
-                choices=[
-                    "1 - I lost time because the answer was wrong.",
-                    "2 - I lost time because the answer was unclear.",
-                    "3 - No time was saved or lost (over searching by other means).",
-                    "4 - I saved time because the answer was clear and correct.",
-                    "5 - The answer was perfect and can be used as a reference.",
-                ],
-                label="How much time did you save?",
-            )
-            feedback_relevant_length = gr.Radio(
-                choices=["Too Long", "Just Right", "Too Short"], label="How was the answer length?"
-            )
-
-        with gr.Row():
             feedback_relevant_sources = gr.Radio(
-                choices=[
-                    "1 - The sources were irrelevant.",
-                    "2 - The sources were relevant but others could have been better.",
-                    "3 - The sources were relevant and the best ones available.",
-                ],
-                label="How relevant were the sources?",
+                choices=["👍", "👎"], label="Were any of the retrieved sources relevant?"
             )
-
-            with gr.Column():
-                feedback_length_sources = gr.Radio(
-                    choices=["Too few", "Just right", "Too many"], label="How was the amount of sources?"
-                )
-
-                feedback_timeliness_sources = gr.Radio(
-                    choices=["Obsolete", "Old", "Recent"], label="How timely were the sources?"
-                )
+        with gr.Row():
+            feedback_relevant_answer = gr.Radio(choices=["👍", "👎"], label="Was the generated answer useful?")
 
         feedback_info = gr.Textbox(
             label="Enter additional information (optional)",
@@ -253,13 +204,8 @@ with block:
         submit_feedback,
         inputs=[
             user_responses,
-            session_id,
-            feedback_good_bad,
-            feedback_relevant_length,
-            feedback_relevant_answer,
             feedback_relevant_sources,
-            feedback_length_sources,
-            feedback_timeliness_sources,
+            feedback_relevant_answer,
             feedback_info,
         ],
     ).success(
