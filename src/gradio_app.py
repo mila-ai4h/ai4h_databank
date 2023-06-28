@@ -200,6 +200,7 @@ with block:
         with gr.Column(visible=False) as feedback_submitted_message:
             gr.Markdown("Feedback recorded, thank you! 📝")
 
+    # fmt: off
     submit_feedback_btn.click(
         submit_feedback,
         inputs=[
@@ -208,11 +209,16 @@ with block:
             feedback_relevant_answer,
             feedback_info,
         ],
-    ).then(toggle_feedback_visible, inputs=gr.State(False), outputs=feedback_submitted_message,).success(
+    ).then(
+        toggle_feedback_visible,
+        inputs=gr.State(False),
+        outputs=feedback_submitted_message,
+    ).success(
         toggle_feedback_visible,
         inputs=gr.State(True),
         outputs=feedback_submitted_message,
     )
+    # fmt: on
 
     gr.Markdown("This application uses GPT to search the docs for relevant info and answer questions.")
 
