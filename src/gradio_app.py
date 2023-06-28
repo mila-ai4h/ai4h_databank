@@ -21,10 +21,21 @@ logging.basicConfig(level=logging.INFO)
 
 buster = Buster(retriever=cfg.retriever, completer=cfg.completer, validator=cfg.validator)
 
+
+def read_file(file_path: str):
+    with open(file_path, "r") as file:
+        # Read the contents of the file
+        file_contents = file.readlines()
+
+    # Remove newline characters and whitespace from each line
+    file_contents = [line.strip() for line in file_contents]
+    return file_contents
+
+
 MAX_TABS = cfg.buster_cfg.retriever_cfg["top_k"]
-RELEVANT_QUESTIONS = pd.read_csv("Questions dataset - Relevant.csv", header=None)[0].to_list()
-IRRELEVANT_QUESTIONS = pd.read_csv("Questions dataset - Irrelevant.csv", header=None)[0].to_list()
-TRICK_QUESTIONS = pd.read_csv("Questions dataset - Trick.csv", header=None)[0].to_list()
+RELEVANT_QUESTIONS = read_file("relevant_questions.txt")
+IRRELEVANT_QUESTIONS = read_file("irrelevant_questions.txt")
+TRICK_QUESTIONS = read_file("trick_questions.txt")
 
 
 def get_utc_time() -> str:
