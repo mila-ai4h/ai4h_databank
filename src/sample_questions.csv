@@ -1,0 +1,132 @@
+question,valid_question,valid_answer,question_type
+Which European countries have AI policies?,True,True,relevant
+Which Latin American countries have AI policies?,True,True,relevant
+How many countries have a national AI strategy?,True,True,relevant
+How many African countries have a national AI strategy?,True,True,relevant
+What are the most common AI policies?,True,True,relevant
+What are some examples of success factors for AI strategies?,True,True,relevant
+How are countries monitoring and evaluating AI policy implementation?,True,True,relevant
+What are the most common AI policies related to transparency?,True,True,relevant
+Which countries have a register of AI systems used in the public sector?,True,True,relevant
+Which countries have AI policies (regulations) on the use of AI in the workplace?,True,True,relevant
+Which countries have conducted an evaluation of their national AI strategy?,True,True,relevant
+Which countries have set up AI research centres?,True,True,relevant
+What are the main policies to foster AI skills in EU countries?,True,True,relevant
+Which countries are developing AI policies aimed at either reducing emissions or fostering the green transition?,True,True,relevant
+Which 	countries have established a dedicated (either digital or AI) ministry to advance their policies?,True,True,relevant
+Which countries are collaborating to foster cross-border AI policy initiatives?/ which policies have more than one financing country?,True,True,relevant
+What is the focus of Italy’s AI policy strategy?,True,True,relevant
+What are the main priorities of the Australian AI Action Plan?,True,True,relevant
+Which sectors does France’s AI policies focus on?,True,True,relevant
+What are three AI policy examples in the USA?,True,True,relevant
+What areas of the AI ecosystem does Germany's AI strategy tend to focus on?,True,True,relevant
+Which OECD AI Principles seem most important in Germany’s AI national strategy?,True,True,relevant
+What are the most important AI policies in Canada ?,True,True,relevant
+"What are the strengths, weaknesses, opportunities and threats of Ireland’s AI ecosystem?",True,True,relevant
+In what way does Canada implement the OECD AI Principles?,True,True,relevant
+To which extent is Australia's AI Ethics Framework aligned to the OECD AI Principles?,True,True,relevant
+What qualitative questions were asked in the UK AI ecosystem survey?,True,True,relevant
+How were stakeholders consulted in the elaboration of the AI national strategy of Colombia?,True,True,relevant
+What are the key pillars of France’s national AI strategy?,True,True,relevant
+Are there AI policies in Portugal related to transparency?,True,True,relevant
+Are there AI policies in the EU related to explainability?,True,True,relevant
+Are there AI policies in France related to robustness?,True,True,relevant
+Are there AI policies in Israel related to security?,True,True,relevant
+Are there AI policies in Denmark related to safety?,True,True,relevant
+Are there AI policies in the UK related to fairness?,True,True,relevant
+Are there AI policies in the UK related to privacy and data governance?,True,True,relevant
+Are there AI policies in Japan related to accountability?,True,True,relevant
+Are there AI policies in Singapore promoting human-centred values?,True,True,relevant
+Are there AI policies in the US related to transparency?,True,True,relevant
+"Are there any AI policies in Germany focusing on [sector e.g. healthcare, mobility]?",True,True,relevant
+Are there any AI policies related to AI adoption in the public sector in the UK?,True,True,relevant
+Are there any AI policies related to AI adoption in the public sector in France?,True,True,relevant
+"Are there any policies targeted to attracting and retaining private investments in AI in Canada? Are there any policies targeted to 	attracting and retaining private investments in AI in Germany?	"",""",True,True,relevant
+"Are there any policies targeted to increasing diversity in AI in the Netherlands (e.g. by supporting the inclusion of women, minorities, vulnerable groups, etc. in AI development and use)?",True,True,relevant
+Are there any policies targeted to attracting and retaining AI talent in the United Kingdom?,True,True,relevant
+Are there any incentives to foster the creation of AI start-ups in Serbia? Are there any barriers?,True,True,relevant
+"Are there AI policies in UAE helping to build human capacity (e.g. reskill, upskill, etc.)?",True,True,relevant
+Are there AI policies in Serbia supporting research and development?,True,True,relevant
+Has Canada set up AI research centres as part of its national AI strategy?,True,True,relevant
+Are there any policies in Canada related to large language models?,True,True,relevant
+Are there any policies in the United States related to data centres and compute capacity?,True,True,relevant
+What official bodies are responsible for AI strategy in the UK?,True,True,relevant
+Which part of the government is responsible for AI policies in Serbia?,True,True,relevant
+Which parts of the Finnish government are involved in AI policymaking?,True,True,relevant
+Are there any AI regulatory sandboxes in Spain?,True,True,relevant
+Are there any AI regulatory sandboxes in Japan?,True,True,relevant
+Which countries have established ethics or oversight bodies for AI?,True,True,relevant
+What is the timeline of Slovenia’s implementation of its national AI strategy?,True,True,relevant
+What is the timeline of Korea’s implementation of its national AI strategy?,True,True,relevant
+In which year has the second phase of France’s national AI strategy started?,True,True,relevant
+How is Canada evaluating the success of its AI strategy?,True,True,relevant
+What are the indicators listed in the Egypt AI strategy to monitor progress of	actions?,True,True,relevant
+How much is the United Kingdom’s AI strategy investing in AI?,True,True,relevant
+What is the budget of the French national AI strategy?,True,True,relevant
+Has the EU proposed specific legislation on AI?,True,True,relevant
+Has Canada proposed specific legislation on AI?,True,True,relevant
+Which legislation in Japan applies to AI?,True,True,relevant
+What are the most effective ways to promote a healthy work-life balance in modern society?,False,False,irrelevant
+How can urban planning and design contribute to the creation of more sustainable and livable cities?,False,False,irrelevant
+"What role do bees play in the ecosystem, and what can be done to protect their populations from decline?",False,False,irrelevant
+"What are the most promising emerging technologies for addressing the global water crisis, and how can they be scaled up?",False,False,irrelevant
+How has the introduction of cryptocurrencies and blockchain technology influenced the global financial landscape?,False,False,irrelevant
+"What are the key factors contributing to the rise in global obesity rates, and how can policymakers address this public health issue?",False,False,irrelevant
+How can we promote sustainable tourism practices that benefit both local communities and the environment?,False,False,irrelevant
+"What are some effective strategies for reducing food waste at the individual, household, and institutional levels?",False,False,irrelevant
+"How has the evolution of social media impacted political discourse and the spread of information, both accurate and inaccurate?",False,False,irrelevant
+What are some of the most significant challenges and opportunities associated with space exploration in the 21st century?,False,False,irrelevant
+How can we encourage the use of renewable energy sources and reduce dependence on fossil fuels?,False,False,irrelevant
+What are the key factors that contribute to the development and preservation of cultural heritage in a rapidly globalizing world?,False,False,irrelevant
+"How can we promote greater gender equality and empower women in various aspects of society, including education, employment, and political representation?",False,False,irrelevant
+What are some innovative methods for addressing the growing issue of plastic pollution in oceans and waterways?,False,False,irrelevant
+How can the global community work together to prevent the spread of infectious diseases and prepare for potential pandemics?,False,False,irrelevant
+"What are the key factors that influence the taste and quality of different types of wine, and how can this knowledge be used to make better wine selections?",False,False,irrelevant
+How have advances in virtual reality and augmented reality technologies impacted the gaming industry and the way we interact with digital content?,False,False,irrelevant
+"What role do pets play in human well-being and mental health, and what are the benefits and challenges of pet ownership?",False,False,irrelevant
+"What are the primary causes of traffic congestion in urban areas, and what solutions can be implemented to alleviate this problem?",False,False,irrelevant
+"How can the arts, such as music, theater, and visual arts, contribute to the overall well-being and personal development of individuals and communities?",False,False,irrelevant
+"What are the most effective methods for learning a new language and achieving fluency, and how do these methods vary among different age groups?",False,False,irrelevant
+What are some strategies for maintaining personal motivation and productivity while working remotely or in a flexible work environment?,False,False,irrelevant
+"How has the increasing popularity of plant-based diets influenced the food industry, and what are the potential health and environmental benefits of adopting such a diet?",False,False,irrelevant
+"What are the primary factors that contribute to the formation of natural disasters, such as earthquakes, hurricanes, and volcanic eruptions, and how can communities better prepare for these events?",False,False,irrelevant
+How can urban agriculture and community gardens contribute to local food security and overall community well-being?,False,False,irrelevant
+What are some innovative approaches to waste management and recycling that can help reduce the environmental impact of human activities?,False,False,irrelevant
+How can we foster greater understanding and empathy between individuals of diverse cultural backgrounds to promote social cohesion and reduce prejudice?,False,False,irrelevant
+What are the most effective ways to teach children about the importance of financial literacy and responsible money management?,False,False,irrelevant
+"How has the growth of e-commerce and online shopping impacted traditional brick-and-mortar retail businesses, and what strategies can they employ to stay competitive?",False,False,irrelevant
+"What are some of the most interesting and unusual hobbies or pastimes that people engage in around the world, and what can we learn from them?",False,False,irrelevant
+How does the United States' AI in Government Act ensure the responsible and ethical use of AI technologies in public services?,True,False,trick
+"To what extent does China's Personal Information Protection Law align with international data protection standards, such as the EU's General Data Protection Regulation (GDPR)?",True,False,trick
+How does the United Kingdom's AI Sector Deal support the development of small and medium-sized AI enterprises?,True,False,trick
+"In Germany's AI Liability Act, how is liability determined when multiple AI systems or a combination of AI and human decisions lead to harm or incorrect decisions?",True,False,trick
+How does France's AI Transparency and Accountability Act ensure that AI developers comply with the requirement to provide explanations for their algorithms' decision-making processes?,True,False,trick
+How does Canada's Algorithmic Impact Assessment Framework balance the benefits of AI systems in the public sector with the potential risks to individuals' rights and freedoms?,True,False,trick
+To what extent do Japan's Guidelines for AI and Data Utilization provide clear and actionable recommendations for AI developers and users?,True,False,trick
+How does Australia's Consumer Data Right (CDR) ensure that consumers can effectively exercise control over their personal data when it is used in AI applications?,True,False,trick
+What measures are included in China's New Generation Artificial Intelligence Development Plan to encourage international collaboration and knowledge-sharing in the field of AI?,True,False,trick
+In what ways does France's High Council for AI (CPAI) contribute to the global discourse on AI governance and ethics?,True,False,trick
+How does Nigeria's National AI Strategy for Nigeria (NAISN) plan to attract foreign investment and expertise to boost the country's AI capabilities?,True,False,trick
+What measures does the AI Empowerment and Inclusion Act in Nigeria propose to ensure that underserved communities have equal access to AI resources and opportunities?,True,False,trick
+How does South Africa's AI for Social Good Initiative incentivize the development of AI solutions to address the country's most pressing socio-economic challenges?,True,False,trick
+"To what extent does the Data Privacy and AI Regulation Act in South Africa align with international data protection standards, such as the EU's General Data Protection Regulation (GDPR)?",True,False,trick
+How does Kenya's AI Vision 2030 plan to promote collaboration between the public and private sectors to drive AI innovation and adoption?,True,False,trick
+What specific provisions are included in Kenya's AI for Sustainable Development Act to encourage the use of AI in environmental conservation and renewable energy sectors?,True,False,trick
+How does Egypt's AI National Strategy aim to build a strong AI research and development infrastructure while fostering international partnerships?,True,False,trick
+In what ways does the AI for Smart Cities Act in Egypt support the development and implementation of AI technologies in urban planning to improve public services and infrastructure?,True,False,trick
+How does Ghana's AI Development Initiative (GAIDI) plan to leverage partnerships with regional and international AI organizations to strengthen the country's AI ecosystem?,True,False,trick
+What strategies are proposed in Ghana's AI for Healthcare Act to ensure the successful development and deployment of AI applications in healthcare services across the country?,True,False,trick
+How does Rwanda's AI Roadmap 2030 envision fostering a skilled workforce capable of driving AI innovation and adoption within the country?,True,False,trick
+How does Sweden's AI for Education and Skills Development Act plan to integrate AI technologies into educational curricula and promote training opportunities in STEM fields?,True,False,trick
+How does Brazil's National AI Strategy (BNAIS) plan to create a robust AI ecosystem through public-private partnerships and international collaborations?,True,False,trick
+What specific measures does Brazil's AI for Economic Growth and Social Inclusion Act propose to ensure that AI technologies benefit all segments of society?,True,False,trick
+How does Argentina's AI for Sustainable Agriculture Initiative support the adoption of AI technologies to enhance agricultural productivity and promote sustainable farming practices?,True,False,trick
+"To what extent does the Data Privacy and AI Regulation Act in Argentina align with international data protection standards, such as the EU's General Data Protection Regulation (GDPR)?",True,False,trick
+"How does Chile's AI Vision 2030 plan to promote collaboration between various stakeholders, including the government, industry, and academia, to drive AI innovation and adoption?",True,False,trick
+What specific provisions are included in Chile's AI for Renewable Energy and Environmental Conservation Act to encourage the use of AI in clean energy and environmental protection efforts?,True,False,trick
+How does Colombia's AI National Strategy aim to build a strong AI research and development infrastructure while fostering international partnerships?,True,False,trick
+"In what ways does the AI for Public Health and Safety Act in Colombia support the development and implementation of AI technologies in healthcare, disaster response, and crime prevention?",True,False,trick
+How does Peru's AI Development Initiative (PADI) plan to leverage partnerships with regional and international AI organizations to strengthen the country's AI ecosystem?,True,False,trick
+What strategies are proposed in Peru's AI for Cultural Heritage Preservation Act to ensure the successful integration of AI applications in cultural preservation and documentation efforts?,True,False,trick
+How does Uruguay's AI Roadmap 2030 envision fostering a skilled workforce capable of driving AI innovation and adoption within the country?,True,False,trick
+How does India's AI for Education and Workforce Development Act plan to integrate AI technologies into educational curricula and promote training opportunities in technology and innovation fields?,True,False,trick
