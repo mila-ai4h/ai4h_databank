@@ -35,6 +35,7 @@ mongo_password = os.getenv("AI4H_MONGODB_PASSWORD")
 mongo_cluster = os.getenv("AI4H_MONGODB_CLUSTER")
 mongo_uri = make_uri(mongo_username, mongo_password, mongo_cluster)
 mongo_db_name = os.getenv("AI4H_MONGODB_DB_DATA")
+feedback_collection = "feedback-test"
 
 from buster.completers import ChatGPTCompleter
 

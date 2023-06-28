@@ -18,16 +18,12 @@ class FeedbackForm:
     relevant_answer: str
     relevant_sources: str
     extra_info: str
-    version: int = 0
 
     def to_json(self) -> Any:
         return jsonable_encoder(self)
 
     @classmethod
     def from_dict(cls, feedback_dict: dict) -> FeedbackForm:
-        # Backwards compatibility
-        if "version" not in feedback_dict:
-            feedback_dict["version"] = 0
         return cls(**feedback_dict)
 
 
@@ -37,15 +33,14 @@ class Feedback:
     user_responses: list[Completion]
     feedback_form: FeedbackForm
     time: str
-    version: int = 1
 
-    def send(self, mongo_db: pymongo.database.Database):
+    def send(self, mongo_db: pymongo.database.Database, collection: str):
         feedback_json = self.to_json()
         logger.info(feedback_json)
 
         try:
-            mongo_db["feedback"].insert_one(feedback_json)
-            logger.info("response logged to mondogb")
+            mongo_db[collection].insert_one(feedback_json)
+            logger.info(f"response logged to mondogb {collection=}")
         except Exception as err:
             logger.exception("Something went wrong logging to mongodb")
 
@@ -90,19 +85,11 @@ class Feedback:
             "user_responses": self.user_responses,
             "feedback_form": self.feedback_form.to_json(),
             "time": self.time,
-            "version": self.version,
         }
         return jsonable_encoder(to_encode, custom_encoder=custom_encoder)
 
     @classmethod
     def from_dict(cls, feedback_dict: dict) -> Feedback:
-        # Backwards compatibility
-        if "version" not in feedback_dict:
-            feedback_dict["version"] = 1
-
-            feedback_dict["feedback_form"] = feedback_dict["feedback"]
-            del feedback_dict["feedback"]
-
         del feedback_dict["_id"]
         feedback_dict["feedback_form"] = FeedbackForm.from_dict(feedback_dict["feedback_form"])
 
@@ -111,14 +98,14 @@ class Feedback:
         return cls(**feedback_dict)
 
 
-def read_feedback(mongo_db: pymongo.database.Database, filters: dict = None) -> pd.DataFrame:
+def read_feedback(mongo_db: pymongo.database.Database, collection: str, filters: dict = None) -> pd.DataFrame:
     """Read feedback from mongodb.
 
     By default, return all feedback. If filters are provided, return only feedback that matches the filters.
     For example, to get just the feedback from a specific session, use filters={"username": <username>}.
     """
     try:
-        feedback = mongo_db["feedback"].find(filters)
+        feedback = mongo_db[collection].find(filters)
         feedback = [Feedback.from_dict(f).flatten() for f in feedback]
         feedback = pd.DataFrame(feedback)
         feedback = feedback.drop_duplicates(subset=["username", "user_input"], keep="last")

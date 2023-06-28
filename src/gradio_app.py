@@ -115,7 +115,7 @@ def submit_feedback(
         time=get_utc_time(),
         username=request.username,
     )
-    feedback.send(mongo_db)
+    feedback.send(mongo_db, collection=cfg.feedback_collection)
 
 
 def toggle_feedback_visible(visible: bool):
@@ -208,7 +208,7 @@ with block:
             feedback_relevant_answer,
             feedback_info,
         ],
-    ).success(
+    ).then(toggle_feedback_visible, inputs=gr.State(False), outputs=feedback_submitted_message,).success(
         toggle_feedback_visible,
         inputs=gr.State(True),
         outputs=feedback_submitted_message,
