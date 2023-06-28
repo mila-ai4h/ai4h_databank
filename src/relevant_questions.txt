@@ -1,0 +1,67 @@
+Which European countries have AI policies?
+Which Latin American countries have AI policies?
+How many countries have a national AI strategy?
+How many African countries have a national AI strategy?
+What are the most common AI policies?
+What are some examples of success factors for AI strategies?
+How are countries monitoring and evaluating AI policy implementation?
+What are the most common AI policies related to transparency?
+Which countries have a register of AI systems used in the public sector?
+Which countries have AI policies (regulations) on the use of AI in the workplace?
+Which countries have conducted an evaluation of their national AI strategy?
+Which countries have set up AI research centres?
+What are the main policies to foster AI skills in EU countries?
+Which countries are developing AI policies aimed at either reducing emissions or fostering the green transition?
+Which 	countries have established a dedicated (either digital or AI) ministry to advance their policies?
+Which countries are collaborating to foster cross-border AI policy initiatives?/ which policies have more than one financing country?
+What is the focus of Italy’s AI policy strategy?
+What are the main priorities of the Australian AI Action Plan?
+Which sectors does France’s AI policies focus on?
+What are three AI policy examples in the USA?
+What areas of the AI ecosystem does Germany's AI strategy tend to focus on?
+Which OECD AI Principles seem most important in Germany’s AI national strategy?
+What are the most important AI policies in Canada ?
+What are the strengths, weaknesses, opportunities and threats of Ireland’s AI ecosystem?
+In what way does Canada implement the OECD AI Principles?
+To which extent is Australia's AI Ethics Framework aligned to the OECD AI Principles?
+What qualitative questions were asked in the UK AI ecosystem survey?
+How were stakeholders consulted in the elaboration of the AI national strategy of Colombia?
+What are the key pillars of France’s national AI strategy?
+Are there AI policies in Portugal related to transparency?
+Are there AI policies in the EU related to explainability?
+Are there AI policies in France related to robustness?
+Are there AI policies in Israel related to security?
+Are there AI policies in Denmark related to safety?
+Are there AI policies in the UK related to fairness?
+Are there AI policies in the UK related to privacy and data governance?
+Are there AI policies in Japan related to accountability?
+Are there AI policies in Singapore promoting human-centred values?
+Are there AI policies in the US related to transparency?
+Are there any AI policies in Germany focusing on [sector e.g. healthcare, mobility]?
+Are there any AI policies related to AI adoption in the public sector in the UK?
+Are there any AI policies related to AI adoption in the public sector in France?
+Are there any policies targeted to attracting and retaining private investments in AI in Canada? Are there any policies targeted to 	attracting and retaining private investments in AI in Germany?	","
+Are there any policies targeted to increasing diversity in AI in the Netherlands (e.g. by supporting the inclusion of women, minorities, vulnerable groups, etc. in AI development and use)?
+Are there any policies targeted to attracting and retaining AI talent in the United Kingdom?
+Are there any incentives to foster the creation of AI start-ups in Serbia? Are there any barriers?
+Are there AI policies in UAE helping to build human capacity (e.g. reskill, upskill, etc.)?
+Are there AI policies in Serbia supporting research and development?
+Has Canada set up AI research centres as part of its national AI strategy?
+Are there any policies in Canada related to large language models?
+Are there any policies in the United States related to data centres and compute capacity?
+What official bodies are responsible for AI strategy in the UK?
+Which part of the government is responsible for AI policies in Serbia?
+Which parts of the Finnish government are involved in AI policymaking?
+Are there any AI regulatory sandboxes in Spain?
+Are there any AI regulatory sandboxes in Japan?
+Which countries have established ethics or oversight bodies for AI?
+What is the timeline of Slovenia’s implementation of its national AI strategy?
+What is the timeline of Korea’s implementation of its national AI strategy?
+In which year has the second phase of France’s national AI strategy started?
+How is Canada evaluating the success of its AI strategy?
+What are the indicators listed in the Egypt AI strategy to monitor progress of	actions?
+How much is the United Kingdom’s AI strategy investing in AI?
+What is the budget of the French national AI strategy?
+Has the EU proposed specific legislation on AI?
+Has Canada proposed specific legislation on AI?
+Which legislation in Japan applies to AI?
