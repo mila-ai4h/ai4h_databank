@@ -10,27 +10,14 @@ class MockValidator:
 
 
 def test_read_write_feedbackform():
-    ff = FeedbackForm(
-        good_bad="good",
-        extra_info="extra",
-        relevant_answer="relevant",
-        relevant_length="length",
-        relevant_sources="sources",
-        length_sources="length",
-        timeliness_sources="timeliness",
-    )
+    ff = FeedbackForm(relevant_answer="relevant", relevant_sources="sources", extra_info="extra info")
 
     ff_json = ff.to_json()
     ff_back = FeedbackForm.from_dict(ff_json)
 
-    assert ff.version == ff_back.version
-    assert ff.good_bad == ff_back.good_bad
     assert ff.extra_info == ff_back.extra_info
     assert ff.relevant_answer == ff_back.relevant_answer
-    assert ff.relevant_length == ff_back.relevant_length
     assert ff.relevant_sources == ff_back.relevant_sources
-    assert ff.length_sources == ff_back.length_sources
-    assert ff.timeliness_sources == ff_back.timeliness_sources
 
 
 def test_read_write_feedback():
@@ -52,17 +39,12 @@ def test_read_write_feedback():
     )
 
     f = Feedback(
-        session_id="session_id",
+        username="test user",
         user_responses=[b],
-        username="unit_test",
         feedback_form=FeedbackForm(
-            good_bad="good",
             extra_info="extra",
             relevant_answer="relevant",
-            relevant_length="length",
             relevant_sources="sources",
-            length_sources="length",
-            timeliness_sources="timeliness",
         ),
         time="time",
     )
@@ -71,22 +53,17 @@ def test_read_write_feedback():
     f_json["_id"] = "0123"  # This is created by mongodb
     f_back = Feedback.from_dict(f_json)
 
-    assert f.version == f_back.version
-    assert f.session_id == f_back.session_id
+    assert f.username == f_back.username
     assert f.time == f_back.time
-    assert f.feedback_form.version == f_back.feedback_form.version
-    assert f.feedback_form.good_bad == f_back.feedback_form.good_bad
     assert f.feedback_form.extra_info == f_back.feedback_form.extra_info
     assert f.feedback_form.relevant_answer == f_back.feedback_form.relevant_answer
-    assert f.feedback_form.relevant_length == f_back.feedback_form.relevant_length
     assert f.feedback_form.relevant_sources == f_back.feedback_form.relevant_sources
-    assert f.feedback_form.length_sources == f_back.feedback_form.length_sources
-    assert f.feedback_form.timeliness_sources == f_back.feedback_form.timeliness_sources
     assert len(f.user_responses) == len(f_back.user_responses)
     assert f.user_responses[0].user_input == f_back.user_responses[0].user_input
     assert f.user_responses[0].error == f_back.user_responses[0].error
     assert f.user_responses[0].text == f_back.user_responses[0].text
     assert f.user_responses[0].answer_relevant == f_back.user_responses[0].answer_relevant
+    assert f.user_responses[0].question_relevant == f_back.user_responses[0].question_relevant
     for col in f_back.user_responses[0].matched_documents.columns.tolist():
         assert col in f.user_responses[0].matched_documents.columns.tolist()
         assert (
