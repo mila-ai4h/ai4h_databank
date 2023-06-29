@@ -1,11 +1,16 @@
-import os
 import copy
-from buster.busterbot import Buster
-import pandas as pd
-from tqdm import tqdm
+import logging
+import os
+
 import openai
+import pandas as pd
+from buster.busterbot import Buster
+from tqdm import tqdm
 
 from src import cfg
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 openai.organization = os.getenv("OPENAI_ORGANIZATION")
 
@@ -22,15 +27,13 @@ def process_questions(q):
         # gets a completion
         completion = buster.process_input(q.question)
 
-        # will compute answer relevance
-        completion = buster.postprocess_completion(completion)
-
         q["answer_relevant"] = completion.answer_relevant
         q["question_relevant"] = completion.question_relevant
-        q["answer"] = completion.text
+        q["answer"] = completion.answer_text
         q["error"] = completion.error
 
     except Exception as e:
+        logger.exception("something went wrong...")
         q["answer_relevant"] = None
         q["question_relevant"] = None
         q["answer"] = None
