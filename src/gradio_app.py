@@ -123,7 +123,18 @@ def submit_feedback(
 
 
 def toggle_feedback_visible(visible: bool):
+    """Toggles the visibility of the 'feedback submitted' message."""
     return {feedback_submitted_message: gr.update(visible=visible)}
+
+
+def clear_feedback_form():
+    """Clears the contents of the feedback form."""
+    return {
+        feedback_submitted_message: gr.update(visible=False),
+        feedback_relevant_sources: gr.update(value=None),
+        feedback_relevant_answer: gr.update(value=None),
+        feedback_info: gr.update(value=""),
+    }
 
 
 block = gr.Blocks(css="#chatbot .overflow-y-auto{height:500px}")
@@ -222,6 +233,7 @@ with block:
         inputs=gr.State(True),
         outputs=feedback_submitted_message,
     )
+    # If you rage click the subimt feedback button, it re-appears so you are confident it was recorded properly.
     # fmt: on
 
     gr.Markdown("This application uses GPT to search the docs for relevant info and answer questions.")
@@ -234,9 +246,8 @@ with block:
     submit.click(
         user, [message, chatbot], [message, chatbot]
     ).then(
-        toggle_feedback_visible,
-        inputs=gr.State(False),
-        outputs=feedback_submitted_message,
+        clear_feedback_form,
+        outputs=[feedback_submitted_message, feedback_relevant_sources, feedback_relevant_answer, feedback_info]
     ).then(
         chat,
         inputs=[chatbot],
@@ -252,9 +263,8 @@ with block:
     message.submit(
         user, [message, chatbot], [message, chatbot]
     ).then(
-        toggle_feedback_visible,
-        inputs=gr.State(False),
-        outputs=feedback_submitted_message,
+        clear_feedback_form,
+        outputs=[feedback_submitted_message, feedback_relevant_sources, feedback_relevant_answer, feedback_info]
     ).then(
         chat,
         inputs=[chatbot],
