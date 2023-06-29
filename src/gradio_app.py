@@ -61,8 +61,6 @@ def pad_sources(sources: list[str]) -> list[str]:
 
 
 def add_sources(completion):
-    completion = buster.postprocess_completion(completion)
-
     if any(arg is False for arg in [completion.question_relevant, completion.answer_relevant]):
         # Question was not relevant, don't bother doing anything else...
         formatted_sources = [""]
@@ -87,14 +85,14 @@ def user(user_input, history):
 def chat(history):
     user_input = history[-1][0]
 
-    response = buster.process_input(user_input)
+    completion = buster.process_input(user_input)
 
     history[-1][1] = ""
 
-    for token in response.completor:
+    for token in completion.answer_generator:
         history[-1][1] += token
 
-        yield history, response
+        yield history, completion
 
 
 def submit_feedback(
@@ -202,6 +200,10 @@ with block:
 
     # fmt: off
     submit_feedback_btn.click(
+        toggle_feedback_visible,
+        inputs=gr.State(False),
+        outputs=feedback_submitted_message,
+    ).then(
         submit_feedback,
         inputs=[
             user_responses,
@@ -209,10 +211,6 @@ with block:
             feedback_relevant_answer,
             feedback_info,
         ],
-    ).then(
-        toggle_feedback_visible,
-        inputs=gr.State(False),
-        outputs=feedback_submitted_message,
     ).success(
         toggle_feedback_visible,
         inputs=gr.State(True),
