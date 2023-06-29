@@ -21,10 +21,14 @@ logging.basicConfig(level=logging.INFO)
 
 buster = Buster(retriever=cfg.retriever, completer=cfg.completer, validator=cfg.validator)
 
+
 MAX_TABS = cfg.buster_cfg.retriever_cfg["top_k"]
-RELEVANT_QUESTIONS = pd.read_csv("Questions dataset - Relevant.csv", header=None)[0].to_list()
-IRRELEVANT_QUESTIONS = pd.read_csv("Questions dataset - Irrelevant.csv", header=None)[0].to_list()
-TRICK_QUESTIONS = pd.read_csv("Questions dataset - Trick.csv", header=None)[0].to_list()
+
+# Load the sample questions and split them by type
+questions = pd.read_csv("sample_questions.csv")
+relevant_questions = questions[questions.question_type == "relevant"].question.to_list()
+irrelevant_questions = questions[questions.question_type == "irrelevant"].question.to_list()
+trick_questions = questions[questions.question_type == "trick"].question.to_list()
 
 
 def get_utc_time() -> str:
@@ -148,19 +152,19 @@ with block:
                 gr.Markdown("## Example questions")
                 with gr.Tab("Relevant questions"):
                     gr.Examples(
-                        examples=RELEVANT_QUESTIONS,
+                        examples=relevant_questions,
                         inputs=message,
                         label="Questions users could ask.",
                     )
                 with gr.Tab("Irrelevant questions"):
                     gr.Examples(
-                        examples=IRRELEVANT_QUESTIONS,
+                        examples=irrelevant_questions,
                         inputs=message,
                         label="Questions with no relevance to the OECD AI Policy Observatory.",
                     )
                 with gr.Tab("Trick questions"):
                     gr.Examples(
-                        examples=TRICK_QUESTIONS,
+                        examples=trick_questions,
                         inputs=message,
                         label="Questions about non-existing AI policies and laws.",
                     )
