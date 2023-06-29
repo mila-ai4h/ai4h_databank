@@ -147,6 +147,7 @@ buster_cfg = BusterConfig(
             "I'm sorry, but I am an AI language model trained to assist with questions related to AI. I cannot answer that question as it is not relevant to the library or its usage. Is there anything else I can assist you with?",
             "I cannot answer this question based on the information I have available",
             "The provided documents do not contain information on your given topic",
+            "The provided documents do not directly address the question",
         ],
         "unknown_threshold": 0.84,
         "embedding_model": "text-embedding-ada-002",

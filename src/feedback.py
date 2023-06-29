@@ -42,7 +42,8 @@ class Feedback:
             mongo_db[collection].insert_one(feedback_json)
             logger.info(f"response logged to mondogb {collection=}")
         except Exception as err:
-            logger.exception("Something went wrong logging to mongodb")
+            logger.exception(f"Something went wrong logging to mongodb {collection=}")
+            raise err
 
     def flatten(self) -> dict:
         """Flatten feedback object into a dict for easier reading."""
