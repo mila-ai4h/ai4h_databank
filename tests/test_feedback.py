@@ -8,6 +8,9 @@ class MockValidator:
     def check_sources_used(self, completion: Completion) -> bool:
         return True
 
+    def check_answer_relevance(self, *args, **kwargs) -> bool:
+        return True
+
 
 def test_read_write_feedbackform():
     ff = FeedbackForm(relevant_answer="relevant", relevant_sources="sources", extra_info="extra info")
@@ -25,7 +28,7 @@ def test_read_write_feedback():
     b = Completion(
         error=False,
         user_input="This is my input",
-        completor="This is my completed answer",
+        answer_text="This is my completed answer",
         matched_documents=pd.DataFrame.from_dict(
             {
                 "title": ["test"] * n_samples,
@@ -36,6 +39,7 @@ def test_read_write_feedback():
                 "source": ["fake source"] * n_samples,
             }
         ),
+        validator=MockValidator(),
     )
 
     f = Feedback(
@@ -61,7 +65,7 @@ def test_read_write_feedback():
     assert len(f.user_responses) == len(f_back.user_responses)
     assert f.user_responses[0].user_input == f_back.user_responses[0].user_input
     assert f.user_responses[0].error == f_back.user_responses[0].error
-    assert f.user_responses[0].text == f_back.user_responses[0].text
+    assert f.user_responses[0].answer_text == f_back.user_responses[0].answer_text
     assert f.user_responses[0].answer_relevant == f_back.user_responses[0].answer_relevant
     assert f.user_responses[0].question_relevant == f_back.user_responses[0].question_relevant
     for col in f_back.user_responses[0].matched_documents.columns.tolist():
