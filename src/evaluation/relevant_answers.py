@@ -41,7 +41,7 @@ def process_questions(q):
     return q
 
 
-def compute_result(results_df, question_type: str):
+def compute_result(results_df, question_type: str) -> pd.Series:
     if question_type == "relevant":
         expected_question_relevant = True
         expected_answer_relevant = True
@@ -59,13 +59,12 @@ def compute_result(results_df, question_type: str):
     # drop entries with errors
     sub_df = sub_df[sub_df.error == False]
 
-    # compute stats
-    num_correct = sum(
-        (sub_df.question_relevant == expected_question_relevant) & (sub_df.answer_relevant == expected_answer_relevant)
+    # compute results, pd.Series of True or False for each entry
+    results = (sub_df.question_relevant == expected_question_relevant) & (
+        sub_df.answer_relevant == expected_answer_relevant
     )
-    total = len(sub_df)
 
-    return num_correct, total
+    return results
 
 
 if __name__ == "__main__":
@@ -76,5 +75,5 @@ if __name__ == "__main__":
     results_df.to_csv("question_results.csv", index=False)
 
     for question_type in ["relevant", "irrelevant", "trick"]:
-        num_correct, total = compute_result(results_df, question_type)
-        print(f"Result for {question_type=}: {num_correct}/{total}")
+        results = compute_result(results_df, question_type)
+        print(f"Result for {question_type=}: {sum(results)}/{len(results)}")
