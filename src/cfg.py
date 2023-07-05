@@ -148,6 +148,7 @@ buster_cfg = BusterConfig(
             "I cannot answer this question based on the information I have available",
             "The provided documents do not contain information on your given topic",
             "The provided documents do not directly address the question",
+            "The provided documents do not directly address the question. I cannot answer this question based on the information I have available.",
         ],
         "unknown_threshold": 0.84,
         "embedding_model": "text-embedding-ada-002",
