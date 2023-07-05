@@ -41,7 +41,8 @@ def process_questions(q):
     return q
 
 
-def compute_result(results_df, question_type: str) -> pd.Series:
+def is_correct(q) -> pd.Series:
+    question_type = q.question_type
     if question_type == "relevant":
         expected_question_relevant = True
         expected_answer_relevant = True
@@ -54,26 +55,29 @@ def compute_result(results_df, question_type: str) -> pd.Series:
     else:
         raise ValueError(f"Invalid {question_type=}")
 
-    # filter by question type
-    sub_df = results_df[results_df.question_type == question_type]
-    # drop entries with errors
-    sub_df = sub_df[sub_df.error == False]
+    if q.error:
+        q["is_correct"] = False
 
-    # compute results, pd.Series of True or False for each entry
-    results = (sub_df.question_relevant == expected_question_relevant) & (
-        sub_df.answer_relevant == expected_answer_relevant
-    )
+    else:
+        q["is_correct"] = (q.question_relevant == expected_question_relevant) & (
+            q.answer_relevant == expected_answer_relevant
+        )
 
-    return results
+    return q
 
 
 if __name__ == "__main__":
     questions_df = pd.read_csv("../sample_questions.csv")
+
+    # feed questions to Buster and evaluate relevance
     results_df = questions_df.progress_apply(process_questions, axis=1)
 
+    # based on results, compute if it's correct or not
+    results_df = results_df.progress_apply(is_correct, axis=1)
+
     # save results to csv
-    results_df.to_csv("question_results.csv", index=False)
+    results_df.to_csv("question_answer_results.csv", index=False)
 
     for question_type in ["relevant", "irrelevant", "trick"]:
-        results = compute_result(results_df, question_type)
-        print(f"Result for {question_type=}: {sum(results)}/{len(results)}")
+        sub_df = results_df[results_df.question_type == question_type]
+        print(f"Result for {question_type=}: {sum(sub_df.is_correct)}/{len(sub_df.is_correct)}")
