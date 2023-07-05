@@ -79,5 +79,6 @@ if __name__ == "__main__":
     results_df.to_csv("question_answer_results.csv", index=False)
 
     for question_type in ["relevant", "irrelevant", "trick"]:
-        sub_df = results_df[results_df.question_type == question_type]
+        # filter out by question type and remove those that might have had an error...
+        sub_df = results_df[(results_df.question_type == question_type) & (results_df.error == False)]
         print(f"Result for {question_type=}: {sum(sub_df.is_correct)}/{len(sub_df.is_correct)}")
