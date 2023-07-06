@@ -135,9 +135,9 @@ def clear_feedback_form():
     }
 
 
-block = gr.Blocks(css="#chatbot .overflow-y-auto{height:500px}")
+buster_app = gr.Blocks(css="#chatbot .overflow-y-auto{height:500px}")
 
-with block:
+with buster_app:
     # TODO: trigger a proper change to update
 
     # state variables are client-side and are reset every time a client refreshes the page
@@ -279,5 +279,9 @@ with block:
     )
     # fmt: on
 
-block.queue(concurrency_count=16)
-block.launch(share=False, auth=check_auth)
+buster_app.auth = check_auth
+buster_app.auth_message = ""
+
+if __name__ == "__main__":
+    buster_app.queue(concurrency_count=16)
+    buster_app.launch(share=False, auth=check_auth)
