@@ -88,13 +88,13 @@ Q:
     },
     completion_cfg={
         "completion_kwargs": {
-            "model": "gpt-3.5-turbo",
+            "model": "gpt-4",
             "stream": True,
             "temperature": 0,
         },
     },
     tokenizer_cfg={
-        "model_name": "gpt-3.5-turbo",
+        "model_name": "gpt-4",
     },
     documents_formatter_cfg={
         "max_tokens": 3500,

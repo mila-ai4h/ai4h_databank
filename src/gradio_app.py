@@ -183,7 +183,7 @@ with block:
                 gr.Markdown("## Model")
                 # TODO: remove interactive=False flag when deployed model gets access to GPT4
                 model = gr.Radio(
-                    cfg.available_models, label="Model to use", value=cfg.available_models[0], interactive=False
+                    cfg.available_models, label="Model to use", value=cfg.available_models[0], interactive=True
                 )
             with gr.Column(variant="panel"):
                 gr.Markdown("## References used")
