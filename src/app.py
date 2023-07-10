@@ -3,10 +3,12 @@ from fastapi import FastAPI
 from starlette.responses import RedirectResponse
 
 from buster_app import buster_app
+from annotation_app import annotation_app
 
 app = FastAPI()
 
 app = gr.mount_gradio_app(app, buster_app, path="/buster")
+app = gr.mount_gradio_app(app, annotation_app, path="/annotation")
 
 
 @app.get("/")
@@ -18,4 +20,4 @@ async def root():
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app)
+    uvicorn.run("app:app", reload=True)
