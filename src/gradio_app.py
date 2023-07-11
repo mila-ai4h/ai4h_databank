@@ -155,7 +155,7 @@ with block:
                 placeholder="Ask your question here...",
                 lines=1,
             )
-            submit = gr.Button(value="Send", variant="secondary").style(full_width=False)
+            submit = gr.Button(value="Send", variant="primary")
 
             with gr.Column(variant="panel"):
                 gr.Markdown("## Example questions")
