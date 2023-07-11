@@ -19,7 +19,7 @@ mongo_db = init_db(username, password, cluster, db_name)
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-buster = Buster(retriever=cfg.retriever, completer=cfg.completer, validator=cfg.validator)
+buster = cfg.buster
 
 
 MAX_TABS = cfg.buster_cfg.retriever_cfg["top_k"]

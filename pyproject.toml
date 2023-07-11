@@ -7,7 +7,7 @@ name = "ai4h_databank"
 version = "0.0.1"
 requires-python = ">=3.10"
 dependencies = [
-    "buster @ git+https://github.com/jerpint/buster@v1.0.13",
+    "buster @ git+https://github.com/jerpint/buster@v1.0.14",
     "gradio",
     "pymongo"
 ]
