@@ -66,6 +66,7 @@ false
 
 Q:
 """,
+        # This completer is only for the question validator
         "completion_kwargs": {
             "model": "gpt-3.5-turbo",
             "stream": False,
@@ -149,5 +150,3 @@ document_answerer: DocumentAnswerer = DocumentAnswerer(
 validator: Validator = QuestionAnswerValidator(**buster_cfg.validator_cfg)
 
 buster: Buster = Buster(retriever=retriever, document_answerer=document_answerer, validator=validator)
-
-available_models = ["gpt-3.5-turbo", "gpt-4"]
