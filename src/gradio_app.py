@@ -155,7 +155,7 @@ with block:
                 placeholder="Ask your question here...",
                 lines=1,
             )
-            submit = gr.Button(value="Send", variant="secondary").style(full_width=False)
+            submit = gr.Button(value="Send", variant="primary")
 
             with gr.Column(variant="panel"):
                 gr.Markdown("## Example questions")
@@ -179,12 +179,6 @@ with block:
                     )
 
         with gr.Row():
-            with gr.Column():
-                gr.Markdown("## Model")
-                # TODO: remove interactive=False flag when deployed model gets access to GPT4
-                model = gr.Radio(
-                    cfg.available_models, label="Model to use", value=cfg.available_models[0], interactive=False
-                )
             with gr.Column(variant="panel"):
                 gr.Markdown("## References used")
                 sources_textboxes = []
@@ -192,6 +186,14 @@ with block:
                     with gr.Tab(f"Source {i + 1} 📝"):
                         t = gr.Markdown()
                     sources_textboxes.append(t)
+
+            with gr.Column():
+                gr.Markdown("## Parameters")
+                metadata = [
+                    ("generation model", cfg.buster_cfg.completion_cfg["completion_kwargs"]["model"]),
+                    ("embedding model", cfg.buster_cfg.retriever_cfg["embedding_model"]),
+                ]
+                gr.HighlightedText(value=metadata, label="Parameters")
 
     # Feedback
     with gr.Column(variant="panel"):
