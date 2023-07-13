@@ -1,3 +1,4 @@
+from functools import lru_cache
 import cfg
 import logging
 import gradio as gr
@@ -18,6 +19,7 @@ relevant_questions = questions[questions.question_type == "relevant"].question.t
 annotation_app = gr.Blocks()
 
 
+@lru_cache
 def get_relevant_documents(
     query: str,
     top_k=10,
