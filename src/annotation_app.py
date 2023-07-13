@@ -24,7 +24,6 @@ def get_relevant_documents(
     query: str,
     top_k=10,
 ) -> pd.DataFrame:
-    # query = "What is the best policy for AI"
     matched_documents = retriever.retrieve(query=query, top_k=top_k)
 
     return matched_documents.content.to_list()
