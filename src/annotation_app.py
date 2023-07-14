@@ -1,16 +1,26 @@
 from functools import lru_cache
+import os
 import cfg
 import logging
 import gradio as gr
 import pandas as pd
+from copy import copy
+
+from db_utils import init_db
+from feedback import Feedback, FeedbackForm
+from buster_app import check_auth
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
+username = os.getenv("AI4H_MONGODB_USERNAME")
+password = os.getenv("AI4H_MONGODB_PASSWORD")
+cluster = os.getenv("AI4H_MONGODB_CLUSTER")
+db_name = os.getenv("AI4H_MONGODB_DB_NAME")
+mongo_db = init_db(username, password, cluster, db_name)
+
 retriever = cfg.retriever
 
-# query = "What is the best policy for AI"
-# matched_documents = retriever.retrieve(query=query, top_k=20)
 
 # Load the sample questions and split them by type
 questions = pd.read_csv("sample_questions.csv")
@@ -24,16 +34,34 @@ empty_evaluations = [False] * top_k
 
 
 @lru_cache
+def retrieve(query, top_k):
+    return retriever.retrieve(query=query, top_k=top_k)
+
+
 def get_relevant_documents(
     query: str,
+    current_question,
     top_k=10,
-) -> pd.DataFrame:
+) -> list[str]:
+    current_question = copy(query)
 
     if query == "":
         return empty_documents
 
-    matched_documents = retriever.retrieve(query=query, top_k=top_k)
-    return matched_documents.content.to_list()
+    matched_documents = retrieve(query=query, top_k=top_k)
+    return matched_documents.content.to_list(), current_question
+
+
+def save_to_db(user_evaluations, request: gr.Request):
+    collection = "chunk_annotation"
+
+    username: str = request.username
+
+    eval = {
+        "username": username,
+        "evaluations": user_evaluations,
+    }
+    mongo_db[collection].replace_one({"username": username}, eval, upsert=True)
 
 
 def get_document(idx, documents):
@@ -46,6 +74,13 @@ with annotation_app:
     # state variables are client-side and are reset every time a client refreshes the page
     user_responses = gr.State([])
 
+    # keep track of submission form components here...
+    documents = gr.State(empty_documents)
+    user_evaluations = gr.State({})
+
+    # current_question is different from question_input because the question_input can be changed after asking a question
+    current_question = gr.State("")
+
     gr.Markdown("<h1><center>Reference Annotation</center></h1>")
 
     with gr.Column(scale=2):
@@ -54,7 +89,6 @@ with annotation_app:
             placeholder="Ask your question here...",
             lines=1,
         )
-        ask_button = gr.Button(value="Ask", variant="primary")
     with gr.Column(variant="panel"):
         gr.Markdown("## Example questions")
         with gr.Tab("Relevant questions"):
@@ -62,8 +96,7 @@ with annotation_app:
                 examples=relevant_questions,
                 inputs=question_input,
                 label="Questions users could ask.",
-                # fn=ask_button.click,
-                # run_on_click=True,
+                examples_per_page=50,
             )
 
     def update_documents(documents):
@@ -74,16 +107,14 @@ with annotation_app:
 
         return updated_document_content
 
-    # keep track of submission form components here...
-    documents = gr.State(empty_documents)
-    user_evaluations = gr.State({})
-
     document_evaluation = []
     document_content = []
 
     with gr.Row():
         with gr.Column():
-            save_button = gr.Button(value="Save 💾", variant="primary")
+            with gr.Row():
+                ask_button = gr.Button(value="Ask", variant="primary")
+                save_button = gr.Button(value="Save 💾", variant="primary")
             for idx in range(len(documents.value)):
                 with gr.Column():
                     document_evaluation.append(gr.Checkbox(value=False, label="relevant", interactive=True))
@@ -95,30 +126,41 @@ with annotation_app:
         latest_evaluation = user_evaluations.get(question)
         if latest_evaluation is None:
             # return an empty evaluation
-            print("Here")
             return empty_evaluations
         else:
-            print("Here 1")
-
             return latest_evaluation
 
     def save_evaluations(question, user_evaluations, *current_evaluations):
-        print(current_evaluations)
         user_evaluations[question] = list(current_evaluations)
-
         return user_evaluations
+
+    def clear_documents():
+        """Simulates a loading strategy"""
+        return ["loading..."] * top_k
+
+    def clear_evaluations():
+        """Simulates a loading strategy"""
+        return empty_evaluations
 
     # fmt: off
     ask_button.click(
-        fn=get_relevant_documents, inputs=question_input, outputs=documents
+        fn=clear_documents, outputs=document_content,
+    ).then(
+        fn=clear_evaluations, outputs=document_evaluation,
+    ).then(
+        fn=get_relevant_documents, inputs=[question_input, current_question], outputs=[documents, current_question]
     ).then(
         update_documents, inputs=[documents], outputs=document_content
     ).then(
-        update_evaluations, inputs=[question_input, user_evaluations], outputs=document_evaluation
+        update_evaluations, inputs=[current_question, user_evaluations], outputs=document_evaluation
     )
-
 
     save_button.click(
-        fn=save_evaluations, inputs=[question_input, user_evaluations, *document_evaluation], outputs=user_evaluations
+        fn=save_evaluations, inputs=[current_question, user_evaluations, *document_evaluation], outputs=user_evaluations
+    ).then(
+        fn=save_to_db, inputs=user_evaluations
     )
     # fmt: on
+
+annotation_app.auth = check_auth
+annotation_app.auth_message = ""
