@@ -26,7 +26,6 @@ retriever = cfg.retriever
 questions = pd.read_csv("sample_questions.csv")
 relevant_questions = questions[questions.question_type == "relevant"].question.to_list()
 
-annotation_app = gr.Blocks()
 
 top_k = 10
 empty_documents = [""] * top_k
@@ -68,6 +67,10 @@ def get_document(idx, documents):
     return documents[idx]
 
 
+def get_current_user(request: gr.Request):
+    return request.username
+
+annotation_app = gr.Blocks()
 with annotation_app:
     # TODO: trigger a proper change to update
 
@@ -99,14 +102,6 @@ with annotation_app:
                 examples_per_page=50,
             )
 
-    def update_documents(documents):
-        updated_document_content = []
-
-        for doc in documents:
-            updated_document_content.append(doc)
-
-        return updated_document_content
-
     document_evaluation = []
     document_content = []
 
@@ -122,7 +117,18 @@ with annotation_app:
                         gr.Textbox(label=f"Document", interactive=False, value=documents.value[idx])
                     )
 
+    def update_documents(documents):
+        """Updates the displayed documents on the frontend."""
+        updated_document_content = []
+
+        for doc in documents:
+            updated_document_content.append(doc)
+
+        return updated_document_content
+
+
     def update_evaluations(question: str, user_evaluations):
+        """Updates the displayed evaluations on the frontend."""
         latest_evaluation = user_evaluations.get(question)
         if latest_evaluation is None:
             # return an empty evaluation
@@ -150,9 +156,9 @@ with annotation_app:
     ).then(
         fn=get_relevant_documents, inputs=[question_input, current_question], outputs=[documents, current_question]
     ).then(
-        update_documents, inputs=[documents], outputs=document_content
+        fn=update_documents, inputs=[documents], outputs=document_content
     ).then(
-        update_evaluations, inputs=[current_question, user_evaluations], outputs=document_evaluation
+        fn=update_evaluations, inputs=[current_question, user_evaluations], outputs=document_evaluation
     )
 
     save_button.click(
