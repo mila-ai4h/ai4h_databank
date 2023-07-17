@@ -70,6 +70,7 @@ def get_document(idx, documents):
 def get_current_user(request: gr.Request):
     return request.username
 
+
 annotation_app = gr.Blocks()
 with annotation_app:
     # TODO: trigger a proper change to update
@@ -80,9 +81,6 @@ with annotation_app:
     # keep track of submission form components here...
     documents = gr.State(empty_documents)
     user_evaluations = gr.State({})
-
-    # current_question is different from question_input because the question_input can be changed after asking a question
-    current_question = gr.State("")
 
     gr.Markdown("<h1><center>Reference Annotation</center></h1>")
 
@@ -110,8 +108,15 @@ with annotation_app:
             with gr.Row():
                 ask_button = gr.Button(value="Ask", variant="primary")
                 save_button = gr.Button(value="Save 💾", variant="primary")
+
+                # current_question is different from question_input because the question_input can be changed after asking a question
+            with gr.Column():
+                current_question = gr.Textbox(value="", interactive=False, label="Selected Question")
+
             for idx in range(len(documents.value)):
+
                 with gr.Column():
+
                     document_evaluation.append(gr.Checkbox(value=False, label="relevant", interactive=True))
                     document_content.append(
                         gr.Textbox(label=f"Document", interactive=False, value=documents.value[idx])
@@ -125,7 +130,6 @@ with annotation_app:
             updated_document_content.append(doc)
 
         return updated_document_content
-
 
     def update_evaluations(question: str, user_evaluations):
         """Updates the displayed evaluations on the frontend."""
