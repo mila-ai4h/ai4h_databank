@@ -149,3 +149,17 @@ document_answerer: DocumentAnswerer = DocumentAnswerer(
 validator: Validator = QuestionAnswerValidator(**buster_cfg.validator_cfg)
 
 buster: Buster = Buster(retriever=retriever, document_answerer=document_answerer, validator=validator)
+
+def setup_buster(buster_cfg):
+    retriever: Retriever = ServiceRetriever(**buster_cfg.retriever_cfg)
+    tokenizer = GPTTokenizer(**buster_cfg.tokenizer_cfg)
+    document_answerer: DocumentAnswerer = DocumentAnswerer(
+        completer=ChatGPTCompleter(**buster_cfg.completion_cfg),
+        documents_formatter=DocumentsFormatter(tokenizer=tokenizer, **buster_cfg.documents_formatter_cfg),
+        prompt_formatter=PromptFormatter(tokenizer=tokenizer, **buster_cfg.prompt_formatter_cfg),
+        **buster_cfg.documents_answerer_cfg,
+    )
+    validator: Validator = QuestionAnswerValidator(**buster_cfg.validator_cfg)
+
+    buster: Buster = Buster(retriever=retriever, document_answerer=document_answerer, validator=validator)
+    return buster
