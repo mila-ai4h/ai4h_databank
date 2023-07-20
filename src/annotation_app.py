@@ -1,14 +1,15 @@
-from functools import lru_cache
-import os
-import cfg
 import logging
+import os
+from copy import copy
+from functools import lru_cache
+
 import gradio as gr
 import pandas as pd
-from copy import copy
 
+import cfg
+from buster_app import check_auth
 from db_utils import init_db
 from feedback import Feedback, FeedbackForm
-from buster_app import check_auth
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -114,9 +115,7 @@ with annotation_app:
                 current_question = gr.Textbox(value="", interactive=False, label="Selected Question")
 
             for idx in range(len(documents.value)):
-
                 with gr.Column():
-
                     document_evaluation.append(gr.Checkbox(value=False, label="relevant", interactive=True))
                     document_content.append(
                         gr.Textbox(label=f"Document", interactive=False, value=documents.value[idx])

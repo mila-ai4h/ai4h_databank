@@ -150,6 +150,7 @@ validator: Validator = QuestionAnswerValidator(**buster_cfg.validator_cfg)
 
 buster: Buster = Buster(retriever=retriever, document_answerer=document_answerer, validator=validator)
 
+
 def setup_buster(buster_cfg):
     retriever: Retriever = ServiceRetriever(**buster_cfg.retriever_cfg)
     tokenizer = GPTTokenizer(**buster_cfg.tokenizer_cfg)
