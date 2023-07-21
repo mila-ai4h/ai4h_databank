@@ -36,11 +36,12 @@ models = []
 
 buster_35_cfg = copy.deepcopy(buster_cfg)
 buster_35_cfg.completion_cfg["completion_kwargs"]["model"] = "gpt-3.5-turbo"
-buster_35 = setup_buster(buster_35_cfg)
+buster_4 = buster_35 = setup_buster(buster_35_cfg)
 
-buster_4_cfg = copy.deepcopy(buster_cfg)
-buster_4_cfg.completion_cfg["completion_kwargs"]["model"] = "gpt-4"
-buster_4 = setup_buster(buster_4_cfg)
+# TODO: DO NOT LEAVE LIKE THIS
+# buster_4_cfg = copy.deepcopy(buster_cfg)
+# buster_4_cfg.completion_cfg["completion_kwargs"]["model"] = "gpt-4"
+# buster_4 = setup_buster(buster_4_cfg)
 
 
 # Define your asynchronous functions
