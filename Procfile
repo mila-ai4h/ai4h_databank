@@ -1,2 +1,2 @@
-web: cd src && gunicorn -k uvicorn.workers.UvicornWorker app:app
+web: cd src && source setup.sh && python comparison_app.py
 
