@@ -74,8 +74,7 @@ async def bot_response_stream(
         for token in text:
             yield token
 
-    debug = True
-
+    debug = False
     if debug:
         from buster.completers import Completion
 
@@ -229,6 +228,9 @@ with comparison_app:
     )
 
     send_btn.click(
+        make_buttons_unfocus,
+        outputs=[*btn_list],
+    ).then(
         update_current_question,
         inputs=[textbox, current_question, chatbot_left, chatbot_right],
         outputs=[textbox, current_question, chatbot_left, chatbot_right],
