@@ -10,23 +10,18 @@ import gradio as gr
 import pandas as pd
 
 import cfg
-from annotation_app import get_current_user
 from buster_app import add_sources, get_utc_time
 from cfg import buster_cfg, setup_buster
-from app_utils import check_auth, init_db
+from app_utils import check_auth
 from feedback import Feedback, ComparisonForm
 
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-MAX_TABS = cfg.buster_cfg.retriever_cfg["top_k"]
+max_sources = cfg.buster_cfg.retriever_cfg["top_k"]
 
-username = os.getenv("AI4H_MONGODB_USERNAME")
-password = os.getenv("AI4H_MONGODB_PASSWORD")
-cluster = os.getenv("AI4H_MONGODB_CLUSTER")
-db_name = os.getenv("AI4H_MONGODB_DB_NAME")
-mongo_db = init_db(username, password, cluster, db_name)
+mongo_db = cfg.mongo_db
 
 # Load the sample questions and split them by type
 questions = pd.read_csv("sample_questions.csv")
@@ -210,7 +205,16 @@ with comparison_app:
         bothbad_btn,
     ]
 
-    clr_button.add(components=[chatbot_left, chatbot_right, model_name_left, model_name_right, *sources_textboxes])
+    clr_button.add(
+        components=[
+            chatbot_left,
+            chatbot_right,
+            model_name_left,
+            model_name_right,
+            response_recorded,
+            *sources_textboxes,
+        ]
+    )
     clr_button.click(
         make_buttons_unavailable,
         outputs=[*btn_list],
@@ -225,7 +229,7 @@ with comparison_app:
         inputs=[current_question, chatbot_left, chatbot_right],
         outputs=[chatbot_left, chatbot_right, completor_left, completor_right],
     ).then(
-        add_sources, inputs=[completor_left, gr.State(MAX_TABS)], outputs=[*sources_textboxes]
+        add_sources, inputs=[completor_left, gr.State(max_sources)], outputs=[*sources_textboxes]
     ).success(
         make_buttons_available, outputs=[*btn_list]
     )

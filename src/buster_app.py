@@ -9,18 +9,13 @@ import cfg
 from app_utils import init_db, get_utc_time, check_auth, add_sources
 from feedback import Feedback, FeedbackForm
 
-username = os.getenv("AI4H_MONGODB_USERNAME")
-password = os.getenv("AI4H_MONGODB_PASSWORD")
-cluster = os.getenv("AI4H_MONGODB_CLUSTER")
-db_name = os.getenv("AI4H_MONGODB_DB_NAME")
-mongo_db = init_db(username, password, cluster, db_name)
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
+mongo_db = cfg.mongo_db
 buster = cfg.buster
-
-MAX_TABS = cfg.buster_cfg.retriever_cfg["top_k"]
+max_sources = cfg.buster_cfg.retriever_cfg["top_k"]
 
 # Load the sample questions and split them by type
 questions = pd.read_csv("sample_questions.csv")
@@ -135,7 +130,7 @@ with buster_app:
             with gr.Column(variant="panel"):
                 gr.Markdown("## References used")
                 sources_textboxes = []
-                for i in range(MAX_TABS):
+                for i in range(max_sources):
                     with gr.Tab(f"Source {i + 1} 📝"):
                         t = gr.Markdown()
                     sources_textboxes.append(t)
@@ -207,7 +202,7 @@ with buster_app:
         outputs=[chatbot, response],
     ).then(
         add_sources,
-        inputs=[response, gr.State(MAX_TABS)],
+        inputs=[response, gr.State(max_sources)],
         outputs=[*sources_textboxes]
     ).then(
         append_response,
@@ -224,7 +219,7 @@ with buster_app:
         outputs=[chatbot, response],
     ).then(
         add_sources,
-        inputs=[response, gr.State(MAX_TABS)],
+        inputs=[response, gr.State(max_sources)],
         outputs=[*sources_textboxes]
     ).then(
         append_response,

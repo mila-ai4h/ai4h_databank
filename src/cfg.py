@@ -11,7 +11,7 @@ from buster.tokenizers import GPTTokenizer
 from buster.validators import QuestionAnswerValidator, Validator
 from openai.embeddings_utils import cosine_similarity
 
-from app_utils import make_uri
+from app_utils import init_db, make_uri
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -35,6 +35,13 @@ mongo_password = os.getenv("AI4H_MONGODB_PASSWORD")
 mongo_cluster = os.getenv("AI4H_MONGODB_CLUSTER")
 mongo_uri = make_uri(mongo_username, mongo_password, mongo_cluster)
 mongo_db_name = os.getenv("AI4H_MONGODB_DB_DATA")
+
+username = os.getenv("AI4H_MONGODB_USERNAME")
+password = os.getenv("AI4H_MONGODB_PASSWORD")
+cluster = os.getenv("AI4H_MONGODB_CLUSTER")
+db_name = os.getenv("AI4H_MONGODB_DB_NAME")
+mongo_db = init_db(username, password, cluster, db_name)
+
 mongo_feedback_collection = os.getenv("AI4H_MONGODB_FEEDBACK_COLLECTION")
 mongo_arena_collection = os.getenv("AI4H_MONGODB_ARENA_COLLECTION")
 
