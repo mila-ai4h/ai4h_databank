@@ -10,11 +10,10 @@ import gradio as gr
 import pandas as pd
 
 import cfg
+from app_utils import check_auth
 from buster_app import add_sources, get_utc_time
 from cfg import buster_cfg, setup_buster
-from app_utils import check_auth
-from feedback import Feedback, ComparisonForm
-
+from feedback import ComparisonForm, Feedback
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -240,7 +239,9 @@ with comparison_app:
         update_current_question,
         inputs=[textbox, current_question, chatbot_left, chatbot_right],
         outputs=[textbox, current_question, chatbot_left, chatbot_right],
-    ).then(hide_models, outputs=[model_name_right, model_name_left]).then(
+    ).then(
+        hide_models, outputs=[model_name_right, model_name_left]
+    ).then(
         bot_response_stream,
         inputs=[current_question, chatbot_left, chatbot_right],
         outputs=[chatbot_left, chatbot_right, completor_left, completor_right],

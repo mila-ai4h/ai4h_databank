@@ -6,9 +6,8 @@ import pandas as pd
 from buster.busterbot import Buster
 
 import cfg
-from app_utils import init_db, get_utc_time, check_auth, add_sources
+from app_utils import add_sources, check_auth, get_utc_time, init_db
 from feedback import Feedback, FeedbackForm
-
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)

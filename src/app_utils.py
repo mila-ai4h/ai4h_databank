@@ -1,9 +1,9 @@
 # Setup mongoDB
 import logging
-from urllib.parse import quote_plus
 from datetime import datetime, timezone
-import pandas as pd
+from urllib.parse import quote_plus
 
+import pandas as pd
 import pymongo
 from pymongo import MongoClient
 

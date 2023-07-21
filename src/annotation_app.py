@@ -7,8 +7,8 @@ import gradio as gr
 import pandas as pd
 
 import cfg
-from buster_app import check_auth
 from app_utils import init_db
+from buster_app import check_auth
 from feedback import Feedback, FeedbackForm
 
 logger = logging.getLogger(__name__)
