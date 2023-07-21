@@ -29,6 +29,8 @@ relevant_questions = questions[questions.question_type == "relevant"].question.t
 
 enable_btn = gr.Button.update(interactive=True)
 disable_btn = gr.Button.update(interactive=False)
+focus_btn = gr.Button.update(variant="primary")
+unfocus_btn = gr.Button.update(variant="secondary")
 
 num_sides = 2
 models = []
@@ -194,6 +196,9 @@ with comparison_app:
     def make_buttons_unavailable():
         return [disable_btn] * 4
 
+    def make_buttons_unfocus():
+        return [unfocus_btn] * 4
+
     def response_recorded_display():
         return gr.Markdown.update(visible=True)
 
@@ -217,6 +222,9 @@ with comparison_app:
     )
     clr_button.click(
         make_buttons_unavailable,
+        outputs=[*btn_list],
+    ).then(
+        make_buttons_unfocus,
         outputs=[*btn_list],
     )
 
@@ -251,6 +259,7 @@ with comparison_app:
 
     def log_submission_bothbad_btn(completor_left, completor_right, current_question, request: gr.Request):
         vote = "both bad"
+        username = request.username
         return log_submission(completor_left, completor_right, current_question, vote, username)
 
     def log_submission(completor_left, completor_right, current_question, vote, username):
@@ -266,12 +275,13 @@ with comparison_app:
             feedback_form=comparison,
             time=get_utc_time(),
         )
-        print(feedback)
         feedback.send(mongo_db, collection=cfg.mongo_arena_collection)
+        return focus_btn
 
     leftvote_btn.click(
         log_submission_leftvote_btn,
         inputs=[completor_left, completor_right, current_question],
+        outputs=leftvote_btn,
     ).then(
         make_buttons_unavailable,
         outputs=[*btn_list],
@@ -287,6 +297,7 @@ with comparison_app:
     rightvote_btn.click(
         log_submission_rightvote_btn,
         inputs=[completor_left, completor_right, current_question],
+        outputs=rightvote_btn,
     ).then(
         make_buttons_unavailable,
         outputs=[*btn_list],
@@ -302,6 +313,7 @@ with comparison_app:
     tie_btn.click(
         log_submission_tie_btn,
         inputs=[completor_left, completor_right, current_question],
+        outputs=tie_btn,
     ).then(
         make_buttons_unavailable,
         outputs=[*btn_list],
@@ -317,6 +329,7 @@ with comparison_app:
     bothbad_btn.click(
         log_submission_bothbad_btn,
         inputs=[completor_left, completor_right, current_question],
+        outputs=bothbad_btn,
     ).then(
         make_buttons_unavailable,
         outputs=[*btn_list],
