@@ -74,7 +74,7 @@ async def bot_response_stream(
         for token in text:
             yield token
 
-    debug = False
+    debug = True
     if debug:
         from buster.completers import Completion
 
@@ -198,8 +198,11 @@ with comparison_app:
     def make_buttons_unfocus():
         return [unfocus_btn] * 4
 
-    def response_recorded_display():
+    def response_recorded_show():
         return gr.Markdown.update(visible=True)
+
+    def response_recorded_hide():
+        return gr.Markdown.update(visible=False)
 
     # Register listeners
     btn_list = [
@@ -230,6 +233,9 @@ with comparison_app:
     send_btn.click(
         make_buttons_unfocus,
         outputs=[*btn_list],
+    ).then(
+        response_recorded_hide,
+        outputs=response_recorded,
     ).then(
         update_current_question,
         inputs=[textbox, current_question, chatbot_left, chatbot_right],
@@ -292,7 +298,7 @@ with comparison_app:
         inputs=[completor_left, completor_right],
         outputs=[model_name_left, model_name_right],
     ).then(
-        response_recorded_display,
+        response_recorded_show,
         outputs=response_recorded,
     )
 
@@ -308,7 +314,7 @@ with comparison_app:
         inputs=[completor_left, completor_right],
         outputs=[model_name_left, model_name_right],
     ).then(
-        response_recorded_display,
+        response_recorded_show,
         outputs=response_recorded,
     )
 
@@ -324,7 +330,7 @@ with comparison_app:
         inputs=[completor_left, completor_right],
         outputs=[model_name_left, model_name_right],
     ).then(
-        response_recorded_display,
+        response_recorded_show,
         outputs=response_recorded,
     )
 
@@ -340,7 +346,7 @@ with comparison_app:
         inputs=[completor_left, completor_right],
         outputs=[model_name_left, model_name_right],
     ).then(
-        response_recorded_display,
+        response_recorded_show,
         outputs=response_recorded,
     )
 
