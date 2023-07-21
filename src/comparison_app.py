@@ -13,11 +13,14 @@ import cfg
 from annotation_app import get_current_user
 from buster_app import add_sources, get_utc_time
 from cfg import buster_cfg, setup_buster
-from db_utils import init_db
+from app_utils import check_auth, init_db
 from feedback import Feedback, ComparisonForm
+
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
+
+MAX_TABS = cfg.buster_cfg.retriever_cfg["top_k"]
 
 username = os.getenv("AI4H_MONGODB_USERNAME")
 password = os.getenv("AI4H_MONGODB_PASSWORD")
@@ -29,7 +32,6 @@ mongo_db = init_db(username, password, cluster, db_name)
 questions = pd.read_csv("sample_questions.csv")
 relevant_questions = questions[questions.question_type == "relevant"].question.to_list()
 
-no_change_btn = gr.Button.update()
 enable_btn = gr.Button.update(interactive=True)
 disable_btn = gr.Button.update(interactive=False)
 
@@ -223,7 +225,7 @@ with comparison_app:
         inputs=[current_question, chatbot_left, chatbot_right],
         outputs=[chatbot_left, chatbot_right, completor_left, completor_right],
     ).then(
-        add_sources, inputs=[completor_left], outputs=[*sources_textboxes]
+        add_sources, inputs=[completor_left, gr.State(MAX_TABS)], outputs=[*sources_textboxes]
     ).success(
         make_buttons_available, outputs=[*btn_list]
     )
@@ -261,9 +263,12 @@ with comparison_app:
             time=get_utc_time(),
         )
         print(feedback)
-        feedback.send(mongo_db, collection="comparison-jerpint")
+        feedback.send(mongo_db, collection=cfg.mongo_arena_collection)
 
-    leftvote_btn.click(log_submission_leftvote_btn, inputs=[completor_left, completor_right, current_question],).then(
+    leftvote_btn.click(
+        log_submission_leftvote_btn,
+        inputs=[completor_left, completor_right, current_question],
+    ).then(
         make_buttons_unavailable,
         outputs=[*btn_list],
     ).then(
@@ -275,7 +280,10 @@ with comparison_app:
         outputs=response_recorded,
     )
 
-    rightvote_btn.click(log_submission_rightvote_btn, inputs=[completor_left, completor_right, current_question],).then(
+    rightvote_btn.click(
+        log_submission_rightvote_btn,
+        inputs=[completor_left, completor_right, current_question],
+    ).then(
         make_buttons_unavailable,
         outputs=[*btn_list],
     ).then(
@@ -287,7 +295,10 @@ with comparison_app:
         outputs=response_recorded,
     )
 
-    tie_btn.click(log_submission_tie_btn, inputs=[completor_left, completor_right, current_question],).then(
+    tie_btn.click(
+        log_submission_tie_btn,
+        inputs=[completor_left, completor_right, current_question],
+    ).then(
         make_buttons_unavailable,
         outputs=[*btn_list],
     ).then(
@@ -299,7 +310,10 @@ with comparison_app:
         outputs=response_recorded,
     )
 
-    bothbad_btn.click(log_submission_bothbad_btn, inputs=[completor_left, completor_right, current_question],).then(
+    bothbad_btn.click(
+        log_submission_bothbad_btn,
+        inputs=[completor_left, completor_right, current_question],
+    ).then(
         make_buttons_unavailable,
         outputs=[*btn_list],
     ).then(
@@ -312,4 +326,6 @@ with comparison_app:
     )
 
 
+comparison_app.auth = check_auth
+comparison_app.auth_message = ""
 comparison_app.queue(concurrency_count=16)

@@ -8,7 +8,7 @@ import pandas as pd
 
 import cfg
 from buster_app import check_auth
-from db_utils import init_db
+from app_utils import init_db
 from feedback import Feedback, FeedbackForm
 
 logger = logging.getLogger(__name__)

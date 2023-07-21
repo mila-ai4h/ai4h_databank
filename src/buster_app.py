@@ -1,13 +1,12 @@
 import logging
 import os
-from datetime import datetime, timezone
 
 import gradio as gr
 import pandas as pd
 from buster.busterbot import Buster
 
 import cfg
-from db_utils import init_db
+from app_utils import init_db, get_utc_time, check_auth, add_sources
 from feedback import Feedback, FeedbackForm
 
 username = os.getenv("AI4H_MONGODB_USERNAME")
@@ -21,7 +20,6 @@ logging.basicConfig(level=logging.INFO)
 
 buster = cfg.buster
 
-
 MAX_TABS = cfg.buster_cfg.retriever_cfg["top_k"]
 
 # Load the sample questions and split them by type
@@ -29,51 +27,6 @@ questions = pd.read_csv("sample_questions.csv")
 relevant_questions = questions[questions.question_type == "relevant"].question.to_list()
 irrelevant_questions = questions[questions.question_type == "irrelevant"].question.to_list()
 trick_questions = questions[questions.question_type == "trick"].question.to_list()
-
-
-def get_utc_time() -> str:
-    return str(datetime.now(timezone.utc))
-
-
-def check_auth(username: str, password: str) -> bool:
-    """Check if authentication succeeds or not.
-
-    The authentication leverages the built-in gradio authentication. We use a shared password among users.
-    It is temporary for developing the PoC. Proper authentication needs to be implemented in the future.
-    We allow a valid username to be any username beginning with 'databank-', this will allow us to differentiate between users easily.
-    """
-    valid_user = username.startswith("databank-") or username == cfg.USERNAME
-    valid_password = password == cfg.PASSWORD
-    is_auth = valid_user and valid_password
-    logger.info(f"Log-in attempted by {username=}. {is_auth=}")
-    return is_auth
-
-
-def format_sources(matched_documents: pd.DataFrame) -> list[str]:
-    formatted_sources = []
-
-    for _, doc in matched_documents.iterrows():
-        formatted_sources.append(f"### [{doc.title}]({doc.url})\n{doc.content}\n")
-
-    return formatted_sources
-
-
-def pad_sources(sources: list[str]) -> list[str]:
-    """Pad sources with empty strings to ensure that the number of tabs is always MAX_TABS."""
-    k = len(sources)
-    return sources + [""] * (MAX_TABS - k)
-
-
-def add_sources(completion):
-    if any(arg is False for arg in [completion.question_relevant, completion.answer_relevant]):
-        # Question was not relevant, don't bother doing anything else...
-        formatted_sources = [""]
-        formatted_sources = pad_sources(formatted_sources)
-        return formatted_sources
-
-    formatted_sources = format_sources(completion.matched_documents)
-
-    return formatted_sources
 
 
 def append_response(response, user_responses):
@@ -254,7 +207,7 @@ with buster_app:
         outputs=[chatbot, response],
     ).then(
         add_sources,
-        inputs=[response],
+        inputs=[response, gr.State(MAX_TABS)],
         outputs=[*sources_textboxes]
     ).then(
         append_response,
@@ -271,7 +224,7 @@ with buster_app:
         outputs=[chatbot, response],
     ).then(
         add_sources,
-        inputs=[response],
+        inputs=[response, gr.State(MAX_TABS)],
         outputs=[*sources_textboxes]
     ).then(
         append_response,
