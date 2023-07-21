@@ -74,7 +74,7 @@ async def bot_response_stream(
         for token in text:
             yield token
 
-    debug = True
+    debug = False
     if debug:
         from buster.completers import Completion
 
