@@ -8,8 +8,8 @@ from comparison_app import comparison_app
 
 app = FastAPI()
 
-app = gr.mount_gradio_app(app, buster_app, path="/buster")
-app = gr.mount_gradio_app(app, annotation_app, path="/annotation")
+#  app = gr.mount_gradio_app(app, buster_app, path="/buster")
+#  app = gr.mount_gradio_app(app, annotation_app, path="/annotation")
 app = gr.mount_gradio_app(app, comparison_app, path="/comparison")
 
 
