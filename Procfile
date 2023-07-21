@@ -1,1 +1,2 @@
-web: cd src && gunicorn app:app
+web: cd src && gunicorn -k uvicorn.workers.UvicornWorker app:app
+
