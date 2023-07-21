@@ -354,4 +354,4 @@ with comparison_app:
 
 comparison_app.auth = check_auth
 comparison_app.auth_message = ""
-comparison_app.queue(concurrency_count=16)
+comparison_app.queue()

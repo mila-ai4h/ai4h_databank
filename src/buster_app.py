@@ -228,7 +228,7 @@ with buster_app:
 
 buster_app.auth = check_auth
 buster_app.auth_message = ""
-buster_app.queue(concurrency_count=16)
+buster_app.queue()
 
 if __name__ == "__main__":
     buster_app.queue(concurrency_count=16)
