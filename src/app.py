@@ -22,4 +22,10 @@ async def root():
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("app:app", reload=True)
+    import os
+    port = os.getenv("PORT")
+    if port is not None:
+        # In production
+        uvicorn.run("app:app", reload=True, port=port, host="0.0.0.0")
+    else:
+        uvicorn.run("app:app", reload=True)
