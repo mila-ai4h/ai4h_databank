@@ -352,8 +352,11 @@ with comparison_app:
     )
 
 
-# comparison_app.auth = check_auth
-# comparison_app.auth_message = ""
-# comparison_app.queue
-comparison_app.queue(concurrency_count=16)
-comparison_app.launch(share=False, auth=check_auth)()
+if __name__ == "__main__":
+    comparison_app.queue(concurrency_count=16)
+    comparison_app.launch(share=False, auth=check_auth)()
+
+else:
+    comparison_app.auth = check_auth
+    comparison_app.auth_message = ""
+    comparison_app.queue()

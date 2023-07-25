@@ -1,19 +1,21 @@
+import copy
 import logging
 import os
 
 import gradio as gr
 import pandas as pd
-from buster.busterbot import Buster
 
 import cfg
-from app_utils import add_sources, check_auth, get_utc_time, init_db
+from app_utils import add_sources, check_auth, get_utc_time
+from cfg import setup_buster
 from feedback import Feedback, FeedbackForm
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 mongo_db = cfg.mongo_db
-buster = cfg.buster
+buster_cfg = copy.deepcopy(cfg.buster_cfg)
+buster = setup_buster(buster_cfg=buster_cfg)
 max_sources = cfg.buster_cfg.retriever_cfg["top_k"]
 
 # Load the sample questions and split them by type

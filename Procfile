@@ -1,2 +1,1 @@
-web: cd src && source setup.sh && python comparison_app.py
-
+web: cd src && source setup.sh && python app.py
