@@ -10,8 +10,8 @@ from comparison_app import comparison_app
 
 app = FastAPI()
 
-app = gr.mount_gradio_app(app, buster_app, path="/buster")
 # app = gr.mount_gradio_app(app, annotation_app, path="/annotation")
+app = gr.mount_gradio_app(app, buster_app, path="/buster")
 app = gr.mount_gradio_app(app, comparison_app, path="/comparison")
 
 
@@ -23,11 +23,4 @@ async def root():
 
 if __name__ == "__main__":
     import uvicorn
-
-    port = os.getenv("PORT")
-    if port is not None:
-        # Port should be specified in production...
-        uvicorn.run("app:app", port=int(port), host="0.0.0.0")
-    else:
-        # otherwise, assume we are locally debugging
-        uvicorn.run("app:app", reload=True)
+    uvicorn.run("app:app", reload=True)

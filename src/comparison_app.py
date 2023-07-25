@@ -31,9 +31,6 @@ disable_btn = gr.Button.update(interactive=False)
 focus_btn = gr.Button.update(variant="primary")
 unfocus_btn = gr.Button.update(variant="secondary")
 
-num_sides = 2
-models = []
-
 buster_35_cfg = copy.deepcopy(buster_cfg)
 buster_35_cfg.completion_cfg["completion_kwargs"]["model"] = "gpt-3.5-turbo"
 buster_35 = setup_buster(buster_35_cfg)
@@ -43,17 +40,18 @@ buster_4_cfg.completion_cfg["completion_kwargs"]["model"] = "gpt-4"
 buster_4 = setup_buster(buster_4_cfg)
 
 
-# Define your asynchronous functions
 async def process_input_35(question):
+    """Run buster with chatGPT"""
     return buster_35.process_input(question)
 
 
 async def process_input_4(question):
+    """Run buster with GPT-4"""
     return buster_4.process_input(question)
 
 
-# Create a separate async function that uses asyncio.gather()
-async def run_async_tasks(question):
+async def run_models_async(question):
+    """Run different buster instances async. Shuffles the resulting models."""
     completion_35, completion_4 = await asyncio.gather(process_input_35(question), process_input_4(question))
     completors = [completion_35, completion_4]
     random.shuffle(completors)
@@ -99,7 +97,7 @@ async def bot_response_stream(
         random.shuffle(completors)
         completor_left, completor_right = completors
     else:
-        completor_left, completor_right = await run_async_tasks(question)
+        completor_left, completor_right = await run_models_async(question)
 
     generator_left = completor_left.answer_generator
     generator_right = completor_right.answer_generator
@@ -111,7 +109,8 @@ async def bot_response_stream(
         yield chatbot_left, chatbot_right, completor_left, completor_right
 
 
-def get_model_from_completor(completor):
+def get_model_from_completor(completor) -> str:
+    """Returns the model name of a given completer."""
     return completor.completion_kwargs["model"]
 
 
