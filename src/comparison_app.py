@@ -9,6 +9,8 @@ from itertools import zip_longest
 import gradio as gr
 import pandas as pd
 
+from buster.completers import Completion
+
 import cfg
 from app_utils import check_auth
 from buster_app import add_sources, get_utc_time
@@ -53,9 +55,9 @@ async def process_input_4(question):
 async def run_models_async(question):
     """Run different buster instances async. Shuffles the resulting models."""
     completion_35, completion_4 = await asyncio.gather(process_input_35(question), process_input_4(question))
-    completors = [completion_35, completion_4]
-    random.shuffle(completors)
-    return completors[0], completors[1]
+    completions = [completion_35, completion_4]
+    random.shuffle(completions)
+    return completions[0], completions[1]
 
 
 async def bot_response_stream(
@@ -73,9 +75,8 @@ async def bot_response_stream(
 
     debug = False
     if debug:
-        from buster.completers import Completion
 
-        completor_left = Completion(
+        completion_left = Completion(
             error=False,
             user_input=question,
             matched_documents=pd.DataFrame(),
@@ -84,7 +85,7 @@ async def bot_response_stream(
             question_relevant=True,
             completion_kwargs={"model": "model LEFT"},
         )
-        completor_right = Completion(
+        completion_right = Completion(
             error=False,
             user_input=question,
             matched_documents=pd.DataFrame(),
@@ -93,30 +94,30 @@ async def bot_response_stream(
             question_relevant=True,
             completion_kwargs={"model": "model RIGHT"},
         )
-        completors = [completor_left, completor_right]
-        random.shuffle(completors)
-        completor_left, completor_right = completors
+        completions = [completion_left, completion_right]
+        random.shuffle(completions)
+        completion_left, completion_right = completions
     else:
-        completor_left, completor_right = await run_models_async(question)
+        completion_left, completion_right = await run_models_async(question)
 
-    generator_left = completor_left.answer_generator
-    generator_right = completor_right.answer_generator
+    generator_left = completion_left.answer_generator
+    generator_right = completion_right.answer_generator
 
     for token_left, token_right in zip_longest(generator_left, generator_right, fillvalue=""):
         chatbot_left[-1][1] += token_left
         chatbot_right[-1][1] += token_right
 
-        yield chatbot_left, chatbot_right, completor_left, completor_right
+        yield chatbot_left, chatbot_right, completion_left, completion_right
 
 
-def get_model_from_completor(completor) -> str:
+def get_model_from_completion(completion: Completion) -> str:
     """Returns the model name of a given completer."""
-    return completor.completion_kwargs["model"]
+    return completion.completion_kwargs["model"]
 
 
-def reveal_models(completor_left, completor_right):
-    model_left = get_model_from_completor(completor_left)
-    model_right = get_model_from_completor(completor_right)
+def reveal_models(completion_left, completion_right):
+    model_left = get_model_from_completion(completion_left)
+    model_right = get_model_from_completion(completion_right)
     return "## Model: " + model_left, "## Model: " + model_right
 
 
@@ -138,8 +139,8 @@ with comparison_app:
     gr.Markdown("<h1><center>⚔️ Chatbot Arena ⚔️️</center></h1>")
 
     current_question = gr.State("")
-    completor_left = gr.State()
-    completor_right = gr.State()
+    completion_left = gr.State()
+    completion_right = gr.State()
 
     with gr.Box(elem_id="share-region-anony"):
         with gr.Row():
@@ -243,43 +244,43 @@ with comparison_app:
     ).then(
         bot_response_stream,
         inputs=[current_question, chatbot_left, chatbot_right],
-        outputs=[chatbot_left, chatbot_right, completor_left, completor_right],
+        outputs=[chatbot_left, chatbot_right, completion_left, completion_right],
     ).then(
-        add_sources, inputs=[completor_left, gr.State(max_sources)], outputs=[*sources_textboxes]
+        add_sources, inputs=[completion_left, gr.State(max_sources)], outputs=[*sources_textboxes]
     ).success(
         make_buttons_available, outputs=[*btn_list]
     )
 
-    def log_submission_leftvote_btn(completor_left, completor_right, current_question, request: gr.Request):
+    def log_submission_leftvote_btn(completion_left, completion_right, current_question, request: gr.Request):
         username = request.username
         vote = "left is better"
-        return log_submission(completor_left, completor_right, current_question, vote, username)
+        return log_submission(completion_left, completion_right, current_question, vote, username)
 
-    def log_submission_rightvote_btn(completor_left, completor_right, current_question, request: gr.Request):
+    def log_submission_rightvote_btn(completion_left, completion_right, current_question, request: gr.Request):
         username = request.username
         vote = "right is better"
-        return log_submission(completor_left, completor_right, current_question, vote, username)
+        return log_submission(completion_left, completion_right, current_question, vote, username)
 
-    def log_submission_tie_btn(completor_left, completor_right, current_question, request: gr.Request):
+    def log_submission_tie_btn(completion_left, completion_right, current_question, request: gr.Request):
         username = request.username
         vote = "tied"
-        return log_submission(completor_left, completor_right, current_question, vote, username)
+        return log_submission(completion_left, completion_right, current_question, vote, username)
 
-    def log_submission_bothbad_btn(completor_left, completor_right, current_question, request: gr.Request):
+    def log_submission_bothbad_btn(completion_left, completion_right, current_question, request: gr.Request):
         vote = "both bad"
         username = request.username
-        return log_submission(completor_left, completor_right, current_question, vote, username)
+        return log_submission(completion_left, completion_right, current_question, vote, username)
 
-    def log_submission(completor_left, completor_right, current_question, vote, username):
-        model_left = get_model_from_completor(completor_left)
-        model_right = get_model_from_completor(completor_right)
+    def log_submission(completion_left, completion_right, current_question, vote, username):
+        model_left = get_model_from_completion(completion_left)
+        model_right = get_model_from_completion(completion_right)
 
         comparison = ComparisonForm(
             vote=vote, model_left=model_left, model_right=model_right, question=current_question
         )
         feedback = Feedback(
             username=username,
-            user_responses=[completor_left, completor_right],
+            user_responses=[completion_left, completion_right],
             feedback_form=comparison,
             time=get_utc_time(),
         )
@@ -288,14 +289,14 @@ with comparison_app:
 
     leftvote_btn.click(
         log_submission_leftvote_btn,
-        inputs=[completor_left, completor_right, current_question],
+        inputs=[completion_left, completion_right, current_question],
         outputs=leftvote_btn,
     ).then(
         make_buttons_unavailable,
         outputs=[*btn_list],
     ).then(
         reveal_models,
-        inputs=[completor_left, completor_right],
+        inputs=[completion_left, completion_right],
         outputs=[model_name_left, model_name_right],
     ).then(
         response_recorded_show,
@@ -304,14 +305,14 @@ with comparison_app:
 
     rightvote_btn.click(
         log_submission_rightvote_btn,
-        inputs=[completor_left, completor_right, current_question],
+        inputs=[completion_left, completion_right, current_question],
         outputs=rightvote_btn,
     ).then(
         make_buttons_unavailable,
         outputs=[*btn_list],
     ).then(
         reveal_models,
-        inputs=[completor_left, completor_right],
+        inputs=[completion_left, completion_right],
         outputs=[model_name_left, model_name_right],
     ).then(
         response_recorded_show,
@@ -320,14 +321,14 @@ with comparison_app:
 
     tie_btn.click(
         log_submission_tie_btn,
-        inputs=[completor_left, completor_right, current_question],
+        inputs=[completion_left, completion_right, current_question],
         outputs=tie_btn,
     ).then(
         make_buttons_unavailable,
         outputs=[*btn_list],
     ).then(
         reveal_models,
-        inputs=[completor_left, completor_right],
+        inputs=[completion_left, completion_right],
         outputs=[model_name_left, model_name_right],
     ).then(
         response_recorded_show,
@@ -336,14 +337,14 @@ with comparison_app:
 
     bothbad_btn.click(
         log_submission_bothbad_btn,
-        inputs=[completor_left, completor_right, current_question],
+        inputs=[completion_left, completion_right, current_question],
         outputs=bothbad_btn,
     ).then(
         make_buttons_unavailable,
         outputs=[*btn_list],
     ).then(
         reveal_models,
-        inputs=[completor_left, completor_right],
+        inputs=[completion_left, completion_right],
         outputs=[model_name_left, model_name_right],
     ).then(
         response_recorded_show,
