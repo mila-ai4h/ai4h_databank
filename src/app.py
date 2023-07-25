@@ -1,3 +1,5 @@
+import os
+
 import gradio as gr
 from fastapi import FastAPI
 from starlette.responses import RedirectResponse
@@ -22,10 +24,10 @@ async def root():
 if __name__ == "__main__":
     import uvicorn
 
-    import os
     port = os.getenv("PORT")
     if port is not None:
         # In production
-        uvicorn.run("app:app", reload=True, port=port, host="0.0.0.0")
+        uvicorn.run("app:app", port=port, host="0.0.0.0")
     else:
+        # for local debugging
         uvicorn.run("app:app", reload=True)
