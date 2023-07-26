@@ -204,8 +204,8 @@ def update_current_question(textbox, current_question, chatbot_left, chatbot_rig
     return textbox, current_question, chatbot_left, chatbot_right
 
 
-comparison_app = gr.Blocks()
-with comparison_app:
+arena_app = gr.Blocks()
+with arena_app:
     gr.Markdown("<h1><center>⚔️ Chatbot Arena ⚔️️</center></h1>")
 
     current_question = gr.State("")
@@ -393,10 +393,10 @@ with comparison_app:
 
 
 if __name__ == "__main__":
-    comparison_app.queue(concurrency_count=16)
-    comparison_app.launch(share=False, auth=check_auth)()
+    arena_app.queue(concurrency_count=16)
+    arena_app.launch(share=False, auth=check_auth)()
 
 else:
-    comparison_app.auth = check_auth
-    comparison_app.auth_message = ""
-    comparison_app.queue()
+    arena_app.auth = check_auth
+    arena_app.auth_message = ""
+    arena_app.queue()
