@@ -10,7 +10,7 @@ from arena_app import arena_app
 app = FastAPI()
 
 app = gr.mount_gradio_app(app, buster_app, path="/buster")
-app = gr.mount_gradio_app(app, arena_app, path="/comparison")
+app = gr.mount_gradio_app(app, arena_app, path="/arena")
 
 
 @app.get("/")
