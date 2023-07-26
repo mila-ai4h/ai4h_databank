@@ -233,6 +233,7 @@ if __name__ == "__main__":
     buster_app.launch(share=False, auth=check_auth)
 
 else:
+    buster_app.show_api = False
     buster_app.auth = check_auth
     buster_app.auth_message = ""
     buster_app.queue()
