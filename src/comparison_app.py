@@ -20,26 +20,93 @@ from feedback import ComparisonForm, Feedback
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
+# Number of sources to display, get value from cfg
 max_sources = cfg.buster_cfg.retriever_cfg["top_k"]
 
+# db that will be logged to
 mongo_db = cfg.mongo_db
 
 # Load the sample questions and split them by type
 questions = pd.read_csv("sample_questions.csv")
 relevant_questions = questions[questions.question_type == "relevant"].question.to_list()
 
-enable_btn = gr.Button.update(interactive=True)
-disable_btn = gr.Button.update(interactive=False)
-focus_btn = gr.Button.update(variant="primary")
-unfocus_btn = gr.Button.update(variant="secondary")
-
+# Set up a version of buster with gpt 3.5
 buster_35_cfg = copy.deepcopy(buster_cfg)
 buster_35_cfg.completion_cfg["completion_kwargs"]["model"] = "gpt-3.5-turbo"
 buster_35 = setup_buster(buster_35_cfg)
 
+# Set up a version of buster with gpt 4
 buster_4_cfg = copy.deepcopy(buster_cfg)
 buster_4_cfg.completion_cfg["completion_kwargs"]["model"] = "gpt-4"
 buster_4 = setup_buster(buster_4_cfg)
+
+# Useful to set when trying out new features locally so you don't have to wait for new streams each time.
+# Set to True to enable.
+DEBUG_MODE = False
+
+
+def make_buttons_available():
+    enable_btn = gr.Button.update(interactive=True)
+    return [enable_btn] * 4
+
+
+def make_buttons_unavailable():
+    disable_btn = gr.Button.update(interactive=False)
+    return [disable_btn] * 4
+
+
+def make_buttons_unfocus():
+    unfocus_btn = gr.Button.update(variant="secondary")
+    return [unfocus_btn] * 4
+
+
+def response_recorded_show():
+    return gr.Markdown.update(visible=True)
+
+
+def response_recorded_hide():
+    return gr.Markdown.update(visible=False)
+
+
+def log_submission_leftvote_btn(completion_left, completion_right, current_question, request: gr.Request):
+    username = request.username
+    vote = "left is better"
+    return log_submission(completion_left, completion_right, current_question, vote, username)
+
+
+def log_submission_rightvote_btn(completion_left, completion_right, current_question, request: gr.Request):
+    username = request.username
+    vote = "right is better"
+    return log_submission(completion_left, completion_right, current_question, vote, username)
+
+
+def log_submission_tie_btn(completion_left, completion_right, current_question, request: gr.Request):
+    username = request.username
+    vote = "tied"
+    return log_submission(completion_left, completion_right, current_question, vote, username)
+
+
+def log_submission_bothbad_btn(completion_left, completion_right, current_question, request: gr.Request):
+    vote = "both bad"
+    username = request.username
+    return log_submission(completion_left, completion_right, current_question, vote, username)
+
+
+def log_submission(completion_left, completion_right, current_question, vote, username):
+    model_left = get_model_from_completion(completion_left)
+    model_right = get_model_from_completion(completion_right)
+
+    comparison = ComparisonForm(vote=vote, model_left=model_left, model_right=model_right, question=current_question)
+    feedback = Feedback(
+        username=username,
+        user_responses=[completion_left, completion_right],
+        feedback_form=comparison,
+        time=get_utc_time(),
+    )
+    feedback.send(mongo_db, collection=cfg.mongo_arena_collection)
+
+    focus_btn = gr.Button.update(variant="primary")
+    return focus_btn
 
 
 async def process_input_35(question):
@@ -61,20 +128,20 @@ async def run_models_async(question):
 
 
 async def bot_response_stream(
-    question,
-    chatbot_left,
-    chatbot_right,
+    question: str,
+    chatbot_left: gr.Chatbot,
+    chatbot_right: gr.Chatbot,
 ):
-    # Init the conversation
+    """Given a question, generate the completions."""
+    # Clear and init. the conversation
     chatbot_left[-1][1] = ""
     chatbot_right[-1][1] = ""
 
-    def generator(text):
-        for token in text:
-            yield token
+    if DEBUG_MODE:
 
-    debug = False
-    if debug:
+        def generator(text):
+            for token in text:
+                yield token
 
         completion_left = Completion(
             error=False,
@@ -115,17 +182,20 @@ def get_model_from_completion(completion: Completion) -> str:
     return completion.completion_kwargs["model"]
 
 
-def reveal_models(completion_left, completion_right):
+def reveal_models(completion_left: Completion, completion_right: Completion) -> str:
+    """Revels the model names as markdown."""
     model_left = get_model_from_completion(completion_left)
     model_right = get_model_from_completion(completion_right)
     return "## Model: " + model_left, "## Model: " + model_right
 
 
 def hide_models():
+    """Resets the model names to empty strings effectively hiding them."""
     return gr.Markdown.update(value=""), gr.Markdown.update(value="")
 
 
 def update_current_question(textbox, current_question, chatbot_left, chatbot_right):
+    """Takes the value from the textbox and sets it as the user's current question state."""
     chatbot_left = [[textbox, None]]
     chatbot_right = [[textbox, None]]
 
@@ -188,22 +258,6 @@ with comparison_app:
         with gr.Column(scale=1, min_width=50):
             send_btn = gr.Button(value="Send", visible=True)
 
-    def make_buttons_available():
-        return [enable_btn] * 4
-
-    def make_buttons_unavailable():
-        return [disable_btn] * 4
-
-    def make_buttons_unfocus():
-        return [unfocus_btn] * 4
-
-    def response_recorded_show():
-        return gr.Markdown.update(visible=True)
-
-    def response_recorded_hide():
-        return gr.Markdown.update(visible=False)
-
-    # Register listeners
     btn_list = [
         leftvote_btn,
         rightvote_btn,
@@ -211,12 +265,15 @@ with comparison_app:
         bothbad_btn,
     ]
 
+    # fmt: off
+
+    # Set up clear button
     clr_button.add(
         components=[
             chatbot_left,
             chatbot_right,
-            model_name_left,
-            model_name_right,
+        model_name_left,
+        model_name_right,
             response_recorded,
             *sources_textboxes,
         ]
@@ -228,7 +285,11 @@ with comparison_app:
         make_buttons_unfocus,
         outputs=[*btn_list],
     )
+    # fmt: on
 
+    # fmt: off
+
+    # When clicking the send button, takes care of also making the vote buttons available.
     send_btn.click(
         make_buttons_unfocus,
         outputs=[*btn_list],
@@ -250,42 +311,20 @@ with comparison_app:
     ).success(
         make_buttons_available, outputs=[*btn_list]
     )
+    # fmt: on
 
-    def log_submission_leftvote_btn(completion_left, completion_right, current_question, request: gr.Request):
-        username = request.username
-        vote = "left is better"
-        return log_submission(completion_left, completion_right, current_question, vote, username)
 
-    def log_submission_rightvote_btn(completion_left, completion_right, current_question, request: gr.Request):
-        username = request.username
-        vote = "right is better"
-        return log_submission(completion_left, completion_right, current_question, vote, username)
+    # fmt: off
 
-    def log_submission_tie_btn(completion_left, completion_right, current_question, request: gr.Request):
-        username = request.username
-        vote = "tied"
-        return log_submission(completion_left, completion_right, current_question, vote, username)
+    # All the different buttons exhibit the same behaviour on click.
+    # 1) register the vote on mongodb, make voted button focused
+    # 2) make voting buttons unavailable after vote
+    # 3) reveal which model was which
+    # 4) show a message that says it was properly logged.
+    # If you edit one button, you MUST edit all of them.
+    # There might be a more pythonic way to do this in gradio, but I'm not sure exactly how to do this.
+    # Can revisit this later
 
-    def log_submission_bothbad_btn(completion_left, completion_right, current_question, request: gr.Request):
-        vote = "both bad"
-        username = request.username
-        return log_submission(completion_left, completion_right, current_question, vote, username)
-
-    def log_submission(completion_left, completion_right, current_question, vote, username):
-        model_left = get_model_from_completion(completion_left)
-        model_right = get_model_from_completion(completion_right)
-
-        comparison = ComparisonForm(
-            vote=vote, model_left=model_left, model_right=model_right, question=current_question
-        )
-        feedback = Feedback(
-            username=username,
-            user_responses=[completion_left, completion_right],
-            feedback_form=comparison,
-            time=get_utc_time(),
-        )
-        feedback.send(mongo_db, collection=cfg.mongo_arena_collection)
-        return focus_btn
 
     leftvote_btn.click(
         log_submission_leftvote_btn,
@@ -350,6 +389,7 @@ with comparison_app:
         response_recorded_show,
         outputs=response_recorded,
     )
+    # fmt: on
 
 
 if __name__ == "__main__":

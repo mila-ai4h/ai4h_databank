@@ -18,8 +18,10 @@ logging.basicConfig(level=logging.INFO)
 
 
 class WordTokenizer(Tokenizer):
+    """Naive word-level tokenizer
 
-    """The original tokenizer from openAI eats way too much Ram. This is a naive word count tokenizer"""
+    The original tokenizer from openAI eats way too much Ram.
+    This is a naive word count tokenizer to be used instead."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
