@@ -1,3 +1,4 @@
 git+https://github.com/jerpint/buster@v1.0.14
 gradio
 pymongo
+gunicorn

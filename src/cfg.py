@@ -3,18 +3,35 @@ import os
 
 import openai
 from buster.busterbot import Buster, BusterConfig
-from buster.completers import ChatGPTCompleter, Completer, DocumentAnswerer
+from buster.completers import ChatGPTCompleter, DocumentAnswerer
 from buster.formatters.documents import DocumentsFormatter
 from buster.formatters.prompts import PromptFormatter
 from buster.retriever import Retriever, ServiceRetriever
-from buster.tokenizers import GPTTokenizer
+from buster.tokenizers import Tokenizer
 from buster.validators import QuestionAnswerValidator, Validator
 from openai.embeddings_utils import cosine_similarity
 
-from src.db_utils import make_uri
+from app_utils import init_db, make_uri
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
+
+
+class WordTokenizer(Tokenizer):
+    """Naive word-level tokenizer
+
+    The original tokenizer from openAI eats way too much Ram.
+    This is a naive word count tokenizer to be used instead."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def encode(self, string):
+        return string.split()
+
+    def decode(self, encoded):
+        return " ".join(encoded)
+
 
 # auth information
 USERNAME = os.getenv("AI4H_USERNAME")
@@ -35,7 +52,15 @@ mongo_password = os.getenv("AI4H_MONGODB_PASSWORD")
 mongo_cluster = os.getenv("AI4H_MONGODB_CLUSTER")
 mongo_uri = make_uri(mongo_username, mongo_password, mongo_cluster)
 mongo_db_name = os.getenv("AI4H_MONGODB_DB_DATA")
+
+username = os.getenv("AI4H_MONGODB_USERNAME")
+password = os.getenv("AI4H_MONGODB_PASSWORD")
+cluster = os.getenv("AI4H_MONGODB_CLUSTER")
+db_name = os.getenv("AI4H_MONGODB_DB_NAME")
+mongo_db = init_db(username, password, cluster, db_name)
+
 mongo_feedback_collection = os.getenv("AI4H_MONGODB_FEEDBACK_COLLECTION")
+mongo_arena_collection = os.getenv("AI4H_MONGODB_ARENA_COLLECTION")
 
 
 buster_cfg = BusterConfig(
@@ -137,15 +162,17 @@ Q:
 )
 
 
-# setup retriever
-retriever: Retriever = ServiceRetriever(**buster_cfg.retriever_cfg)
-tokenizer = GPTTokenizer(**buster_cfg.tokenizer_cfg)
-document_answerer: DocumentAnswerer = DocumentAnswerer(
-    completer=ChatGPTCompleter(**buster_cfg.completion_cfg),
-    documents_formatter=DocumentsFormatter(tokenizer=tokenizer, **buster_cfg.documents_formatter_cfg),
-    prompt_formatter=PromptFormatter(tokenizer=tokenizer, **buster_cfg.prompt_formatter_cfg),
-    **buster_cfg.documents_answerer_cfg,
-)
-validator: Validator = QuestionAnswerValidator(**buster_cfg.validator_cfg)
+def setup_buster(buster_cfg):
+    retriever: Retriever = ServiceRetriever(**buster_cfg.retriever_cfg)
+    tokenizer = WordTokenizer(**buster_cfg.tokenizer_cfg)
+    # tokenizer = GPTTokenizer(**buster_cfg.tokenizer_cfg)
+    document_answerer: DocumentAnswerer = DocumentAnswerer(
+        completer=ChatGPTCompleter(**buster_cfg.completion_cfg),
+        documents_formatter=DocumentsFormatter(tokenizer=tokenizer, **buster_cfg.documents_formatter_cfg),
+        prompt_formatter=PromptFormatter(tokenizer=tokenizer, **buster_cfg.prompt_formatter_cfg),
+        **buster_cfg.documents_answerer_cfg,
+    )
+    validator: Validator = QuestionAnswerValidator(**buster_cfg.validator_cfg)
 
-buster: Buster = Buster(retriever=retriever, document_answerer=document_answerer, validator=validator)
+    buster: Buster = Buster(retriever=retriever, document_answerer=document_answerer, validator=validator)
+    return buster

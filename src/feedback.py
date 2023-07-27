@@ -14,24 +14,39 @@ logging.basicConfig(level=logging.INFO)
 
 
 @dataclass
-class FeedbackForm:
-    relevant_answer: str
-    relevant_sources: str
-    extra_info: str
-
+class StandardForm:
     def to_json(self) -> Any:
         return jsonable_encoder(self)
 
     @classmethod
-    def from_dict(cls, feedback_dict: dict) -> FeedbackForm:
+    def from_dict(cls, feedback_dict: dict) -> StandardForm:
         return cls(**feedback_dict)
+
+
+@dataclass
+class FeedbackForm(StandardForm):
+    """Form on the original Buster app."""
+
+    relevant_answer: str
+    relevant_sources: str
+    extra_info: str
+
+
+@dataclass
+class ComparisonForm(StandardForm):
+    """Easily readable comparison result on the battle arena."""
+
+    question: str
+    model_left: str
+    model_right: str
+    vote: str
 
 
 @dataclass
 class Feedback:
     username: str
     user_responses: list[Completion]
-    feedback_form: FeedbackForm
+    feedback_form: StandardForm
     time: str
 
     def send(self, mongo_db: pymongo.database.Database, collection: str):
@@ -89,9 +104,9 @@ class Feedback:
         return jsonable_encoder(to_encode, custom_encoder=custom_encoder)
 
     @classmethod
-    def from_dict(cls, feedback_dict: dict) -> Feedback:
+    def from_dict(cls, feedback_dict: dict, feedback_cls: StandardForm) -> Feedback:
         del feedback_dict["_id"]
-        feedback_dict["feedback_form"] = FeedbackForm.from_dict(feedback_dict["feedback_form"])
+        feedback_dict["feedback_form"] = feedback_cls.from_dict(feedback_dict["feedback_form"])
 
         feedback_dict["user_responses"] = [Completion.from_dict(r) for r in feedback_dict["user_responses"]]
 

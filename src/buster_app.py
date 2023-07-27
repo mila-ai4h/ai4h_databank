@@ -1,79 +1,28 @@
+import copy
 import logging
 import os
-from datetime import datetime, timezone
 
 import gradio as gr
 import pandas as pd
-from buster.busterbot import Buster
 
 import cfg
-from db_utils import init_db
+from app_utils import add_sources, check_auth, get_utc_time
+from cfg import setup_buster
 from feedback import Feedback, FeedbackForm
-
-username = os.getenv("AI4H_MONGODB_USERNAME")
-password = os.getenv("AI4H_MONGODB_PASSWORD")
-cluster = os.getenv("AI4H_MONGODB_CLUSTER")
-db_name = os.getenv("AI4H_MONGODB_DB_NAME")
-mongo_db = init_db(username, password, cluster, db_name)
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-buster = cfg.buster
-
-
-MAX_TABS = cfg.buster_cfg.retriever_cfg["top_k"]
+mongo_db = cfg.mongo_db
+buster_cfg = copy.deepcopy(cfg.buster_cfg)
+buster = setup_buster(buster_cfg=buster_cfg)
+max_sources = cfg.buster_cfg.retriever_cfg["top_k"]
 
 # Load the sample questions and split them by type
 questions = pd.read_csv("sample_questions.csv")
 relevant_questions = questions[questions.question_type == "relevant"].question.to_list()
 irrelevant_questions = questions[questions.question_type == "irrelevant"].question.to_list()
 trick_questions = questions[questions.question_type == "trick"].question.to_list()
-
-
-def get_utc_time() -> str:
-    return str(datetime.now(timezone.utc))
-
-
-def check_auth(username: str, password: str) -> bool:
-    """Check if authentication succeeds or not.
-
-    The authentication leverages the built-in gradio authentication. We use a shared password among users.
-    It is temporary for developing the PoC. Proper authentication needs to be implemented in the future.
-    We allow a valid username to be any username beginning with 'databank-', this will allow us to differentiate between users easily.
-    """
-    valid_user = username.startswith("databank-") or username == cfg.USERNAME
-    valid_password = password == cfg.PASSWORD
-    is_auth = valid_user and valid_password
-    logger.info(f"Log-in attempted by {username=}. {is_auth=}")
-    return is_auth
-
-
-def format_sources(matched_documents: pd.DataFrame) -> list[str]:
-    formatted_sources = []
-
-    for _, doc in matched_documents.iterrows():
-        formatted_sources.append(f"### [{doc.title}]({doc.url})\n{doc.content}\n")
-
-    return formatted_sources
-
-
-def pad_sources(sources: list[str]) -> list[str]:
-    """Pad sources with empty strings to ensure that the number of tabs is always MAX_TABS."""
-    k = len(sources)
-    return sources + [""] * (MAX_TABS - k)
-
-
-def add_sources(completion):
-    if any(arg is False for arg in [completion.question_relevant, completion.answer_relevant]):
-        # Question was not relevant, don't bother doing anything else...
-        formatted_sources = [""]
-        formatted_sources = pad_sources(formatted_sources)
-        return formatted_sources
-
-    formatted_sources = format_sources(completion.matched_documents)
-
-    return formatted_sources
 
 
 def append_response(response, user_responses):
@@ -135,9 +84,9 @@ def clear_feedback_form():
     }
 
 
-block = gr.Blocks(css="#chatbot .overflow-y-auto{height:500px}")
+buster_app = gr.Blocks(css="#chatbot .overflow-y-auto{height:500px}")
 
-with block:
+with buster_app:
     # TODO: trigger a proper change to update
 
     # state variables are client-side and are reset every time a client refreshes the page
@@ -182,7 +131,7 @@ with block:
             with gr.Column(variant="panel"):
                 gr.Markdown("## References used")
                 sources_textboxes = []
-                for i in range(MAX_TABS):
+                for i in range(max_sources):
                     with gr.Tab(f"Source {i + 1} 📝"):
                         t = gr.Markdown()
                     sources_textboxes.append(t)
@@ -254,7 +203,7 @@ with block:
         outputs=[chatbot, response],
     ).then(
         add_sources,
-        inputs=[response],
+        inputs=[response, gr.State(max_sources)],
         outputs=[*sources_textboxes]
     ).then(
         append_response,
@@ -271,7 +220,7 @@ with block:
         outputs=[chatbot, response],
     ).then(
         add_sources,
-        inputs=[response],
+        inputs=[response, gr.State(max_sources)],
         outputs=[*sources_textboxes]
     ).then(
         append_response,
@@ -279,5 +228,12 @@ with block:
     )
     # fmt: on
 
-block.queue(concurrency_count=16)
-block.launch(share=False, auth=check_auth)
+if __name__ == "__main__":
+    buster_app.queue(concurrency_count=16)
+    buster_app.launch(share=False, auth=check_auth)
+
+else:
+    buster_app.show_api = False
+    buster_app.auth = check_auth
+    buster_app.auth_message = ""
+    buster_app.queue()
