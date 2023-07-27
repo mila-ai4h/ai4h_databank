@@ -51,11 +51,10 @@ class Feedback:
 
         # Flatten user responses, only keep the most recent interaction
         if len(feedback_dict["user_responses"]) > 0:
-            feedback_dict.update(feedback_dict["user_responses"][-1])
-
-            for k in feedback_dict["completion"].keys():
-                feedback_dict[f"completion_{k}"] = feedback_dict["completion"][k]
-            del feedback_dict["completion"]
+            completion_dict = feedback_dict["user_responses"][-1]
+            # # TODO: add test for this...
+            for k in completion_dict.keys():
+                feedback_dict[f"completion_{k}"] = completion_dict[k]
         del feedback_dict["user_responses"]
 
         # Flatten feedback form
@@ -109,7 +108,6 @@ def read_feedback(mongo_db: pymongo.database.Database, collection: str, filters:
         feedback = mongo_db[collection].find(filters)
         feedback = [Feedback.from_dict(f).flatten() for f in feedback]
         feedback = pd.DataFrame(feedback)
-        feedback = feedback.drop_duplicates(subset=["username", "user_input"], keep="last")
 
         return feedback
     except Exception as err:
