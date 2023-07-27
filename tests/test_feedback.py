@@ -55,7 +55,7 @@ def test_read_write_feedback():
 
     f_json = f.to_json()
     f_json["_id"] = "0123"  # This is created by mongodb
-    f_back = Feedback.from_dict(f_json)
+    f_back = Feedback.from_dict(f_json, feedback_cls=FeedbackForm)
 
     assert f.username == f_back.username
     assert f.time == f_back.time

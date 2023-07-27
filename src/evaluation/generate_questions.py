@@ -7,7 +7,6 @@ import pandas as pd
 from buster.completers import ChatGPTCompleter
 
 from src.cfg import retriever
-from src.db_utils import make_uri
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
