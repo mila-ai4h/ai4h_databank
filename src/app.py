@@ -4,8 +4,8 @@ import gradio as gr
 from fastapi import FastAPI
 from starlette.responses import RedirectResponse
 
-from buster_app import buster_app
 from arena_app import arena_app
+from buster_app import buster_app
 
 app = FastAPI()
 

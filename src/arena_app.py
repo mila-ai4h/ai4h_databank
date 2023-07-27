@@ -8,7 +8,6 @@ from itertools import zip_longest
 
 import gradio as gr
 import pandas as pd
-
 from buster.completers import Completion
 
 import cfg
