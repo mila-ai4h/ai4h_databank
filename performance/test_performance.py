@@ -90,12 +90,12 @@ def process_questions(busterbot, questions: pd.DataFrame) -> pd.DataFrame:
             ],
             index=[
                 "question",
-                "Category",
+                "question_type",
                 "valid_question",
                 "valid_answer",
                 "question_relevant",
                 "answer_relevant",
-                "answer",
+                "answer_text",
             ],
         )
 
@@ -104,15 +104,15 @@ def process_questions(busterbot, questions: pd.DataFrame) -> pd.DataFrame:
 
 def test_summary(busterbot, results_dir):
     questions = pd.read_csv("src/sample_questions.csv")
-    results = process_questions(busterbot, questions.iloc)
+    results = process_questions(busterbot, questions)
 
     results.reset_index().to_csv("results_detailed.csv", index=False)
-    results.drop(columns=["answer"], inplace=True)
+    results.drop(columns=["answer_text"], inplace=True)
 
     logger.info(results.head())
-    summary = results.groupby("Category").agg({"answer_relevant": ["sum", "count"]}).reset_index()
+    summary = results.groupby("question_type").agg({"answer_relevant": ["sum", "count"]}).reset_index()
     summary.columns = ["_".join(col).strip() for col in summary.columns.values]
-    summary.rename(columns={"Category_": "Category"}, inplace=True)
+    summary.rename(columns={"question_type_": "Category"}, inplace=True)
     column_order = ["Category"] + [col for col in summary.columns if col not in ["Category"]]
     summary = summary.loc[:, column_order]
 
