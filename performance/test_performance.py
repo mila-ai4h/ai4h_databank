@@ -22,7 +22,6 @@ import random
 import pandas as pd
 import pytest
 from buster.busterbot import Buster
-from buster.retriever import ServiceRetriever
 from buster.completers import ChatGPTCompleter, DocumentAnswerer
 from buster.formatters.documents import DocumentsFormatter
 from buster.formatters.prompts import PromptFormatter
@@ -67,7 +66,7 @@ def busterbot(monkeypatch, run_expensive):
     validator: Validator = QuestionAnswerValidator(**buster_cfg.validator_cfg)
 
     buster: Buster = Buster(retriever=retriever, document_answerer=document_answerer, validator=validator)
-    
+
     return buster
 
 
@@ -78,12 +77,34 @@ def results_dir(tmp_path_factory):
 
 def process_questions(busterbot, questions: pd.DataFrame) -> pd.DataFrame:
     results = []
+
     def answer_question(question):
         completion = busterbot.process_input(question.question)
-        results.append((question.question, question.question_type, question.valid_question, question.valid_answer, completion.question_relevant, completion.answer_relevant, completion.answer_text))
+        results.append(
+            (
+                question.question,
+                question.question_type,
+                question.valid_question,
+                question.valid_answer,
+                completion.question_relevant,
+                completion.answer_relevant,
+                completion.answer_text,
+            )
+        )
 
     questions.apply(answer_question, axis=1)
-    return pd.DataFrame(results, columns=["question", "Category", "valid_question", "valid_answer", "question_relevant", "answer_relevant", "answer"])
+    return pd.DataFrame(
+        results,
+        columns=[
+            "question",
+            "Category",
+            "valid_question",
+            "valid_answer",
+            "question_relevant",
+            "answer_relevant",
+            "answer",
+        ],
+    )
 
 
 def test_summary(busterbot, results_dir):
