@@ -7,7 +7,7 @@ import pandas as pd
 import pymongo
 from pymongo import MongoClient
 
-import cfg
+import src.cfg
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)

@@ -1,25 +1,14 @@
-name: prod-ci
+name: performance
 
-on:
-  push:
-    branches:
-      - 'main'
+on: workflow_dispatch
 
 jobs:
-  tests:
+  performance:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-      - name: black linter
-        uses: psf/black@stable
-        with:
-          options: "--check --diff --line-length 120"
-      - name: isort
-        run: |
-          pip install isort
-          isort --profile black --check-only .
-      - name: unit tests
+      - name: performance
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           HUB_TOKEN: ${{ secrets.HUB_TOKEN }}
@@ -33,16 +22,13 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           pip install -e .[tests]
-          pytest --ignore=performance
-  deploy-prod:
-    needs: tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@v3
-      - name: Deploy to Heroku
-        uses: akhileshns/heroku-deploy@v3.12.13 # This is the action
+          pytest --run_expensive --ignore=tests
+      - name: Save performance results
+        uses: actions/upload-artifact@v3
         with:
-          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: ${{ vars.HEROKU_PROD_SERVER }}
-          heroku_email: ${{ vars.HEROKU_EMAIL }}
+          name: results
+          path: |
+            results_detailed.csv
+            results_summary.csv
+      - name: Update summary
+        run: cat results_summary.md >> $GITHUB_STEP_SUMMARY
