@@ -76,12 +76,10 @@ def results_dir(tmp_path_factory):
 
 
 def process_questions(busterbot, questions: pd.DataFrame) -> pd.DataFrame:
-    results = []
-
     def answer_question(question):
         completion = busterbot.process_input(question.question)
-        results.append(
-            (
+        return pd.Series(
+            [
                 question.question,
                 question.question_type,
                 question.valid_question,
@@ -89,27 +87,24 @@ def process_questions(busterbot, questions: pd.DataFrame) -> pd.DataFrame:
                 completion.question_relevant,
                 completion.answer_relevant,
                 completion.answer_text,
-            )
+            ],
+            index=[
+                "question",
+                "Category",
+                "valid_question",
+                "valid_answer",
+                "question_relevant",
+                "answer_relevant",
+                "answer",
+            ],
         )
 
-    questions.apply(answer_question, axis=1)
-    return pd.DataFrame(
-        results,
-        columns=[
-            "question",
-            "Category",
-            "valid_question",
-            "valid_answer",
-            "question_relevant",
-            "answer_relevant",
-            "answer",
-        ],
-    )
+    return questions.apply(answer_question, axis=1)
 
 
 def test_summary(busterbot, results_dir):
     questions = pd.read_csv("src/sample_questions.csv")
-    results = process_questions(busterbot, questions.iloc[:2])
+    results = process_questions(busterbot, questions.iloc)
 
     results.reset_index().to_csv("results_detailed.csv", index=False)
     results.drop(columns=["answer"], inplace=True)
