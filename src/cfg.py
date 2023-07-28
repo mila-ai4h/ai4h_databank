@@ -9,9 +9,8 @@ from buster.formatters.prompts import PromptFormatter
 from buster.retriever import Retriever, ServiceRetriever
 from buster.tokenizers import Tokenizer
 from buster.validators import QuestionAnswerValidator, Validator
-from openai.embeddings_utils import cosine_similarity
 
-from app_utils import init_db, make_uri
+from src.app_utils import init_db, make_uri
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
