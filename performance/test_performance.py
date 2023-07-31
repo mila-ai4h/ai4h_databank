@@ -50,7 +50,7 @@ def busterbot(monkeypatch, run_expensive):
         )
         # set thresh = 1 to be sure that no documents get retrieved
         buster_cfg.retriever_cfg["thresh"] = 1
-        
+
     retriever = ServiceRetriever(**buster_cfg.retriever_cfg)
 
     buster_cfg.validator_cfg["completion_kwargs"]["stream"] = False
