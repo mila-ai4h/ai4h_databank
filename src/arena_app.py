@@ -391,9 +391,9 @@ with arena_app:
     # fmt: on
 
 
-if __name__ == "__main__":
+if __name__ == "arena_app":
     arena_app.queue(concurrency_count=16)
-    arena_app.launch(share=False, auth=check_auth)()
+    arena_app.launch(share=False, auth=check_auth)
 
 else:
     arena_app.auth = check_auth

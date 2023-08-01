@@ -6,9 +6,9 @@ import gradio as gr
 import pandas as pd
 
 import cfg
-from app_utils import add_sources, check_auth, get_utc_time
 from cfg import setup_buster
 from feedback import Feedback, FeedbackForm
+from src.app_utils import add_sources, check_auth, get_utc_time
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -17,9 +17,13 @@ mongo_db = cfg.mongo_db
 buster_cfg = copy.deepcopy(cfg.buster_cfg)
 buster = setup_buster(buster_cfg=buster_cfg)
 max_sources = cfg.buster_cfg.retriever_cfg["top_k"]
+from pathlib import Path
+
+current_dir = Path(__file__).resolve().parent
 
 # Load the sample questions and split them by type
-questions = pd.read_csv("sample_questions.csv")
+questions_file = str(current_dir / "sample_questions.csv")
+questions = pd.read_csv(questions_file)
 relevant_questions = questions[questions.question_type == "relevant"].question.to_list()
 irrelevant_questions = questions[questions.question_type == "irrelevant"].question.to_list()
 trick_questions = questions[questions.question_type == "trick"].question.to_list()
@@ -228,7 +232,9 @@ with buster_app:
     )
     # fmt: on
 
-if __name__ == "__main__":
+
+# True when launching using gradio entrypoint
+if __name__ == "buster_app":
     buster_app.queue(concurrency_count=16)
     buster_app.launch(share=False, auth=check_auth)
 
