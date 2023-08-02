@@ -1,5 +1,5 @@
-# Setup mongoDB
 import logging
+import os
 from datetime import datetime, timezone
 from urllib.parse import quote_plus
 
@@ -7,7 +7,10 @@ import pandas as pd
 import pymongo
 from pymongo import MongoClient
 
-import src.cfg
+# auth information
+USERNAME = os.getenv("AI4H_USERNAME")
+PASSWORD = os.getenv("AI4H_PASSWORD")
+
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -54,8 +57,8 @@ def check_auth(username: str, password: str) -> bool:
     It is temporary for developing the PoC. Proper authentication needs to be implemented in the future.
     We allow a valid username to be any username beginning with 'databank-', this will allow us to differentiate between users easily.
     """
-    valid_user = username.startswith("databank-") or username == cfg.USERNAME
-    valid_password = password == cfg.PASSWORD
+    valid_user = username.startswith(USERNAME)
+    valid_password = password == PASSWORD
     is_auth = valid_user and valid_password
     logger.info(f"Log-in attempted by {username=}. {is_auth=}")
     return is_auth
