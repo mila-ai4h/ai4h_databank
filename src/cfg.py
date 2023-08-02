@@ -32,10 +32,6 @@ class WordTokenizer(Tokenizer):
         return " ".join(encoded)
 
 
-# auth information
-USERNAME = os.getenv("AI4H_USERNAME")
-PASSWORD = os.getenv("AI4H_PASSWORD")
-
 # set openAI creds
 openai.api_key = os.getenv("OPENAI_API_KEY")
 openai.organization = os.getenv("OPENAI_ORGANIZATION")
