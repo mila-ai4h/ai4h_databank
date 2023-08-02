@@ -234,12 +234,7 @@ with buster_app:
 
 
 # True when launching using gradio entrypoint
-if __name__ == "buster_app":
+if os.getenv("MOUNT_GRADIO_APP") is None:
+    logger.info("launching app via gradio")
     buster_app.queue(concurrency_count=16)
     buster_app.launch(share=False, auth=check_auth)
-
-else:
-    buster_app.show_api = False
-    buster_app.auth = check_auth
-    buster_app.auth_message = ""
-    buster_app.queue()
