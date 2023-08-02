@@ -34,7 +34,7 @@ cd $TMP_DEPLOY_DIR
 
 # Create the README configuration (necessary for Hugging Face space)
 echo '---
-title: Buster Dev
+title: Buster
 emoji: 💻
 colorFrom: pink
 colorTo: green
@@ -64,10 +64,8 @@ git commit -m "Deploy app"
 
 # Set the remote URL based on the deployment type
 if [ "$DEPLOY_TYPE" = "dev" ]; then
-  # Replace <YOUR-ORG> and <YOUR-DEV-SPACE> with the actual values for your Hugging Face organization and dev space
   git remote add space https://huggingface.co/spaces/databank-ai4h/buster-dev
 elif [ "$DEPLOY_TYPE" = "prod" ]; then
-  # Replace <YOUR-ORG> and <YOUR-PROD-SPACE> with the actual values for your Hugging Face organization and prod space
   git remote add space https://huggingface.co/spaces/databank-ai4h/buster-prod
 fi
 
