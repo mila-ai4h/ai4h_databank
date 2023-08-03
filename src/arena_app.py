@@ -211,12 +211,12 @@ with arena_app:
         with gr.Box() as button_row:
             with gr.Row():
                 choices = ["👈  A is better", "👉  B is better", "🤝  Tie", "👎  Both are bad"]
-                vote_radio = gr.Radio(choices=choices, scale=1, interactive=False)
+                vote_radio = gr.Radio(choices=choices, scale=2, interactive=False)
                 feedback_extra_info = gr.Textbox(
                     label="Enter additional information (optional)",
                     lines=4,
                     placeholder="Enter more helpful information for us here...",
-                    scale=1.5,
+                    scale=3,
                     interactive=False,
                 )
 
@@ -287,6 +287,10 @@ with arena_app:
     submit_feedback_btn.click(
         deactivate_feedback_elements,
         outputs=[submit_feedback_btn, vote_radio, feedback_extra_info],
+    ).then(
+        reveal_models,
+        inputs=[completion_left, completion_right],
+        outputs=[model_name_left, model_name_right],
     ).then(
         submit_feedback,
         inputs=[
