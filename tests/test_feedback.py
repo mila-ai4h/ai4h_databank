@@ -45,7 +45,7 @@ def test_read_write_feedback():
     f = Interaction(
         username="test user",
         user_completions=[b],
-        feedback_form=FeedbackForm(
+        form=FeedbackForm(
             extra_info="extra",
             relevant_answer="relevant",
             relevant_sources="sources",
@@ -59,9 +59,9 @@ def test_read_write_feedback():
 
     assert f.username == f_back.username
     assert f.time == f_back.time
-    assert f.feedback_form.extra_info == f_back.feedback_form.extra_info
-    assert f.feedback_form.relevant_answer == f_back.feedback_form.relevant_answer
-    assert f.feedback_form.relevant_sources == f_back.feedback_form.relevant_sources
+    assert f.form.extra_info == f_back.form.extra_info
+    assert f.form.relevant_answer == f_back.form.relevant_answer
+    assert f.form.relevant_sources == f_back.form.relevant_sources
     assert len(f.user_completions) == len(f_back.user_completions)
     assert f.user_completions[0].user_input == f_back.user_completions[0].user_input
     assert f.user_completions[0].error == f_back.user_completions[0].error
