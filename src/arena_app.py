@@ -42,70 +42,56 @@ buster_4 = setup_buster(buster_4_cfg)
 DEBUG_MODE = False
 
 
-def make_buttons_available():
-    enable_btn = gr.Button.update(interactive=True)
-    return [enable_btn] * 4
+def deactivate_feedback_elements():
+    return deactivate_button(), deactivate_radio(), deactivate_textbox()
 
 
-def make_buttons_unavailable():
-    disable_btn = gr.Button.update(interactive=False)
-    return [disable_btn] * 4
+def activate_feedback_elements():
+    return activate_button(), activate_radio(), activate_textbox()
 
 
-def make_buttons_unfocus():
-    unfocus_btn = gr.Button.update(variant="secondary")
-    return [unfocus_btn] * 4
+def activate_textbox():
+    return gr.Textbox.update(interactive=True)
 
 
-def response_recorded_show():
-    return gr.Markdown.update(visible=True)
+def deactivate_textbox():
+    return gr.Textbox.update(interactive=False)
 
 
-def response_recorded_hide():
-    return gr.Markdown.update(visible=False)
+def deactivate_radio():
+    return gr.Radio.update(interactive=False)
 
 
-def log_submission_leftvote_btn(completion_left, completion_right, current_question, request: gr.Request):
-    username = request.username
-    vote = "left is better"
-    return log_submission(completion_left, completion_right, current_question, vote, username)
+def activate_radio():
+    return gr.Radio.update(interactive=True)
 
 
-def log_submission_rightvote_btn(completion_left, completion_right, current_question, request: gr.Request):
-    username = request.username
-    vote = "right is better"
-    return log_submission(completion_left, completion_right, current_question, vote, username)
+def deactivate_button():
+    return gr.Button.update(interactive=False)
 
 
-def log_submission_tie_btn(completion_left, completion_right, current_question, request: gr.Request):
-    username = request.username
-    vote = "tied"
-    return log_submission(completion_left, completion_right, current_question, vote, username)
+def activate_button():
+    return gr.Button.update(interactive=True)
 
 
-def log_submission_bothbad_btn(completion_left, completion_right, current_question, request: gr.Request):
-    vote = "both bad"
-    username = request.username
-    return log_submission(completion_left, completion_right, current_question, vote, username)
+def show_success():
+    gr.Info("Succesfully logged your response!")
 
 
-def log_submission(completion_left, completion_right, current_question, vote, username):
+def submit_feedback(completion_left, completion_right, current_question, vote, extra_info, request: gr.Request):
     model_left = get_model_from_completion(completion_left)
     model_right = get_model_from_completion(completion_right)
 
     comparison_form = ComparisonForm(
-        vote=vote, model_left=model_left, model_right=model_right, question=current_question
+        vote=vote, model_left=model_left, model_right=model_right, question=current_question, extra_info=extra_info
     )
     feedback = Interaction(
-        username=username,
+        username=request.username,
         user_completions=[completion_left, completion_right],
         form=comparison_form,
         time=get_utc_time(),
     )
     feedback.send(mongo_db, collection=cfg.mongo_arena_collection)
-
-    focus_btn = gr.Button.update(variant="primary")
-    return focus_btn
 
 
 async def process_input_35(question):
@@ -224,12 +210,18 @@ with arena_app:
 
         with gr.Box() as button_row:
             with gr.Row():
-                leftvote_btn = gr.Button(value="👈  A is better", interactive=False)
-                rightvote_btn = gr.Button(value="👉  B is better", interactive=False)
-                tie_btn = gr.Button(value="🤝  Tie", interactive=False)
-                bothbad_btn = gr.Button(value="👎  Both are bad", interactive=False)
+                choices = ["👈  A is better", "👉  B is better", "🤝  Tie", "👎  Both are bad"]
+                vote_radio = gr.Radio(choices=choices, scale=1, interactive=False)
+                feedback_extra_info = gr.Textbox(
+                    label="Enter additional information (optional)",
+                    lines=4,
+                    placeholder="Enter more helpful information for us here...",
+                    scale=1.5,
+                    interactive=False,
+                )
+
+            submit_feedback_btn = gr.Button("Submit Feedback 🔼", interactive=False)
             clr_button = gr.ClearButton(value="Clear 🗑️")
-            response_recorded = gr.Markdown("**Succesfully submitted! 💾**", visible=False)
 
     with gr.Column(variant="panel"):
         gr.Markdown("## References used")
@@ -257,44 +249,24 @@ with arena_app:
         with gr.Column(scale=1, min_width=50):
             send_btn = gr.Button(value="Send", visible=True)
 
-    btn_list = [
-        leftvote_btn,
-        rightvote_btn,
-        tie_btn,
-        bothbad_btn,
-    ]
-
-    # fmt: off
-
     # Set up clear button
     clr_button.add(
         components=[
             chatbot_left,
             chatbot_right,
-        model_name_left,
-        model_name_right,
-            response_recorded,
+            model_name_left,
+            model_name_right,
+            vote_radio,
             *sources_textboxes,
         ]
     )
-    clr_button.click(
-        make_buttons_unavailable,
-        outputs=[*btn_list],
-    ).then(
-        make_buttons_unfocus,
-        outputs=[*btn_list],
-    )
-    # fmt: on
 
     # fmt: off
 
-    # When clicking the send button, takes care of also making the vote buttons available.
+    # When clicking the send button, takes care of also making the feedback elements available.
     send_btn.click(
-        make_buttons_unfocus,
-        outputs=[*btn_list],
-    ).then(
-        response_recorded_hide,
-        outputs=response_recorded,
+        activate_feedback_elements,
+        outputs=[submit_feedback_btn, vote_radio, feedback_extra_info]
     ).then(
         update_current_question,
         inputs=[textbox, current_question, chatbot_left, chatbot_right],
@@ -307,86 +279,25 @@ with arena_app:
         outputs=[chatbot_left, chatbot_right, completion_left, completion_right],
     ).then(
         add_sources, inputs=[completion_left, gr.State(max_sources)], outputs=[*sources_textboxes]
-    ).success(
-        make_buttons_available, outputs=[*btn_list]
     )
     # fmt: on
 
 
     # fmt: off
-
-    # All the different buttons exhibit the same behaviour on click.
-    # 1) register the vote on mongodb, make voted button focused
-    # 2) make voting buttons unavailable after vote
-    # 3) reveal which model was which
-    # 4) show a message that says it was properly logged.
-    # If you edit one button, you MUST edit all of them.
-    # There might be a more pythonic way to do this in gradio, but I'm not sure exactly how to do this.
-    # Can revisit this later
-
-
-    leftvote_btn.click(
-        log_submission_leftvote_btn,
-        inputs=[completion_left, completion_right, current_question],
-        outputs=leftvote_btn,
+    submit_feedback_btn.click(
+        deactivate_feedback_elements,
+        outputs=[submit_feedback_btn, vote_radio, feedback_extra_info],
     ).then(
-        make_buttons_unavailable,
-        outputs=[*btn_list],
-    ).then(
-        reveal_models,
-        inputs=[completion_left, completion_right],
-        outputs=[model_name_left, model_name_right],
-    ).then(
-        response_recorded_show,
-        outputs=response_recorded,
-    )
-
-    rightvote_btn.click(
-        log_submission_rightvote_btn,
-        inputs=[completion_left, completion_right, current_question],
-        outputs=rightvote_btn,
-    ).then(
-        make_buttons_unavailable,
-        outputs=[*btn_list],
-    ).then(
-        reveal_models,
-        inputs=[completion_left, completion_right],
-        outputs=[model_name_left, model_name_right],
-    ).then(
-        response_recorded_show,
-        outputs=response_recorded,
-    )
-
-    tie_btn.click(
-        log_submission_tie_btn,
-        inputs=[completion_left, completion_right, current_question],
-        outputs=tie_btn,
-    ).then(
-        make_buttons_unavailable,
-        outputs=[*btn_list],
-    ).then(
-        reveal_models,
-        inputs=[completion_left, completion_right],
-        outputs=[model_name_left, model_name_right],
-    ).then(
-        response_recorded_show,
-        outputs=response_recorded,
-    )
-
-    bothbad_btn.click(
-        log_submission_bothbad_btn,
-        inputs=[completion_left, completion_right, current_question],
-        outputs=bothbad_btn,
-    ).then(
-        make_buttons_unavailable,
-        outputs=[*btn_list],
-    ).then(
-        reveal_models,
-        inputs=[completion_left, completion_right],
-        outputs=[model_name_left, model_name_right],
-    ).then(
-        response_recorded_show,
-        outputs=response_recorded,
+        submit_feedback,
+        inputs=[
+            completion_left,
+            completion_right,
+            current_question,
+            vote_radio,
+            feedback_extra_info,
+        ]
+    ).success(
+        show_success
     )
     # fmt: on
 
