@@ -214,6 +214,9 @@ with buster_app:
     #     log_completion,
     #     inputs=completion,
     ).then(
+        log_completion,
+        inputs=completion,
+    ).then(
         append_completion,
         inputs=[completion, user_completions], outputs=[user_completions]
     )
@@ -233,6 +236,9 @@ with buster_app:
     # ).then(
     #     log_completion,
     #     inputs=completion,
+    ).then(
+        log_completion,
+        inputs=completion,
     ).then(
         append_completion,
         inputs=[completion, user_completions], outputs=[user_completions]
