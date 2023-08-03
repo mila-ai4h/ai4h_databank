@@ -44,7 +44,7 @@ class ComparisonForm(StandardForm):
 
 
 @dataclass
-class Feedback:
+class Interaction:
     username: str
     user_completions: list[Completion]
     time: str
@@ -109,7 +109,7 @@ class Feedback:
         return jsonable_encoder(to_encode, custom_encoder=custom_encoder)
 
     @classmethod
-    def from_dict(cls, feedback_dict: dict, feedback_cls: StandardForm) -> Feedback:
+    def from_dict(cls, feedback_dict: dict, feedback_cls: StandardForm) -> Interaction:
         del feedback_dict["_id"]
         feedback_dict["feedback_form"] = feedback_cls.from_dict(feedback_dict["feedback_form"])
 
@@ -126,7 +126,7 @@ def read_feedback(mongo_db: pymongo.database.Database, collection: str, filters:
     """
     try:
         feedback = mongo_db[collection].find(filters)
-        feedback = [Feedback.from_dict(f).flatten() for f in feedback]
+        feedback = [Interaction.from_dict(f).flatten() for f in feedback]
         feedback = pd.DataFrame(feedback)
 
         return feedback

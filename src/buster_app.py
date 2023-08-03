@@ -8,7 +8,7 @@ from buster.completers import Completion
 
 import cfg
 from cfg import setup_buster
-from feedback import Feedback, FeedbackForm
+from feedback import FeedbackForm, Interaction
 from src.app_utils import add_sources, check_auth, get_utc_time
 
 logger = logging.getLogger(__name__)
@@ -59,7 +59,7 @@ def log_completion(
 ):
     collection = cfg.mongo_interaction_collection
 
-    interaction = Feedback(
+    interaction = Interaction(
         user_completions=[completion],
         time=get_utc_time(),
         username=request.username,
@@ -79,7 +79,7 @@ def submit_feedback(
         relevant_answer=feedback_relevant_answer,
         relevant_sources=feedback_relevant_sources,
     )
-    feedback = Feedback(
+    feedback = Interaction(
         user_completions=user_completions,
         feedback_form=feedback_form,
         time=get_utc_time(),

@@ -1,7 +1,7 @@
 import pandas as pd
 from buster.completers import Completion
 
-from src.feedback import Feedback, FeedbackForm
+from src.feedback import FeedbackForm, Interaction
 
 
 class MockValidator:
@@ -42,7 +42,7 @@ def test_read_write_feedback():
         validator=MockValidator(),
     )
 
-    f = Feedback(
+    f = Interaction(
         username="test user",
         user_responses=[b],
         feedback_form=FeedbackForm(
@@ -55,7 +55,7 @@ def test_read_write_feedback():
 
     f_json = f.to_json()
     f_json["_id"] = "0123"  # This is created by mongodb
-    f_back = Feedback.from_dict(f_json, feedback_cls=FeedbackForm)
+    f_back = Interaction.from_dict(f_json, feedback_cls=FeedbackForm)
 
     assert f.username == f_back.username
     assert f.time == f_back.time

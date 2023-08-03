@@ -11,7 +11,7 @@ from buster.completers import Completion
 
 import cfg
 from cfg import buster_cfg, setup_buster
-from feedback import ComparisonForm, Feedback
+from feedback import ComparisonForm, Interaction
 from src.app_utils import add_sources, check_auth, get_utc_time
 
 logger = logging.getLogger(__name__)
@@ -94,7 +94,7 @@ def log_submission(completion_left, completion_right, current_question, vote, us
     model_right = get_model_from_completion(completion_right)
 
     comparison = ComparisonForm(vote=vote, model_left=model_left, model_right=model_right, question=current_question)
-    feedback = Feedback(
+    feedback = Interaction(
         username=username,
         user_completions=[completion_left, completion_right],
         feedback_form=comparison,
