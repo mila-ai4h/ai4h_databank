@@ -8,6 +8,7 @@ import pandas as pd
 import pymongo
 from buster.completers.base import Completion
 from fastapi.encoders import jsonable_encoder
+from pyparsing import Optional
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -46,8 +47,8 @@ class ComparisonForm(StandardForm):
 class Feedback:
     username: str
     user_completions: list[Completion]
-    feedback_form: StandardForm
     time: str
+    feedback_form: Optional[StandardForm] = None
 
     def send(self, mongo_db: pymongo.database.Database, collection: str):
         feedback_json = self.to_json()
@@ -72,10 +73,11 @@ class Feedback:
                 feedback_dict[f"completion_{k}"] = completion_dict[k]
         del feedback_dict["user_completions"]
 
-        # Flatten feedback form
-        for k in feedback_dict["feedback_form"].keys():
-            feedback_dict[f"feedback_{k}"] = feedback_dict["feedback_form"][k]
-        del feedback_dict["feedback_form"]
+        if self.feedback_form is not None:
+            # Flatten feedback form
+            for k in feedback_dict["feedback_form"].keys():
+                feedback_dict[f"feedback_{k}"] = feedback_dict["feedback_form"][k]
+            del feedback_dict["feedback_form"]
 
         # Flatten matched documents
         feedback_dict["matched_documents"] = self.user_completions[-1].matched_documents
@@ -98,9 +100,12 @@ class Feedback:
         to_encode = {
             "username": self.username,
             "user_completions": self.user_completions,
-            "feedback_form": self.feedback_form.to_json(),
             "time": self.time,
         }
+
+        if self.feedback_form is not None:
+            to_encode["feedback_form"] = self.feedback_form.to_json()
+
         return jsonable_encoder(to_encode, custom_encoder=custom_encoder)
 
     @classmethod

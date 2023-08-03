@@ -4,6 +4,7 @@ import os
 
 import gradio as gr
 import pandas as pd
+from buster.completers import Completion
 
 import cfg
 from cfg import setup_buster
@@ -50,6 +51,20 @@ def chat(history):
         history[-1][1] += token
 
         yield history, completion
+
+
+def log_completion(
+    completion: Completion,
+    request: gr.Request,
+):
+    collection = cfg.mongo_interaction_collection
+
+    interaction = Feedback(
+        user_completions=[completion],
+        time=get_utc_time(),
+        username=request.username,
+    )
+    interaction.send(mongo_db, collection=collection)
 
 
 def submit_feedback(
@@ -195,7 +210,6 @@ with buster_app:
 
     completion = gr.State()
 
-
     # fmt: off
     submit.click(
         user, [message, chatbot], [message, chatbot]
@@ -210,9 +224,6 @@ with buster_app:
         add_sources,
         inputs=[completion, gr.State(max_sources)],
         outputs=[*sources_textboxes]
-    # ).then(
-    #     log_completion,
-    #     inputs=completion,
     ).then(
         log_completion,
         inputs=completion,
@@ -233,9 +244,6 @@ with buster_app:
         add_sources,
         inputs=[completion, gr.State(max_sources)],
         outputs=[*sources_textboxes]
-    # ).then(
-    #     log_completion,
-    #     inputs=completion,
     ).then(
         log_completion,
         inputs=completion,
