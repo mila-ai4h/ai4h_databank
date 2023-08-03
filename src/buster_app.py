@@ -81,7 +81,7 @@ def submit_feedback(
     )
     feedback = Interaction(
         user_completions=user_completions,
-        feedback_form=feedback_form,
+        form=feedback_form,
         time=get_utc_time(),
         username=request.username,
     )

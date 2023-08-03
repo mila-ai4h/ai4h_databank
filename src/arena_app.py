@@ -93,11 +93,13 @@ def log_submission(completion_left, completion_right, current_question, vote, us
     model_left = get_model_from_completion(completion_left)
     model_right = get_model_from_completion(completion_right)
 
-    comparison = ComparisonForm(vote=vote, model_left=model_left, model_right=model_right, question=current_question)
+    comparison_form = ComparisonForm(
+        vote=vote, model_left=model_left, model_right=model_right, question=current_question
+    )
     feedback = Interaction(
         username=username,
         user_completions=[completion_left, completion_right],
-        feedback_form=comparison,
+        form=comparison_form,
         time=get_utc_time(),
     )
     feedback.send(mongo_db, collection=cfg.mongo_arena_collection)
