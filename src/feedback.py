@@ -41,6 +41,7 @@ class ComparisonForm(StandardForm):
     model_left: str
     model_right: str
     vote: str
+    extra_info: str
 
 
 @dataclass
