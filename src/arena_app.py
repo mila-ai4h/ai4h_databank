@@ -43,15 +43,19 @@ DEBUG_MODE = False
 
 
 def deactivate_feedback_elements():
-    return deactivate_button(), deactivate_radio(), deactivate_textbox()
+    return deactivate_radio(), deactivate_textbox()
 
 
 def activate_feedback_elements():
-    return activate_button(), activate_radio(), activate_textbox()
+    return activate_radio(), activate_textbox()
 
 
 def activate_textbox():
     return gr.Textbox.update(interactive=True)
+
+
+def clear_textbox():
+    return gr.Textbox.update(value=None)
 
 
 def deactivate_textbox():
@@ -191,7 +195,17 @@ def update_current_question(textbox, current_question, chatbot_left, chatbot_rig
 
 arena_app = gr.Blocks()
 with arena_app:
-    gr.Markdown("<h1><center>⚔️ Chatbot Arena ⚔️️</center></h1>")
+    gr.Markdown(
+        """<h1><center>⚔️ Chatbot Arena ⚔️️</center></h1>
+        Welcome to the chatbot arena!
+
+        Each time you ask a question, separate models will generate a response to the exact same question.
+        In this case, we are only interested in comparing `gpt-3.5-turbo` with `gpt-4`.
+        They will be presented to you in a random order. Vote for the model you prefer, and add additional information  as notes (optional).
+
+        Once you vote, the models will be revealed at the top. Clear or ask a new question to start over.
+        """
+    )
 
     current_question = gr.State("")
     completion_left = gr.State()
@@ -224,7 +238,7 @@ with arena_app:
         with gr.Box() as button_row:
             with gr.Row():
                 choices = ["👈  A is better", "👉  B is better", "🤝  Tie", "👎  Both are bad"]
-                vote_radio = gr.Radio(choices=choices, scale=2, interactive=False)
+                vote_radio = gr.Radio(choices=choices, scale=2, interactive=False, label="Select best model")
                 feedback_extra_info = gr.Textbox(
                     label="Enter additional information (optional)",
                     lines=4,
@@ -265,10 +279,27 @@ with arena_app:
 
     # fmt: off
 
+    clr_button.click(
+        deactivate_feedback_elements,
+        outputs=[vote_radio, feedback_extra_info]
+    ).then(
+        deactivate_button,
+        outputs=submit_feedback_btn,
+    ).then(
+        clear_textbox,
+        outputs=feedback_extra_info
+    )
+
+    vote_radio.change(
+        activate_button,
+        outputs=submit_feedback_btn
+    )
+
+
     # When clicking the send button, takes care of also making the feedback elements available.
     send_btn.click(
         activate_feedback_elements,
-        outputs=[submit_feedback_btn, vote_radio, feedback_extra_info]
+        outputs=[vote_radio, feedback_extra_info]
     ).then(
         update_current_question,
         inputs=[textbox, current_question, chatbot_left, chatbot_right],
@@ -288,7 +319,10 @@ with arena_app:
     # fmt: off
     submit_feedback_btn.click(
         deactivate_feedback_elements,
-        outputs=[submit_feedback_btn, vote_radio, feedback_extra_info],
+        outputs=[vote_radio, feedback_extra_info],
+    ).then(
+        deactivate_button,
+        outputs=submit_feedback_btn,
     ).then(
         reveal_models,
         inputs=[completion_left, completion_right],
