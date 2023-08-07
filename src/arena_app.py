@@ -208,6 +208,19 @@ with arena_app:
             chatbot_left = gr.Chatbot(label="Model A", elem_id=f"chatbot", visible=True, height=550)
             chatbot_right = gr.Chatbot(label="Model B", elem_id=f"chatbot", visible=True, height=550)
 
+        with gr.Row(variant="panel"):
+            with gr.Column(scale=10):
+                textbox = gr.Textbox(
+                    lines=2,
+                    show_label=False,
+                    placeholder="Enter text and press ENTER",
+                    visible=True,
+                    container=False,
+                    interactive=True,
+                )
+            with gr.Column(scale=1, min_width=50):
+                send_btn = gr.Button(value="Send", visible=True, variant="primary", size="lg")
+
         with gr.Box() as button_row:
             with gr.Row():
                 choices = ["👈  A is better", "👉  B is better", "🤝  Tie", "👎  Both are bad"]
@@ -231,23 +244,12 @@ with arena_app:
                 t = gr.Markdown()
             sources_textboxes.append(t)
 
-    with gr.Row():
-        with gr.Column(scale=20):
-            textbox = gr.Textbox(
-                show_label=False,
-                placeholder="Enter text and press ENTER",
-                visible=True,
-                container=False,
-                interactive=True,
-            )
-            gr.Examples(
-                examples=relevant_questions,
-                inputs=textbox,
-                label="Questions users could ask.",
-                examples_per_page=50,
-            )
-        with gr.Column(scale=1, min_width=50):
-            send_btn = gr.Button(value="Send", visible=True)
+    gr.Examples(
+        examples=relevant_questions,
+        inputs=textbox,
+        label="Questions users could ask.",
+        examples_per_page=15,
+    )
 
     # Set up clear button
     clr_button.add(
