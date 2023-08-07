@@ -56,6 +56,7 @@ mongo_db = init_db(username, password, cluster, db_name)
 
 mongo_feedback_collection = os.getenv("AI4H_MONGODB_FEEDBACK_COLLECTION")
 mongo_arena_collection = os.getenv("AI4H_MONGODB_ARENA_COLLECTION")
+mongo_interaction_collection = os.getenv("AI4H_MONGODB_INTERACTION_COLLECTION")
 
 
 buster_cfg = BusterConfig(

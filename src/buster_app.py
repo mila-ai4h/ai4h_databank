@@ -4,10 +4,11 @@ import os
 
 import gradio as gr
 import pandas as pd
+from buster.completers import Completion
 
 import cfg
 from cfg import setup_buster
-from feedback import Feedback, FeedbackForm
+from feedback import FeedbackForm, Interaction
 from src.app_utils import add_sources, check_auth, get_utc_time
 
 logger = logging.getLogger(__name__)
@@ -29,9 +30,9 @@ irrelevant_questions = questions[questions.question_type == "irrelevant"].questi
 trick_questions = questions[questions.question_type == "trick"].question.to_list()
 
 
-def append_response(response, user_responses):
-    user_responses.append(response)
-    return user_responses
+def append_completion(completion, user_completions):
+    user_completions.append(completion)
+    return user_completions
 
 
 def user(user_input, history):
@@ -52,8 +53,22 @@ def chat(history):
         yield history, completion
 
 
+def log_completion(
+    completion: Completion,
+    request: gr.Request,
+):
+    collection = cfg.mongo_interaction_collection
+
+    interaction = Interaction(
+        user_completions=[completion],
+        time=get_utc_time(),
+        username=request.username,
+    )
+    interaction.send(mongo_db, collection=collection)
+
+
 def submit_feedback(
-    user_responses,
+    user_completions,
     feedback_relevant_sources,
     feedback_relevant_answer,
     feedback_info,
@@ -64,9 +79,9 @@ def submit_feedback(
         relevant_answer=feedback_relevant_answer,
         relevant_sources=feedback_relevant_sources,
     )
-    feedback = Feedback(
-        user_responses=user_responses,
-        feedback_form=feedback_form,
+    feedback = Interaction(
+        user_completions=user_completions,
+        form=feedback_form,
         time=get_utc_time(),
         username=request.username,
     )
@@ -94,7 +109,7 @@ with buster_app:
     # TODO: trigger a proper change to update
 
     # state variables are client-side and are reset every time a client refreshes the page
-    user_responses = gr.State([])
+    user_completions = gr.State([])
 
     with gr.Row():
         gr.Markdown("<h1><center>LLawMa 🦙: A Question-Answering Bot for your documentation</center></h1>")
@@ -176,7 +191,7 @@ with buster_app:
     ).then(
         submit_feedback,
         inputs=[
-            user_responses,
+            user_completions,
             feedback_relevant_sources,
             feedback_relevant_answer,
             feedback_info,
@@ -193,7 +208,7 @@ with buster_app:
 
     gr.HTML("<center> Powered by <a href='https://github.com/jerpint/buster'>Buster</a> 🤖</center>")
 
-    response = gr.State()
+    completion = gr.State()
 
     # fmt: off
     submit.click(
@@ -204,14 +219,17 @@ with buster_app:
     ).then(
         chat,
         inputs=[chatbot],
-        outputs=[chatbot, response],
+        outputs=[chatbot, completion],
     ).then(
         add_sources,
-        inputs=[response, gr.State(max_sources)],
+        inputs=[completion, gr.State(max_sources)],
         outputs=[*sources_textboxes]
     ).then(
-        append_response,
-        inputs=[response, user_responses], outputs=[user_responses]
+        log_completion,
+        inputs=completion,
+    ).then(
+        append_completion,
+        inputs=[completion, user_completions], outputs=[user_completions]
     )
     message.submit(
         user, [message, chatbot], [message, chatbot]
@@ -221,14 +239,17 @@ with buster_app:
     ).then(
         chat,
         inputs=[chatbot],
-        outputs=[chatbot, response],
+        outputs=[chatbot, completion],
     ).then(
         add_sources,
-        inputs=[response, gr.State(max_sources)],
+        inputs=[completion, gr.State(max_sources)],
         outputs=[*sources_textboxes]
     ).then(
-        append_response,
-        inputs=[response, user_responses], outputs=[user_responses]
+        log_completion,
+        inputs=completion,
+    ).then(
+        append_completion,
+        inputs=[completion, user_completions], outputs=[user_completions]
     )
     # fmt: on
 

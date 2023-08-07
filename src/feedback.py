@@ -8,6 +8,7 @@ import pandas as pd
 import pymongo
 from buster.completers.base import Completion
 from fastapi.encoders import jsonable_encoder
+from pyparsing import Optional
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -19,8 +20,8 @@ class StandardForm:
         return jsonable_encoder(self)
 
     @classmethod
-    def from_dict(cls, feedback_dict: dict) -> StandardForm:
-        return cls(**feedback_dict)
+    def from_dict(cls, interaction_dict: dict) -> StandardForm:
+        return cls(**interaction_dict)
 
 
 @dataclass
@@ -43,11 +44,11 @@ class ComparisonForm(StandardForm):
 
 
 @dataclass
-class Feedback:
+class Interaction:
     username: str
-    user_responses: list[Completion]
-    feedback_form: StandardForm
+    user_completions: list[Completion]
     time: str
+    form: Optional[StandardForm] = None
 
     def send(self, mongo_db: pymongo.database.Database, collection: str):
         feedback_json = self.to_json()
@@ -61,56 +62,60 @@ class Feedback:
             raise err
 
     def flatten(self) -> dict:
-        """Flatten feedback object into a dict for easier reading."""
-        feedback_dict = self.to_json()
+        """Flattens the Interaction object into a dict for easier reading."""
+        interaction_dict = self.to_json()
 
-        # Flatten user responses, only keep the most recent interaction
-        if len(feedback_dict["user_responses"]) > 0:
-            completion_dict = feedback_dict["user_responses"][-1]
+        # Flatten user completions, only keep the most recent interaction
+        if len(interaction_dict["user_completions"]) > 0:
+            completion_dict = interaction_dict["user_completions"][-1]
             # # TODO: add test for this...
             for k in completion_dict.keys():
-                feedback_dict[f"completion_{k}"] = completion_dict[k]
-        del feedback_dict["user_responses"]
+                interaction_dict[f"completion_{k}"] = completion_dict[k]
+        del interaction_dict["user_completions"]
 
-        # Flatten feedback form
-        for k in feedback_dict["feedback_form"].keys():
-            feedback_dict[f"feedback_{k}"] = feedback_dict["feedback_form"][k]
-        del feedback_dict["feedback_form"]
+        if self.form is not None:
+            # Flatten feedback form
+            for k in interaction_dict["form"].keys():
+                interaction_dict[f"form_{k}"] = interaction_dict["form"][k]
+            del interaction_dict["form"]
 
         # Flatten matched documents
-        feedback_dict["matched_documents"] = self.user_responses[-1].matched_documents
-        feedback_dict["matched_documents"].reset_index(inplace=True)
-        feedback_dict["matched_documents"].drop(columns=["index"], inplace=True)
-        feedback_dict["matched_documents"] = feedback_dict["matched_documents"].T
-        if len(feedback_dict["matched_documents"]) > 0:
-            for k in feedback_dict["matched_documents"].keys():
-                feedback_dict[f"matched_documents_{k}"] = feedback_dict["matched_documents"][k].values
-        del feedback_dict["matched_documents"]
+        interaction_dict["matched_documents"] = self.user_completions[-1].matched_documents
+        interaction_dict["matched_documents"].reset_index(inplace=True)
+        interaction_dict["matched_documents"].drop(columns=["index"], inplace=True)
+        interaction_dict["matched_documents"] = interaction_dict["matched_documents"].T
+        if len(interaction_dict["matched_documents"]) > 0:
+            for k in interaction_dict["matched_documents"].keys():
+                interaction_dict[f"matched_documents_{k}"] = interaction_dict["matched_documents"][k].values
+        del interaction_dict["matched_documents"]
 
-        return feedback_dict
+        return interaction_dict
 
     def to_json(self) -> Any:
         custom_encoder = {
-            # Converts the matched_documents in the user_responses to json
+            # Converts the matched_documents in the user_completions to json
             Completion: lambda completion: completion.to_json(columns_to_ignore=["embedding", "_id"]),
         }
 
         to_encode = {
             "username": self.username,
-            "user_responses": self.user_responses,
-            "feedback_form": self.feedback_form.to_json(),
+            "user_completions": self.user_completions,
             "time": self.time,
         }
+
+        if self.form is not None:
+            to_encode["form"] = self.form.to_json()
+
         return jsonable_encoder(to_encode, custom_encoder=custom_encoder)
 
     @classmethod
-    def from_dict(cls, feedback_dict: dict, feedback_cls: StandardForm) -> Feedback:
-        del feedback_dict["_id"]
-        feedback_dict["feedback_form"] = feedback_cls.from_dict(feedback_dict["feedback_form"])
+    def from_dict(cls, interaction_dict: dict, feedback_cls: StandardForm) -> Interaction:
+        del interaction_dict["_id"]
+        interaction_dict["form"] = feedback_cls.from_dict(interaction_dict["form"])
 
-        feedback_dict["user_responses"] = [Completion.from_dict(r) for r in feedback_dict["user_responses"]]
+        interaction_dict["user_completions"] = [Completion.from_dict(r) for r in interaction_dict["user_completions"]]
 
-        return cls(**feedback_dict)
+        return cls(**interaction_dict)
 
 
 def read_feedback(mongo_db: pymongo.database.Database, collection: str, filters: dict = None) -> pd.DataFrame:
@@ -121,7 +126,7 @@ def read_feedback(mongo_db: pymongo.database.Database, collection: str, filters:
     """
     try:
         feedback = mongo_db[collection].find(filters)
-        feedback = [Feedback.from_dict(f).flatten() for f in feedback]
+        feedback = [Interaction.from_dict(f).flatten() for f in feedback]
         feedback = pd.DataFrame(feedback)
 
         return feedback

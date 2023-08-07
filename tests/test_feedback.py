@@ -1,7 +1,7 @@
 import pandas as pd
 from buster.completers import Completion
 
-from src.feedback import Feedback, FeedbackForm
+from src.feedback import FeedbackForm, Interaction
 
 
 class MockValidator:
@@ -42,10 +42,10 @@ def test_read_write_feedback():
         validator=MockValidator(),
     )
 
-    f = Feedback(
+    f = Interaction(
         username="test user",
-        user_responses=[b],
-        feedback_form=FeedbackForm(
+        user_completions=[b],
+        form=FeedbackForm(
             extra_info="extra",
             relevant_answer="relevant",
             relevant_sources="sources",
@@ -55,22 +55,22 @@ def test_read_write_feedback():
 
     f_json = f.to_json()
     f_json["_id"] = "0123"  # This is created by mongodb
-    f_back = Feedback.from_dict(f_json, feedback_cls=FeedbackForm)
+    f_back = Interaction.from_dict(f_json, feedback_cls=FeedbackForm)
 
     assert f.username == f_back.username
     assert f.time == f_back.time
-    assert f.feedback_form.extra_info == f_back.feedback_form.extra_info
-    assert f.feedback_form.relevant_answer == f_back.feedback_form.relevant_answer
-    assert f.feedback_form.relevant_sources == f_back.feedback_form.relevant_sources
-    assert len(f.user_responses) == len(f_back.user_responses)
-    assert f.user_responses[0].user_input == f_back.user_responses[0].user_input
-    assert f.user_responses[0].error == f_back.user_responses[0].error
-    assert f.user_responses[0].answer_text == f_back.user_responses[0].answer_text
-    assert f.user_responses[0].answer_relevant == f_back.user_responses[0].answer_relevant
-    assert f.user_responses[0].question_relevant == f_back.user_responses[0].question_relevant
-    for col in f_back.user_responses[0].matched_documents.columns.tolist():
-        assert col in f.user_responses[0].matched_documents.columns.tolist()
+    assert f.form.extra_info == f_back.form.extra_info
+    assert f.form.relevant_answer == f_back.form.relevant_answer
+    assert f.form.relevant_sources == f_back.form.relevant_sources
+    assert len(f.user_completions) == len(f_back.user_completions)
+    assert f.user_completions[0].user_input == f_back.user_completions[0].user_input
+    assert f.user_completions[0].error == f_back.user_completions[0].error
+    assert f.user_completions[0].answer_text == f_back.user_completions[0].answer_text
+    assert f.user_completions[0].answer_relevant == f_back.user_completions[0].answer_relevant
+    assert f.user_completions[0].question_relevant == f_back.user_completions[0].question_relevant
+    for col in f_back.user_completions[0].matched_documents.columns.tolist():
+        assert col in f.user_completions[0].matched_documents.columns.tolist()
         assert (
-            f.user_responses[0].matched_documents[col].tolist()
-            == f_back.user_responses[0].matched_documents[col].tolist()
+            f.user_completions[0].matched_documents[col].tolist()
+            == f_back.user_completions[0].matched_documents[col].tolist()
         )

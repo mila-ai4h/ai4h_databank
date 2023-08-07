@@ -10,10 +10,9 @@ import pandas as pd
 from buster.completers import Completion
 
 import cfg
-from app_utils import check_auth
-from buster_app import add_sources, get_utc_time
 from cfg import buster_cfg, setup_buster
-from feedback import ComparisonForm, Feedback
+from feedback import ComparisonForm, Interaction
+from src.app_utils import add_sources, check_auth, get_utc_time
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -94,11 +93,13 @@ def log_submission(completion_left, completion_right, current_question, vote, us
     model_left = get_model_from_completion(completion_left)
     model_right = get_model_from_completion(completion_right)
 
-    comparison = ComparisonForm(vote=vote, model_left=model_left, model_right=model_right, question=current_question)
-    feedback = Feedback(
+    comparison_form = ComparisonForm(
+        vote=vote, model_left=model_left, model_right=model_right, question=current_question
+    )
+    feedback = Interaction(
         username=username,
-        user_responses=[completion_left, completion_right],
-        feedback_form=comparison,
+        user_completions=[completion_left, completion_right],
+        form=comparison_form,
         time=get_utc_time(),
     )
     feedback.send(mongo_db, collection=cfg.mongo_arena_collection)
@@ -391,6 +392,6 @@ with arena_app:
 
 
 if os.getenv("MOUNT_GRADIO_APP") is None:
-    logger.info("launching gradio app")
+    logger.info("launching gradio arena app")
     arena_app.queue(concurrency_count=16)
     arena_app.launch(share=False, auth=check_auth)

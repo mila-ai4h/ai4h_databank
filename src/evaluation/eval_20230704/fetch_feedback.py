@@ -3,7 +3,7 @@ import os
 import pandas as pd
 
 from src.db_utils import init_db
-from src.feedback import Feedback, FeedbackForm, read_feedback
+from src.feedback import FeedbackForm, Interaction, read_feedback
 
 """
 Fetch the feedback from the round of human evaluation done on gpt-3.5-turbo on 2023-07-04.
