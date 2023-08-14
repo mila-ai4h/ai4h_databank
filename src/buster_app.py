@@ -114,7 +114,8 @@ with buster_app:
     app_name = "LLaWma 🦙"
     gr.Markdown(f"<h1><center>{app_name}: A Question-Answering Bot for your documentation</center></h1>")
     with gr.Row():
-        gr.Markdown(f"""
+        gr.Markdown(
+            f"""
 
         ## Welcome!
 
@@ -124,9 +125,11 @@ with buster_app:
         This app uses language models to convert documents to their semanatic representations.
         When a user asks a question, {app_name} compares it against all available documents. It then retrieves the documents that are most relevance to the question and prompts ChatGPT with those documents to generate a response.
         The answer and accompanying sources are then displayed to the user.
-        """)
+        """
+        )
 
-        gr.Markdown(f"""
+        gr.Markdown(
+            f"""
         ## Limitations
 
         {app_name} is intended to ***_only be used as a demo._*** While we have worked hard to make this as useful as possible, it is important to understand that there are no guarantees regarding the accuracy of its responses.
@@ -138,7 +141,8 @@ with buster_app:
         For optimal results, employ {app_name} in scenarios where the answers to questions are explicitly present within the provided documentation.
         It is most effective for queries that require direct extraction of information. However, for questions that demand complex reasoning spanning across an entire document or require contextual understanding, the performance of {app_name} might be limited. In such cases, alternative methods of information retrieval and analysis might be more appropriate.
 
-        """)
+        """
+        )
 
     with gr.Row():
         with gr.Column(scale=2):
@@ -174,9 +178,11 @@ with buster_app:
 
         with gr.Row():
             with gr.Column(variant="panel"):
-                gr.Markdown("""## Relevant Documents
+                gr.Markdown(
+                    """## Relevant Documents
                 All retrieved documents will be listed here in order of importance. If no answer was found, documents will not be displayed.
-                """)
+                """
+                )
                 sources_textboxes = []
                 for i in range(max_sources):
                     with gr.Tab(f"Source {i + 1} 📝"):
@@ -233,7 +239,8 @@ with buster_app:
     # If you rage click the subimt feedback button, it re-appears so you are confident it was recorded properly.
     # fmt: on
 
-    gr.Markdown("""
+    gr.Markdown(
+        """
 
     ## 📚 Sources
     | Source | Report | URL | Release date |
@@ -432,7 +439,8 @@ with buster_app:
     Orsolya|OECD/Venture Capital Investments in Artificial Intelligence Analysing Trends in VC in AI Companies from 2012 through 2020/27/8|https://www.oecd-ilibrary.org/docserver/f97beae7-en.pdf?expires=1684155625&id=id&accname=guest&checksum=90745719FACC67F4FD8F95FA340A9ABF|2021
     Orsolya|OECD/What are the OECD Principles on AI/28/0|https://www.oecd-ilibrary.org/docserver/6ff2a1c4-en.pdf?expires=1684155213&id=id&accname=guest&checksum=47DD8B6DF2D9129E96D568E8A575B941|2020
     Orsolya|OECD/Who develops AI-Related Innovations, Goods and Services A Firm-Level Analysis/29/2|https://www.oecd-ilibrary.org/docserver/3e4aedd4-en.pdf?expires=1684155135&id=id&accname=guest&checksum=5AF7BB5C54110469A7BB41C5E9BEEE7C|2021
-    """)
+    """
+    )
 
     gr.Markdown("This application uses GPT to search the docs for relevant info and answer questions.")
 
