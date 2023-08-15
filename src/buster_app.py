@@ -113,7 +113,7 @@ with buster_app:
 
     app_name = "LLaWma 🦙"
     gr.Markdown(f"<h1><center>{app_name}: A Question-Answering Bot for your documentation</center></h1>")
-    with gr.Row():
+    with gr.Row(variant="panel"):
         gr.Markdown(
             f"""
 
@@ -145,7 +145,7 @@ with buster_app:
         )
 
     with gr.Row():
-        with gr.Column(scale=2):
+        with gr.Column(scale=2, variant="panel"):
             gr.Markdown("## Chatbot")
             chatbot = gr.Chatbot()
             message = gr.Textbox(
