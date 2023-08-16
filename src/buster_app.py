@@ -52,7 +52,6 @@ def get_metadata_markdown(df):
     metadata_str = "\n".join(metadata)
 
     markdown_text = f"""
-## 📚 Sources
 | Source | Year | Report |
 | ---    | ---    | --- |
 {metadata_str}
@@ -148,14 +147,15 @@ with buster_app:
             gr.Markdown(
                 f"""
 
-            ## Welcome!
-
-            {app_name} is connected to AI policies from various sources. Using this platform, you can ask AI-policy questions and {app_name} will look for the most relevant policies to formulate an answer based on the sources.
+            ## Welcome
+            {app_name} is a question-answering chatbot on AI policies from various sources.
+            Using this platform, you can ask AI-policy questions and {app_name} will look for the most relevant policies at its disposal to formulate an answer.
+            All of its available sources are listed on the bottom of the page.
 
             ## How it works
             This app uses language models to convert documents to their semanatic representations.
-            When a user asks a question, {app_name} compares it against all available documents. It then retrieves the documents that are most relevance to the question and prompts ChatGPT with those documents to generate a response.
-            The answer and accompanying sources are then displayed to the user.
+            When a user asks a question, {app_name} compares it against all available documents at its disposal. It then retrieves the documents that are most relevant to your question and prompts ChatGPT with these documents to generate a response.
+            The answer and accompanying sources are then displayed so that you can verify the veracity of the generated responses.
             """
             )
 
@@ -165,14 +165,16 @@ with buster_app:
             ## Limitations
 
             {app_name} is intended to ***_only be used as a demo._*** While we have worked hard to make this as useful as possible, it is important to understand that there are no guarantees regarding the accuracy of its responses.
-            Like all language models, {app_name} might generate information that is not entirely reliable. To mitigate this, users are strongly advised to independently verify the information provided by the tool.
+            Like all language models, {app_name} might generate information that is not entirely reliable and sometimes hallucinate responses. To mitigate this, users are strongly advised to independently verify the information provided by the tool.
             All sources available to the model are listed below.
 
             ## Recommended usage
 
-            For optimal results, employ {app_name} in scenarios where the answers to questions are explicitly present within the provided documentation.
-            It is most effective for queries that require direct extraction of information. However, for questions that demand complex reasoning spanning across an entire document or require contextual understanding, the performance of {app_name} might be limited. In such cases, alternative methods of information retrieval and analysis might be more appropriate.
+            For optimal results, employ {app_name} in scenarios where the answers to questions can be found concisely within the provided documentation.
+            For questions that demand complex reasoning spanning across an entire document, multiple documents or require contextual understanding, the performance of {app_name} might be limited.
 
+            When the model fails to find relevant information, it will advise a user that it cannot answer a question.
+            The model is also instructed to ignore questions that are not directly related to AI policies.
             """
             )
 
@@ -259,23 +261,25 @@ with buster_app:
                         f"""## Help Us Improve with Your Feedback! 👍👎
 By filling out the feedback form, you're helping us understand what's working well and where we can make improvements on {app_name}.
 
-Rest assured, your feedback is completely anonymous, and we don't collect any personal information. This means you can express your thoughts openly and honestly, allowing us to gain valuable insights into how we can enhance the chatbot's performance and accuracy.
-
-Every thumbs up or thumbs down helps us determine how to make the chatbot better. Thank you for contributing to the evolution of our app.
+Every thumbs up or thumbs down helps us determine how to improve {app_name}. Thank you for contributing to the evaluation of our app.
 
 """
                     )
 
-    # TODO: Pick how to display the sources, 2 options for now
-    # Display the sources using a dataframe...
-    # gr.DataFrame(documents_metadata, headers=list(documents_metadata.columns), interactive=False)
-
+    # Display sources
     with gr.Box():
         with gr.Column():
+            gr.Markdown("""## 📚 Sources
+            Here we list all of the sources that {app_name} has access to.
+            """)
+            # TODO: Pick how to display the sources, 2 options for now
+            # Display the sources using a dataframe...
+            # gr.DataFrame(documents_metadata, headers=list(documents_metadata.columns), interactive=False)
+
             # ... Or display the sources using markdown.
             gr.Markdown(get_metadata_markdown(documents_metadata))
 
-            gr.HTML("<center> Powered by <a href='https://github.com/jerpint/buster'>Buster</a> 🤖</center>")
+    gr.HTML("<center> Powered by <a href='https://github.com/jerpint/buster'>Buster</a> 🤖</center>")
 
     # store the users' last completion here
     completion = gr.State()
