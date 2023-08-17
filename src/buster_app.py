@@ -46,20 +46,22 @@ def get_metadata_markdown(df) -> str:
     metadata = []
 
     # Order articles by year, with latest first
-    df = df.sort_values("Year", ascending=False)
+    df = df.sort_values(["Country", "Year"], ascending=True)
 
     for _, item in df.iterrows():
         # source = item["Source"]
         link = item["Link"]
         title = item["Title"]
         year = item["Year"]
+        country = item["Country"]
+        print(country)
 
-        metadata.append(f"{year} | {to_md_link(title, link)} ")
+        metadata.append(f"{year} | {country} | {to_md_link(title, link)} ")
     metadata_str = "\n".join(metadata)
 
     markdown_text = f"""
-| Year | Report |
-| ---    | --- |
+| Year | Country | Report |
+| ---    | --- | --- |
 {metadata_str}
 """
     return markdown_text
