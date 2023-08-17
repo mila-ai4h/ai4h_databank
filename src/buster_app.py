@@ -338,7 +338,7 @@ with buster_app:
                 """
                 )
                 # TODO: Pick how to display the sources, 2 options for now
-                # Display the sources using a dataframe...
+                # Display the sources using a dataframe (rendering options limited)...
                 # gr.DataFrame(documents_metadata, headers=list(documents_metadata.columns), interactive=False)
 
                 # ... Or display the sources using markdown.
