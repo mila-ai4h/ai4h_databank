@@ -10,6 +10,7 @@ import cfg
 from cfg import setup_buster
 from feedback import FeedbackForm, Interaction
 from src.app_utils import add_sources, check_auth, get_utc_time
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -18,7 +19,6 @@ mongo_db = cfg.mongo_db
 buster_cfg = copy.deepcopy(cfg.buster_cfg)
 buster = setup_buster(buster_cfg=buster_cfg)
 max_sources = cfg.buster_cfg.retriever_cfg["top_k"]
-from pathlib import Path
 
 current_dir = Path(__file__).resolve().parent
 
@@ -32,6 +32,8 @@ questions = pd.read_csv(questions_file)
 relevant_questions = questions[questions.question_type == "relevant"].question.to_list()
 irrelevant_questions = questions[questions.question_type == "irrelevant"].question.to_list()
 trick_questions = questions[questions.question_type == "trick"].question.to_list()
+
+enable_terms_and_conditions = True
 
 
 def get_metadata_markdown(df):
@@ -236,7 +238,7 @@ with buster_app:
             """
             )
 
-    accept_terms_group = gr.Group(visible=True)
+    accept_terms_group = gr.Group(visible=enable_terms_and_conditions)
     with accept_terms_group:
         with gr.Column(variant="compact"):
             with gr.Box():
@@ -249,7 +251,8 @@ with buster_app:
                     accept_checkbox = gr.Checkbox(label="I accept the terms.", interactive=True)
                     accept_terms = gr.Button("Enter", variant="primary")
 
-    app_group = gr.Box(visible=False)
+    app_group_visible = False if enable_terms_and_conditions else True
+    app_group = gr.Box(visible=app_group_visible)
     with app_group:
         with gr.Row():
             with gr.Column(scale=2, variant="panel"):
@@ -308,7 +311,7 @@ with buster_app:
 
                         feedback_info = gr.Textbox(
                             label="Enter additional information (optional)",
-                            lines=10,
+                            lines=3,
                             placeholder="Enter more helpful information for us here...",
                         )
 
