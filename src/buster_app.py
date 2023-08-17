@@ -40,12 +40,12 @@ def to_md_link(title: str, link: str):
     """Converts a title and link to markown link format"""
     return f"[{title}]({link})"
 
+
 def get_metadata_markdown(df):
     metadata = []
 
     df = df.sort_values("Year", ascending=False)
     for _, item in df.iterrows():
-
         # source = item["Source"]
         link = item["Link"]
         title = item["Title"]
