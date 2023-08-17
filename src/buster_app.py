@@ -36,15 +36,18 @@ trick_questions = questions[questions.question_type == "trick"].question.to_list
 enable_terms_and_conditions = True
 
 
-def to_md_link(title: str, link: str):
+def to_md_link(title: str, link: str) -> str:
     """Converts a title and link to markown link format"""
     return f"[{title}]({link})"
 
 
-def get_metadata_markdown(df):
+def get_metadata_markdown(df) -> str:
+    """Converts the content from a dataframe to a markdown table string format."""
     metadata = []
 
+    # Order articles by year, with latest first
     df = df.sort_values("Year", ascending=False)
+
     for _, item in df.iterrows():
         # source = item["Source"]
         link = item["Link"]
