@@ -36,26 +36,27 @@ trick_questions = questions[questions.question_type == "trick"].question.to_list
 enable_terms_and_conditions = True
 
 
+def to_md_link(title: str, link: str):
+    """Converts a title and link to markown link format"""
+    return f"[{title}]({link})"
+
 def get_metadata_markdown(df):
     metadata = []
 
-    def to_link(title: str, link: str):
-        return f"[{title}]({link})"
-
+    df = df.sort_values("Year", ascending=False)
     for _, item in df.iterrows():
-        # metadata.append(" | ".join([str(i) for i in item]))
 
-        source = item["Source"]
+        # source = item["Source"]
         link = item["Link"]
-        title = item["Title"]  # limit to 50 chars
+        title = item["Title"]
         year = item["Year"]
 
-        metadata.append(f"{source} | {year} | {to_link(title, link)} ")
+        metadata.append(f"{year} | {to_md_link(title, link)} ")
     metadata_str = "\n".join(metadata)
 
     markdown_text = f"""
-| Source | Year | Report |
-| ---    | ---    | --- |
+| Year | Report |
+| ---    | --- |
 {metadata_str}
 """
     return markdown_text
