@@ -1,6 +1,7 @@
 import copy
 import logging
 import os
+from pathlib import Path
 
 import gradio as gr
 import pandas as pd
@@ -10,7 +11,6 @@ import cfg
 from cfg import setup_buster
 from feedback import FeedbackForm, Interaction
 from src.app_utils import add_sources, check_auth, get_utc_time
-from pathlib import Path
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
