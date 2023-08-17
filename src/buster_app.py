@@ -142,7 +142,7 @@ def reveal_app(checkbox: bool):
     if checkbox:
         return gr.Group.update(visible=True), gr.Group.update(visible=False)
     else:
-        gr.Warning("Must accept terms and conditions to continue...")
+        gr.Warning("You must accept terms and conditions to continue...")
         return gr.Group.update(visible=False), gr.Group.update(visible=True)
 
 
@@ -247,7 +247,7 @@ with buster_app:
         with gr.Column(variant="compact"):
             with gr.Box():
                 gr.Markdown(
-                    f"Welcome to {app_name} Before continuing, you must read and accept the terms and conditions."
+                    f"## Terms and Coniditions \n Welcome to {app_name} Before continuing, you must read and accept the terms and conditions."
                 )
                 terms = gr.Textbox(terms_and_conditions, interactive=False, max_lines=10, label="Terms & Conditions")
                 # with gr.Box():
