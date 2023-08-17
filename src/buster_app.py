@@ -199,7 +199,6 @@ with buster_app:
     # state variables are client-side and are reset every time a client refreshes the page
     user_completions = gr.State([])
 
-
     gr.Markdown(f"<h1><center>{app_name}: A Question-Answering Bot for your documentation</center></h1>")
     with gr.Row(variant="panel"):
         with gr.Box():
