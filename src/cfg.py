@@ -88,7 +88,7 @@ false
 Q:
 """,
         "completion_kwargs": {
-            "model": "gpt-3.5-turbo",
+            "model": "gpt-3.5-turbo-0613",
             "stream": False,
             "temperature": 0,
         },
@@ -109,13 +109,13 @@ Q:
     },
     completion_cfg={
         "completion_kwargs": {
-            "model": "gpt-3.5-turbo",
+            "model": "gpt-3.5-turbo-0613",
             "stream": True,
             "temperature": 0,
         },
     },
     tokenizer_cfg={
-        "model_name": "gpt-3.5-turbo",
+        "model_name": "gpt-3.5-turbo-0613",
     },
     documents_formatter_cfg={
         "max_tokens": 3500,
