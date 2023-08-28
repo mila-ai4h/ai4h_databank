@@ -130,6 +130,11 @@ def toggle_feedback_visible(visible: bool):
     return {feedback_submitted_message: gr.update(visible=visible)}
 
 
+def clear_sources():
+    """Clears all the documents in the tabs"""
+    return ["" for _ in range(max_sources)]
+
+
 def clear_feedback_form():
     """Clears the contents of the feedback form."""
     return {
@@ -383,6 +388,9 @@ with buster_app:
     submit.click(
         add_user_question, [message], [chatbot]
     ).then(
+        clear_sources,
+        outputs=[*sources_textboxes]
+    ).then(
         clear_feedback_form,
         outputs=[feedback_submitted_message, feedback_relevant_sources, feedback_relevant_answer, feedback_info]
     ).then(
@@ -400,8 +408,12 @@ with buster_app:
         append_completion,
         inputs=[completion, user_completions], outputs=[user_completions]
     )
+
     message.submit(
         add_user_question, [message], [chatbot]
+    ).then(
+        clear_sources,
+        outputs=[*sources_textboxes]
     ).then(
         clear_feedback_form,
         outputs=[feedback_submitted_message, feedback_relevant_sources, feedback_relevant_answer, feedback_info]
