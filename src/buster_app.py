@@ -2,6 +2,7 @@ import copy
 import logging
 import os
 from pathlib import Path
+from typing import Optional
 
 import gradio as gr
 import pandas as pd
@@ -71,9 +72,9 @@ def append_completion(completion, user_completions):
     return user_completions
 
 
-def user(user_input):
+def add_user_question(user_question: str) -> list[str, None]:
     """Adds user's question immediately to the chat."""
-    return [[user_input, None]]
+    return [[user_question, None]]
 
 
 def chat(history):
@@ -380,7 +381,7 @@ with buster_app:
 
     # fmt: off
     submit.click(
-        user, [message], [chatbot]
+        add_user_question, [message], [chatbot]
     ).then(
         clear_feedback_form,
         outputs=[feedback_submitted_message, feedback_relevant_sources, feedback_relevant_answer, feedback_info]
@@ -400,7 +401,7 @@ with buster_app:
         inputs=[completion, user_completions], outputs=[user_completions]
     )
     message.submit(
-        user, [message], [chatbot]
+        add_user_question, [message], [chatbot]
     ).then(
         clear_feedback_form,
         outputs=[feedback_submitted_message, feedback_relevant_sources, feedback_relevant_answer, feedback_info]
