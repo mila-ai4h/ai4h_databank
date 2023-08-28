@@ -54,7 +54,6 @@ def get_metadata_markdown(df) -> str:
         title = item["Title"]
         year = item["Year"]
         country = item["Country"]
-        print(country)
 
         metadata.append(f"{year} | {country} | {to_md_link(title, link)} ")
     metadata_str = "\n".join(metadata)
@@ -72,9 +71,9 @@ def append_completion(completion, user_completions):
     return user_completions
 
 
-def user(user_input, history):
+def user(user_input):
     """Adds user's question immediately to the chat."""
-    return "", history + [[user_input, None]]
+    return [[user_input, None]]
 
 
 def chat(history):
@@ -381,7 +380,7 @@ with buster_app:
 
     # fmt: off
     submit.click(
-        user, [message, chatbot], [message, chatbot]
+        user, [message], [chatbot]
     ).then(
         clear_feedback_form,
         outputs=[feedback_submitted_message, feedback_relevant_sources, feedback_relevant_answer, feedback_info]
@@ -401,7 +400,7 @@ with buster_app:
         inputs=[completion, user_completions], outputs=[user_completions]
     )
     message.submit(
-        user, [message, chatbot], [message, chatbot]
+        user, [message], [chatbot]
     ).then(
         clear_feedback_form,
         outputs=[feedback_submitted_message, feedback_relevant_sources, feedback_relevant_answer, feedback_info]
