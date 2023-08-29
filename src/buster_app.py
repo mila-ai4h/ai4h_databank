@@ -2,6 +2,7 @@ import copy
 import logging
 import os
 from pathlib import Path
+from typing import Optional
 
 import gradio as gr
 import pandas as pd
@@ -14,6 +15,9 @@ from src.app_utils import add_sources, check_auth, get_utc_time
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
+
+# Typehint for chatbot history
+ChatHistory = list[list[Optional[str], Optional[str]]]
 
 mongo_db = cfg.mongo_db
 buster_cfg = copy.deepcopy(cfg.buster_cfg)
@@ -54,7 +58,6 @@ def get_metadata_markdown(df) -> str:
         title = item["Title"]
         year = item["Year"]
         country = item["Country"]
-        print(country)
 
         metadata.append(f"{year} | {country} | {to_md_link(title, link)} ")
     metadata_str = "\n".join(metadata)
@@ -72,22 +75,31 @@ def append_completion(completion, user_completions):
     return user_completions
 
 
-def user(user_input, history):
-    """Adds user's question immediately to the chat."""
-    return "", history + [[user_input, None]]
+def add_user_question(user_question: str, chat_history: Optional[ChatHistory] = None) -> ChatHistory:
+    """Adds a user's question to the chat history.
+
+    If no history is provided, the first element of the history will be the user conversation.
+    """
+    if chat_history is None:
+        chat_history = []
+    chat_history.append([user_question, None])
+    return chat_history
 
 
-def chat(history):
-    user_input = history[-1][0]
+def chat(chat_history: ChatHistory):
+    """Answer a user's question using retrieval augmented generation."""
+
+    # We assume that the question is the user's last interaction
+    user_input = chat_history[-1][0]
 
     completion = buster.process_input(user_input)
 
-    history[-1][1] = ""
-
+    # Stream tokens one at a time
+    chat_history[-1][1] = ""
     for token in completion.answer_generator:
-        history[-1][1] += token
+        chat_history[-1][1] += token
 
-        yield history, completion
+        yield chat_history, completion
 
 
 def log_completion(
@@ -128,6 +140,11 @@ def submit_feedback(
 def toggle_feedback_visible(visible: bool):
     """Toggles the visibility of the 'feedback submitted' message."""
     return {feedback_submitted_message: gr.update(visible=visible)}
+
+
+def clear_sources():
+    """Clears all the documents in the tabs"""
+    return ["" for _ in range(max_sources)]
 
 
 def clear_feedback_form():
@@ -381,7 +398,10 @@ with buster_app:
 
     # fmt: off
     submit.click(
-        user, [message, chatbot], [message, chatbot]
+        add_user_question, [message], [chatbot]
+    ).then(
+        clear_sources,
+        outputs=[*sources_textboxes]
     ).then(
         clear_feedback_form,
         outputs=[feedback_submitted_message, feedback_relevant_sources, feedback_relevant_answer, feedback_info]
@@ -400,8 +420,12 @@ with buster_app:
         append_completion,
         inputs=[completion, user_completions], outputs=[user_completions]
     )
+
     message.submit(
-        user, [message, chatbot], [message, chatbot]
+        add_user_question, [message], [chatbot]
+    ).then(
+        clear_sources,
+        outputs=[*sources_textboxes]
     ).then(
         clear_feedback_form,
         outputs=[feedback_submitted_message, feedback_relevant_sources, feedback_relevant_answer, feedback_info]
