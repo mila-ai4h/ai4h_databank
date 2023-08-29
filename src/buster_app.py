@@ -16,6 +16,9 @@ from src.app_utils import add_sources, check_auth, get_utc_time
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
+# Typehint for chatbot history
+ChatHistory = list[list[Optional[str], Optional[str]]]
+
 mongo_db = cfg.mongo_db
 buster_cfg = copy.deepcopy(cfg.buster_cfg)
 buster = setup_buster(buster_cfg=buster_cfg)
@@ -72,22 +75,31 @@ def append_completion(completion, user_completions):
     return user_completions
 
 
-def add_user_question(user_question: str) -> list[str, None]:
-    """Adds user's question immediately to the chat."""
-    return [[user_question, None]]
+def add_user_question(user_question: str, chat_history: Optional[ChatHistory] = None) -> ChatHistory:
+    """Adds a user's question to the chat history.
+
+    If no history is provided, the first element of the history will be the user conversation.
+    """
+    if chat_history is None:
+        chat_history = []
+    chat_history.append([user_question, None])
+    return chat_history
 
 
-def chat(history):
-    user_input = history[-1][0]
+def chat(chat_history: ChatHistory):
+    """Answer a user's question using retrieval augmented generation."""
+
+    # We assume that the question is the user's last interaction
+    user_input = chat_history[-1][0]
 
     completion = buster.process_input(user_input)
 
-    history[-1][1] = ""
-
+    # Stream tokens one at a time
+    chat_history[-1][1] = ""
     for token in completion.answer_generator:
-        history[-1][1] += token
+        chat_history[-1][1] += token
 
-        yield history, completion
+        yield chat_history, completion
 
 
 def log_completion(
