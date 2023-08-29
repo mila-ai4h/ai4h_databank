@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Type
 
 import pandas as pd
 import pymongo
@@ -110,7 +110,7 @@ class Interaction:
         return jsonable_encoder(to_encode, custom_encoder=custom_encoder)
 
     @classmethod
-    def from_dict(cls, interaction_dict: dict, feedback_cls: StandardForm) -> Interaction:
+    def from_dict(cls, interaction_dict: dict, feedback_cls: Type[StandardForm]) -> Interaction:
         del interaction_dict["_id"]
         interaction_dict["form"] = feedback_cls.from_dict(interaction_dict["form"])
 
@@ -119,7 +119,12 @@ class Interaction:
         return cls(**interaction_dict)
 
 
-def read_feedback(mongo_db: pymongo.database.Database, collection: str, filters: dict = None) -> pd.DataFrame:
+def read_feedback(
+    mongo_db: pymongo.database.Database,
+    collection: str,
+    filters: dict = None,
+    feedback_cls: Type[StandardForm] = FeedbackForm,
+) -> pd.DataFrame:
     """Read feedback from mongodb.
 
     By default, return all feedback. If filters are provided, return only feedback that matches the filters.
@@ -127,7 +132,7 @@ def read_feedback(mongo_db: pymongo.database.Database, collection: str, filters:
     """
     try:
         feedback = mongo_db[collection].find(filters)
-        feedback = [Interaction.from_dict(f).flatten() for f in feedback]
+        feedback = [Interaction.from_dict(f, feedback_cls).flatten() for f in feedback]
         feedback = pd.DataFrame(feedback)
 
         return feedback

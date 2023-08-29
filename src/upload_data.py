@@ -1,0 +1,56 @@
+import argparse
+import os
+
+import pandas as pd
+from buster.documents_manager import DocumentsService
+
+from src.app_utils import make_uri
+
+
+def upload_data(
+    pinecone_api_key: str,
+    pinecone_env: str,
+    pinecone_index: str,
+    pinecone_namespace: str,
+    mongo_uri: str,
+    mongo_db_name: str,
+    dataframe: pd.DataFrame,
+):
+    manager = DocumentsService(
+        pinecone_api_key, pinecone_env, pinecone_index, pinecone_namespace, mongo_uri, mongo_db_name
+    )
+    manager.batch_add(dataframe)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Upload a CSV file containing chunks of data into the specified Pinecone namespace and Mongo database."
+    )
+
+    parser.add_argument("pinecone_namespace", type=str, help="Pinecone namespace to use.")
+    parser.add_argument("mongo_db_name", type=str, help="Name of the mongo database to use.")
+    parser.add_argument(
+        "filepath", type=str, help="Path to the csv containing the chunks. Will be loaded as a pandas dataframe."
+    )
+
+    args = parser.parse_args()
+
+    # These are the new names
+    pinecone_namespace = args.pinecone_namespace
+    mongo_db_name = args.mongo_db_name
+
+    # Set pinecone creds
+    pinecone_api_key = os.getenv("AI4H_PINECONE_API_KEY")
+    pinecone_env = os.getenv("AI4H_PINECONE_ENV")
+    pinecone_index = os.getenv("AI4H_PINECONE_INDEX")
+
+    # Set mongo creds
+    mongo_username = os.getenv("AI4H_MONGODB_USERNAME")
+    mongo_password = os.getenv("AI4H_MONGODB_PASSWORD")
+    mongo_cluster = os.getenv("AI4H_MONGODB_CLUSTER")
+    mongo_uri = make_uri(mongo_username, mongo_password, mongo_cluster)
+
+    # Read data
+    df = pd.read_csv(args.filepath, delimiter="\t")
+
+    upload_data(pinecone_api_key, pinecone_env, pinecone_index, pinecone_namespace, mongo_uri, mongo_db_name, df)
