@@ -40,6 +40,82 @@ trick_questions = questions[questions.question_type == "trick"].question.to_list
 enable_terms_and_conditions = True
 
 
+def toggle_additional_feedback():
+    return {show_additional_feedback: gr.update(visible=True)}
+
+
+def setup_feedback_form():
+    # Feedback
+    feedback_elems = {}
+    with gr.Box():
+        with gr.Row():
+            with gr.Box():
+                with gr.Column():
+                    gr.Markdown("## Feedback Form")
+                    with gr.Row():
+                        feedback_relevant_sources = gr.Radio(
+                            choices=["👍", "👎"], label="Did you find what you were looking for?"
+                        )
+
+                    show_additional_feedback = gr.Group(visible=False)
+                    with show_additional_feedback:
+                        with gr.Row():
+                            feedback_relevant_answer = gr.Radio(
+                                choices=["👍", "👎"], label="Was the generated answer clear and understandable?"
+                            )
+
+                        feedback_info = gr.Textbox(
+                            label="Enter additional information (optional)",
+                            lines=3,
+                            placeholder="Enter more helpful information for us here...",
+                        )
+
+                    submit_feedback_btn = gr.Button("Submit Feedback!")
+                    with gr.Column(visible=False) as feedback_submitted_message:
+                        gr.Markdown("Feedback recorded, thank you! 📝")
+            with gr.Box():
+                with gr.Column():
+                    gr.Markdown(
+                        f"""## Help Us Improve with Your Feedback! 👍👎
+By filling out the feedback form, you're helping us understand what's working well and where we can make improvements on {app_name}.
+
+Every thumbs up or thumbs down helps us determine how to improve {app_name}. Thank you for contributing to the evaluation of our app.
+
+"""
+                    )
+
+    feedback_relevant_sources.input(toggle_additional_feedback, outputs=show_additional_feedback)
+
+    # fmt: off
+    submit_feedback_btn.click(
+        toggle_feedback_visible,
+        inputs=gr.State(False),
+        outputs=feedback_submitted_message,
+    ).then(
+        submit_feedback,
+        inputs=[
+            user_completions,
+            feedback_relevant_sources,
+            feedback_relevant_answer,
+            feedback_info,
+        ],
+    ).success(
+        toggle_feedback_visible,
+        inputs=gr.State(True),
+        outputs=feedback_submitted_message,
+    )
+    # If you rage click the subimt feedback button, it re-appears so you are confident it was recorded properly.
+    # fmt: on
+    return (
+        feedback_relevant_sources,
+        feedback_relevant_answer,
+        feedback_info,
+        submit_feedback_btn,
+        feedback_submitted_message,
+        show_additional_feedback,
+    )
+
+
 def to_md_link(title: str, link: str) -> str:
     """Converts a title and link to markown link format"""
     return f"[{title}]({link})"
@@ -317,40 +393,14 @@ with buster_app:
                     ]
                     gr.HighlightedText(value=metadata, label="Parameters")
 
-        # Feedback
-        with gr.Box():
-            with gr.Row():
-                with gr.Box():
-                    with gr.Column():
-                        gr.Markdown("## Feedback Form")
-                        with gr.Row():
-                            feedback_relevant_sources = gr.Radio(
-                                choices=["👍", "👎"], label="Were any of the retrieved sources relevant?"
-                            )
-                        with gr.Row():
-                            feedback_relevant_answer = gr.Radio(
-                                choices=["👍", "👎"], label="Was the generated answer useful?"
-                            )
-
-                        feedback_info = gr.Textbox(
-                            label="Enter additional information (optional)",
-                            lines=3,
-                            placeholder="Enter more helpful information for us here...",
-                        )
-
-                        submit_feedback_btn = gr.Button("Submit Feedback!")
-                        with gr.Column(visible=False) as feedback_submitted_message:
-                            gr.Markdown("Feedback recorded, thank you! 📝")
-                with gr.Box():
-                    with gr.Column():
-                        gr.Markdown(
-                            f"""## Help Us Improve with Your Feedback! 👍👎
-    By filling out the feedback form, you're helping us understand what's working well and where we can make improvements on {app_name}.
-
-    Every thumbs up or thumbs down helps us determine how to improve {app_name}. Thank you for contributing to the evaluation of our app.
-
-    """
-                        )
+        (
+            feedback_relevant_sources,
+            feedback_relevant_answer,
+            feedback_info,
+            submit_feedback_btn,
+            feedback_submitted_message,
+            show_additional_feedback,
+        ) = setup_feedback_form()
 
         # Display sources
         with gr.Box():
@@ -371,27 +421,6 @@ with buster_app:
 
         # store the users' last completion here
         completion = gr.State()
-
-        # fmt: off
-        submit_feedback_btn.click(
-            toggle_feedback_visible,
-            inputs=gr.State(False),
-            outputs=feedback_submitted_message,
-        ).then(
-            submit_feedback,
-            inputs=[
-                user_completions,
-                feedback_relevant_sources,
-                feedback_relevant_answer,
-                feedback_info,
-            ],
-        ).success(
-            toggle_feedback_visible,
-            inputs=gr.State(True),
-            outputs=feedback_submitted_message,
-        )
-        # If you rage click the subimt feedback button, it re-appears so you are confident it was recorded properly.
-        # fmt: on
 
     # Reval app if terms are accepted
     accept_terms.click(reveal_app, inputs=accept_checkbox, outputs=[app_group, accept_terms_group])
