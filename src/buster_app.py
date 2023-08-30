@@ -49,7 +49,6 @@ def toggle_additional_feedback():
 def hide_about_panel(accept_checkbox):
     # Stay open while not accepted
     open = not bool(accept_checkbox)
-    print(open)
     return {about_panel: gr.update(open=open)}
 
 
