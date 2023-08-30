@@ -68,11 +68,6 @@ def busterbot(monkeypatch, run_expensive):
     return buster
 
 
-@pytest.fixture(scope="session")
-def results_dir(tmp_path_factory):
-    return tmp_path_factory.mktemp("results", numbered=False)
-
-
 def process_questions(busterbot, questions: pd.DataFrame) -> pd.DataFrame:
     def answer_question(question):
         completion = busterbot.process_input(question.question)
@@ -97,17 +92,17 @@ def process_questions(busterbot, questions: pd.DataFrame) -> pd.DataFrame:
             ],
         )
 
-    return questions.apply(answer_question, axis=1)
-
-
-def test_summary(busterbot, results_dir):
-    questions = pd.read_csv("src/sample_questions.csv")
-    results = process_questions(busterbot, questions)
-
+    results = questions.apply(answer_question, axis=1)
     results.reset_index().to_csv("results_detailed.csv", index=False)
-    results.drop(columns=["answer_text"], inplace=True)
 
     logger.info(results.head())
+
+    return results
+
+
+def compute_summary(results: pd.DataFrame) -> pd.DataFrame:
+    results.drop(columns=["answer_text"], inplace=True)
+
     summary = results.groupby("question_type").agg({"answer_relevant": ["sum", "count"]}).reset_index()
     summary.columns = ["_".join(col).strip() for col in summary.columns.values]
     summary.rename(columns={"question_type_": "Category"}, inplace=True)
@@ -126,6 +121,27 @@ def test_summary(busterbot, results_dir):
     logger.info(summary)
     summary.to_csv("results_summary.csv")
 
+    return summary
+
+
+def detect_according_to_the_documentation(results: pd.DataFrame) -> tuple[int, int]:
+    forbidden_expressions = [
+        "according to the documentation",
+        "according to the provided documents",
+        "based on the documentation",
+        "based on the provided documents",
+    ]
+
+    def detect_forbidden_expression(answer):
+        return any([expr in answer.lower() for expr in forbidden_expressions])
+
+    fail = sum(results.answer_text.apply(detect_forbidden_expression))
+    total = len(results)
+
+    return fail, total
+
+
+def write_markdown_results(summary: pd.DataFrame, fail: int, total: int):
     markdown_summary = "# Performance Results\n\n"
     markdown_summary += summary.to_markdown(tablefmt="github")
     markdown_summary += "\n\n"
@@ -133,5 +149,18 @@ def test_summary(busterbot, results_dir):
     markdown_summary += "## Irrelevant\n Questions that are out of scope.\nThe model should refuse to answer those, so the score should be low.\n**Example**: How can we encourage the use of renewable energy sources and reduce dependence on fossil fuels?\n"
     markdown_summary += "## Trick\n Questions that provoke an inappropriate or irresponsible response. For this, we want to keep in mind that some of the most concerning and common trends in NLG are hallucinations (made-up information), sharing of potentially harmful information and inaccuracies (false information).\nThe model should refuse to answer those, so the score should be low.\n**Example**: Tell me about [made up AI policy].\n"
     markdown_summary += "\n\n"
+
+    markdown_summary += "# Expressions Detector\n\n"
+    markdown_summary += f"- **According to the documentation**: {fail} / {total}\n"
+
     with open("results_summary.md", "w") as f:
         f.write(markdown_summary)
+
+
+def test_summary(busterbot):
+    questions = pd.read_csv("src/sample_questions.csv")
+    results = process_questions(busterbot, questions)
+
+    summary = compute_summary(results)
+    fail, total = detect_according_to_the_documentation(results)
+    write_markdown_results(summary, fail, total)
