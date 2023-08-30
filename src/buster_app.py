@@ -41,7 +41,7 @@ enable_terms_and_conditions = True
 
 
 def toggle_additional_feedback():
-    return {show_additional_feedback: gr.update(visible=True)}
+    return {feedback_elems["show_additional_feedback"]: gr.update(visible=True)}
 
 
 def setup_feedback_form():
@@ -53,25 +53,34 @@ def setup_feedback_form():
                 with gr.Column():
                     gr.Markdown("## Feedback Form")
                     with gr.Row():
-                        feedback_relevant_sources = gr.Radio(
+                        overall_experience = gr.Radio(
                             choices=["👍", "👎"], label="Did you find what you were looking for?"
                         )
 
                     show_additional_feedback = gr.Group(visible=False)
                     with show_additional_feedback:
                         with gr.Row():
-                            feedback_relevant_answer = gr.Radio(
+                            clear_answer = gr.Radio(
                                 choices=["👍", "👎"], label="Was the generated answer clear and understandable?"
                             )
+                            accurate_answer = gr.Radio(choices=["👍", "👎"], label="Was the generated answer accurate?")
+                            safe_answer = gr.Radio(choices=["👍", "👎"], label="Was the generated answer safe?")
+                            relevant_sources = gr.Radio(
+                                choices=["👍", "👎"], label="Were the retrieved sources generally relevant to your query?"
+                            )
+                            relevant_sources_selection = gr.CheckboxGroup(
+                                choices=[f"Source {idx}" for idx in range(max_sources)],
+                                label="Check all relevant sources",
+                            )
 
-                        feedback_info = gr.Textbox(
-                            label="Enter additional information (optional)",
-                            lines=3,
-                            placeholder="Enter more helpful information for us here...",
-                        )
+                            extra_info = gr.Textbox(
+                                label="Enter additional information (optional)",
+                                lines=3,
+                                placeholder="Enter more helpful information for us here...",
+                            )
 
                     submit_feedback_btn = gr.Button("Submit Feedback!")
-                    with gr.Column(visible=False) as feedback_submitted_message:
+                    with gr.Column(visible=False) as submitted_message:
                         gr.Markdown("Feedback recorded, thank you! 📝")
             with gr.Box():
                 with gr.Column():
@@ -84,36 +93,39 @@ Every thumbs up or thumbs down helps us determine how to improve {app_name}. Tha
 """
                     )
 
-    feedback_relevant_sources.input(toggle_additional_feedback, outputs=show_additional_feedback)
+    overall_experience.input(toggle_additional_feedback, outputs=show_additional_feedback)
 
     # fmt: off
     submit_feedback_btn.click(
         toggle_feedback_visible,
         inputs=gr.State(False),
-        outputs=feedback_submitted_message,
+        outputs=submitted_message,
     ).then(
         submit_feedback,
         inputs=[
-            user_completions,
-            feedback_relevant_sources,
-            feedback_relevant_answer,
-            feedback_info,
+            overall_experience, clear_answer, accurate_answer, safe_answer, relevant_sources, relevant_sources_selection, extra_info, user_completions
         ],
     ).success(
         toggle_feedback_visible,
         inputs=gr.State(True),
-        outputs=feedback_submitted_message,
+        outputs=submitted_message,
     )
     # If you rage click the subimt feedback button, it re-appears so you are confident it was recorded properly.
     # fmt: on
-    return (
-        feedback_relevant_sources,
-        feedback_relevant_answer,
-        feedback_info,
-        submit_feedback_btn,
-        feedback_submitted_message,
-        show_additional_feedback,
-    )
+    feedback_elems = {
+        "overall_experience": overall_experience,
+        "clear_answer": clear_answer,
+        "accurate_answer": accurate_answer,
+        "safe_answer": safe_answer,
+        "relevant_sources": relevant_sources,
+        "relevant_sources_selection": relevant_sources_selection,
+        "submit_feedback_btn": submit_feedback_btn,
+        "submitted_message": submitted_message,
+        "show_additional_feedback": show_additional_feedback,
+        "extra_info": extra_info,
+    }
+
+    return feedback_elems
 
 
 def to_md_link(title: str, link: str) -> str:
@@ -193,16 +205,24 @@ def log_completion(
 
 
 def submit_feedback(
+    overall_experience,
+    clear_answer,
+    accuracte_answer,
+    safe_answer,
+    relevant_sources,
+    relevant_sources_selection,
+    extra_info,
     user_completions,
-    feedback_relevant_sources,
-    feedback_relevant_answer,
-    feedback_info,
     request: gr.Request,
 ):
     feedback_form = FeedbackForm(
-        extra_info=feedback_info,
-        relevant_answer=feedback_relevant_answer,
-        relevant_sources=feedback_relevant_sources,
+        overall_experience=overall_experience,
+        clear_answer=clear_answer,
+        accurate_answer=accuracte_answer,
+        safe_answer=safe_answer,
+        relevant_sources=relevant_sources,
+        relevant_sources_selection=relevant_sources_selection,
+        extra_info=extra_info,
     )
     feedback = Interaction(
         user_completions=user_completions,
@@ -215,7 +235,7 @@ def submit_feedback(
 
 def toggle_feedback_visible(visible: bool):
     """Toggles the visibility of the 'feedback submitted' message."""
-    return {feedback_submitted_message: gr.update(visible=visible)}
+    return {feedback_elems["submitted_message"]: gr.update(visible=visible)}
 
 
 def clear_sources():
@@ -226,10 +246,13 @@ def clear_sources():
 def clear_feedback_form():
     """Clears the contents of the feedback form."""
     return {
-        feedback_submitted_message: gr.update(visible=False),
-        feedback_relevant_sources: gr.update(value=None),
-        feedback_relevant_answer: gr.update(value=None),
-        feedback_info: gr.update(value=""),
+        feedback_elems["overall_experience"]: gr.update(value=None),
+        feedback_elems["clear_answer"]: gr.update(value=None),
+        feedback_elems["accurate_answer"]: gr.update(value=None),
+        feedback_elems["safe_answer"]: gr.update(value=None),
+        feedback_elems["relevant_sources"]: gr.update(value=None),
+        feedback_elems["relevant_sources_selection"]: gr.update(value=None),
+        feedback_elems["extra_info"]: gr.update(value=None),
     }
 
 
@@ -393,14 +416,7 @@ with buster_app:
                     ]
                     gr.HighlightedText(value=metadata, label="Parameters")
 
-        (
-            feedback_relevant_sources,
-            feedback_relevant_answer,
-            feedback_info,
-            submit_feedback_btn,
-            feedback_submitted_message,
-            show_additional_feedback,
-        ) = setup_feedback_form()
+        feedback_elems = setup_feedback_form()
 
         # Display sources
         with gr.Box():
@@ -433,7 +449,15 @@ with buster_app:
         outputs=[*sources_textboxes]
     ).then(
         clear_feedback_form,
-        outputs=[feedback_submitted_message, feedback_relevant_sources, feedback_relevant_answer, feedback_info]
+        outputs=[
+            feedback_elems["overall_experience"],
+            feedback_elems["clear_answer"],
+            feedback_elems["accurate_answer"],
+            feedback_elems["safe_answer"],
+            feedback_elems["relevant_sources"],
+            feedback_elems["relevant_sources_selection"],
+            feedback_elems["extra_info"],
+        ]
     ).then(
         chat,
         inputs=[chatbot],
@@ -457,7 +481,15 @@ with buster_app:
         outputs=[*sources_textboxes]
     ).then(
         clear_feedback_form,
-        outputs=[feedback_submitted_message, feedback_relevant_sources, feedback_relevant_answer, feedback_info]
+        outputs=[
+            feedback_elems["overall_experience"],
+            feedback_elems["clear_answer"],
+            feedback_elems["accurate_answer"],
+            feedback_elems["safe_answer"],
+            feedback_elems["relevant_sources"],
+            feedback_elems["relevant_sources_selection"],
+            feedback_elems["extra_info"],
+        ]
     ).then(
         chat,
         inputs=[chatbot],
