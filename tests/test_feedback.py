@@ -13,14 +13,26 @@ class MockValidator:
 
 
 def test_read_write_feedbackform():
-    ff = FeedbackForm(relevant_answer="relevant", relevant_sources="sources", extra_info="extra info")
+    ff = FeedbackForm(
+        overall_experience="yes",
+        clear_answer="yes",
+        accurate_answer="yes",
+        safe_answer="yes",
+        relevant_sources="yes",
+        relevant_sources_selection=["source 1", "source 2"],
+        extra_info="Helpful",
+    )
 
     ff_json = ff.to_json()
     ff_back = FeedbackForm.from_dict(ff_json)
 
-    assert ff.extra_info == ff_back.extra_info
-    assert ff.relevant_answer == ff_back.relevant_answer
+    assert ff.overall_experience == ff_back.overall_experience
+    assert ff.clear_answer == ff_back.clear_answer
+    assert ff.accurate_answer == ff_back.accurate_answer
+    assert ff.safe_answer == ff_back.safe_answer
     assert ff.relevant_sources == ff_back.relevant_sources
+    assert ff.relevant_sources_selection == ff_back.relevant_sources_selection
+    assert ff.extra_info == ff_back.extra_info
 
 
 def test_read_write_feedback():
@@ -46,9 +58,13 @@ def test_read_write_feedback():
         username="test user",
         user_completions=[b],
         form=FeedbackForm(
-            extra_info="extra",
-            relevant_answer="relevant",
-            relevant_sources="sources",
+            overall_experience="yes",
+            clear_answer="yes",
+            accurate_answer="yes",
+            safe_answer="yes",
+            relevant_sources="yes",
+            relevant_sources_selection=["source 1", "source 2"],
+            extra_info="Helpful",
         ),
         time="time",
     )
@@ -60,7 +76,6 @@ def test_read_write_feedback():
     assert f.username == f_back.username
     assert f.time == f_back.time
     assert f.form.extra_info == f_back.form.extra_info
-    assert f.form.relevant_answer == f_back.form.relevant_answer
     assert f.form.relevant_sources == f_back.form.relevant_sources
     assert len(f.user_completions) == len(f_back.user_completions)
     assert f.user_completions[0].user_input == f_back.user_completions[0].user_input
