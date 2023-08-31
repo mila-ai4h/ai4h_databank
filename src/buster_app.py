@@ -67,7 +67,7 @@ We look forward to sharing with you an updated version of the product once we fe
                     )
                     with gr.Row():
                         overall_experience = gr.Radio(
-                            choices=["👍", "👎"], label="Did you find what you were looking for?"
+                            choices=["👍", "👎"], label="(*) Did you find what you were looking for?"
                         )
 
                     show_additional_feedback = gr.Group(visible=False)
@@ -81,17 +81,17 @@ We look forward to sharing with you an updated version of the product once we fe
                             relevant_sources = gr.Radio(
                                 choices=["👍", "👎"], label="Were the retrieved sources generally relevant to your query?"
                             )
-                            relevant_sources_order = gr.Radio(
-                                choices=["👍", "👎"],
-                                label="Were the sources ranked appropriately, in order of relevance?",
-                            )
                             relevant_sources_selection = gr.CheckboxGroup(
                                 choices=[f"Source {i+1}" for i in range(max_sources)],
                                 label="Check all relevant sources",
                             )
+                            relevant_sources_order = gr.Radio(
+                                choices=["👍", "👎"],
+                                label="Were the sources ranked appropriately, in order of relevance?",
+                            )
 
                             extra_info = gr.Textbox(
-                                label="Enter additional information (optional)",
+                                label="Enter any additional information",
                                 lines=3,
                                 placeholder="Enter more helpful information for us here...",
                             )
@@ -431,7 +431,6 @@ def setup_additional_sources():
 
                 # ... Or display the sources using markdown.
                 gr.Markdown(get_metadata_markdown(documents_metadata))
-
 
 
 with buster_app:
