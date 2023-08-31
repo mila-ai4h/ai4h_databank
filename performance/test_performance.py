@@ -161,6 +161,6 @@ def test_summary(busterbot):
     questions = pd.read_csv("src/sample_questions.csv")
     results = process_questions(busterbot, questions)
 
-    summary = compute_summary(results)
     fail, total = detect_according_to_the_documentation(results)
+    summary = compute_summary(results)
     write_markdown_results(summary, fail, total)
