@@ -82,7 +82,8 @@ We look forward to sharing with you an updated version of the product once we fe
                                 choices=["👍", "👎"], label="Were the retrieved sources generally relevant to your query?"
                             )
                             relevant_sources_order = gr.Radio(
-                                choices=["👍", "👎"], label="Were the sources ranked appropriately, in order of relevance?"
+                                choices=["👍", "👎"],
+                                label="Were the sources ranked appropriately, in order of relevance?",
                             )
                             relevant_sources_selection = gr.CheckboxGroup(
                                 choices=[f"Source {i+1}" for i in range(max_sources)],
@@ -200,7 +201,6 @@ def log_completion(
     completion: Union[Completion, list[Completion]],
     request: gr.Request,
 ):
-
     # TODO: add UID for each page visitor instead of username
 
     # Get the proper mongo collection to save logs to
@@ -310,7 +310,8 @@ def setup_about_panel():
     with gr.Accordion(label=f"About {app_name}", open=True) as about_panel:
         with gr.Row(variant="panel"):
             with gr.Box():
-                gr.Markdown(f"""
+                gr.Markdown(
+                    f"""
 
                 ## Welcome
                 Artificial intelligence is a field that's developing fast! In response, policy makers from around the world are creating guidelines, rules and regulations to keep up.
@@ -326,7 +327,8 @@ def setup_about_panel():
                 )
 
             with gr.Box():
-                gr.Markdown(f"""
+                gr.Markdown(
+                    f"""
                 ## Risks
 
                 We have done our best to make sure that the AI algorithms are __only__ taking information from what is available in the OECD AI Observatory’s Database; but, of course, Large Language Models (LLMs) are prone to fabrication. This means LLMs can make things up and present this made up information as if it were real, making it seem as if the information was found in a policy document. We therefore advise you to check the sources provided by the model to validate that the answer is in fact true. If you'd like to know exactly which documents the model can reference in its response, please see below.
@@ -466,7 +468,6 @@ with buster_app:
                     gr.Markdown(get_metadata_markdown(documents_metadata))
 
         gr.HTML("<center> Powered by <a href='https://github.com/jerpint/buster'>Buster</a> 🤖</center>")
-
 
     # fmt: off
     # Reval app if terms are accepted, once accepted
