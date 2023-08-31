@@ -42,10 +42,6 @@ enable_terms_and_conditions = True
 app_name = "LLaWma 🦙"
 
 
-def toggle_additional_feedback():
-    return {feedback_elems["show_additional_feedback"]: gr.update(visible=True)}
-
-
 def hide_about_panel(accept_checkbox):
     # Stay open while not accepted
     open = not bool(accept_checkbox)
@@ -94,15 +90,15 @@ Every thumbs up or thumbs down helps us determine how to improve {app_name}. Tha
                                 placeholder="Enter more helpful information for us here...",
                             )
 
-                    submit_feedback_btn = gr.Button("Submit Feedback!")
+                    submit_feedback_btn = gr.Button("Submit Feedback!", variant="primary", interactive=False)
                     with gr.Column(visible=False) as submitted_message:
                         gr.Markdown("Feedback recorded, thank you! 📝")
 
-    overall_experience.input(toggle_additional_feedback, outputs=show_additional_feedback)
+    overall_experience.input(toggle_visibility, inputs=gr.State("True"), outputs=show_additional_feedback)
 
     # fmt: off
     submit_feedback_btn.click(
-        toggle_feedback_visible,
+        toggle_visibility,
         inputs=gr.State(False),
         outputs=submitted_message,
     ).then(
@@ -111,10 +107,15 @@ Every thumbs up or thumbs down helps us determine how to improve {app_name}. Tha
             overall_experience, clear_answer, accurate_answer, safe_answer, relevant_sources, relevant_sources_selection, extra_info, user_completions
         ],
     ).success(
-        toggle_feedback_visible,
+        toggle_visibility,
         inputs=gr.State(True),
         outputs=submitted_message,
+    ).success(
+        toggle_interactivity,
+        inputs=gr.State(False),
+        outputs=submit_feedback_btn,
     )
+
     # If you rage click the subimt feedback button, it re-appears so you are confident it was recorded properly.
     # fmt: on
     feedback_elems = {
@@ -238,9 +239,14 @@ def submit_feedback(
     feedback.send(mongo_db, collection=cfg.mongo_feedback_collection)
 
 
-def toggle_feedback_visible(visible: bool):
+def toggle_visibility(visible: bool):
     """Toggles the visibility of the 'feedback submitted' message."""
-    return {feedback_elems["submitted_message"]: gr.update(visible=visible)}
+    return gr.update(visible=visible)
+
+
+def toggle_interactivity(interactive: bool):
+    """Toggles the visibility of the 'feedback submitted' message."""
+    return gr.update(interactive=interactive)
 
 
 def clear_sources():
@@ -288,7 +294,7 @@ buster_app = gr.Blocks()
 
 
 def setup_about_panel():
-    with gr.Accordion(label="About Panel", open=True) as about_panel:
+    with gr.Accordion(label=f"About {app_name}", open=True) as about_panel:
         with gr.Row(variant="panel"):
             with gr.Box():
                 gr.Markdown(
@@ -409,9 +415,9 @@ with buster_app:
         with gr.Row():
             with gr.Column(scale=2, variant="panel"):
                 gr.Markdown("## Chatbot")
-                chatbot = gr.Chatbot()
+                chatbot = gr.Chatbot(label=f"{app_name}")
                 message = gr.Textbox(
-                    label="Chat with 🦙",
+                    label=f"Chat with {app_name}",
                     placeholder="Ask your question here...",
                     lines=1,
                 )
@@ -483,6 +489,10 @@ with buster_app:
             feedback_elems["extra_info"],
         ]
     ).then(
+        toggle_interactivity,
+        inputs=gr.State("True"),
+        outputs=feedback_elems["submit_feedback_btn"],
+    ).then(
         chat,
         inputs=[chatbot],
         outputs=[chatbot, completion],
@@ -497,6 +507,8 @@ with buster_app:
         append_completion,
         inputs=[completion, user_completions], outputs=[user_completions]
     )
+    # TODO: i dont think we want to track all user_completions anymore, make sure this doesnt happen
+    # TODO: add UID for each page visit
 
     message.submit(
         add_user_question, [message], [chatbot]
