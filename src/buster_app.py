@@ -100,7 +100,17 @@ We look forward to sharing with you an updated version of the product once we fe
                     with gr.Column(visible=False) as submitted_message:
                         gr.Markdown("Feedback recorded, thank you! 📝")
 
-    overall_experience.input(toggle_visibility, inputs=gr.State("True"), outputs=show_additional_feedback)
+    # fmt: off
+    overall_experience.input(
+        toggle_visibility,
+        inputs=gr.State("True"),
+        outputs=show_additional_feedback
+    ).then(
+        toggle_interactivity,
+        inputs=gr.State(True),
+        outputs=submit_feedback_btn,
+    )
+    # fmt: on
 
     # fmt: off
     submit_feedback_btn.click(
@@ -122,7 +132,6 @@ We look forward to sharing with you an updated version of the product once we fe
         outputs=submit_feedback_btn,
     )
 
-    # If you rage click the subimt feedback button, it re-appears so you are confident it was recorded properly.
     # fmt: on
     feedback_elems = {
         "overall_experience": overall_experience,
@@ -131,6 +140,7 @@ We look forward to sharing with you an updated version of the product once we fe
         "safe_answer": safe_answer,
         "relevant_sources": relevant_sources,
         "relevant_sources_selection": relevant_sources_selection,
+        "relevant_sources_order": relevant_sources_order,
         "submit_feedback_btn": submit_feedback_btn,
         "submitted_message": submitted_message,
         "show_additional_feedback": show_additional_feedback,
@@ -206,8 +216,11 @@ def log_completion(
     # Get the proper mongo collection to save logs to
     collection = cfg.mongo_interaction_collection
 
+    # make sure it's always a list
     if isinstance(completion, Completion):
         user_completions = [completion]
+    else:
+        user_completions = completion
 
     interaction = Interaction(
         user_completions=user_completions,
@@ -240,8 +253,11 @@ def submit_feedback(
         extra_info=extra_info,
     )
 
+    # make sure it's always a list
     if isinstance(completion, Completion):
         user_completions = [completion]
+    else:
+        user_completions = completion
 
     feedback = Interaction(
         user_completions=user_completions,
@@ -253,12 +269,12 @@ def submit_feedback(
 
 
 def toggle_visibility(visible: bool):
-    """Toggles the visibility of the 'feedback submitted' message."""
+    """Toggles the visibility of the gradio element."""
     return gr.update(visible=visible)
 
 
 def toggle_interactivity(interactive: bool):
-    """Toggles the visibility of the 'feedback submitted' message."""
+    """Toggles the visibility of the gradio element."""
     return gr.update(interactive=interactive)
 
 
@@ -276,6 +292,7 @@ def clear_feedback_form():
         feedback_elems["safe_answer"]: gr.update(value=None),
         feedback_elems["relevant_sources"]: gr.update(value=None),
         feedback_elems["relevant_sources_selection"]: gr.update(value=None),
+        feedback_elems["relevant_sources_order"]: gr.update(value=None),
         feedback_elems["extra_info"]: gr.update(value=None),
     }
 
@@ -493,7 +510,15 @@ with buster_app:
         clear_sources,
         outputs=[*sources_textboxes]
     ).then(
-        clear_feedback_form,
+        toggle_visibility,
+        inputs=gr.State(False),
+        outputs=feedback_elems["submitted_message"],
+    ).then(
+        toggle_visibility,
+        inputs=gr.State(False),
+        outputs=feedback_elems["show_additional_feedback"],
+    ).then(
+      clear_feedback_form,
         outputs=[
             feedback_elems["overall_experience"],
             feedback_elems["clear_answer"],
@@ -501,12 +526,9 @@ with buster_app:
             feedback_elems["safe_answer"],
             feedback_elems["relevant_sources"],
             feedback_elems["relevant_sources_selection"],
+            feedback_elems["relevant_sources_order"],
             feedback_elems["extra_info"],
         ]
-    ).then(
-        toggle_interactivity,
-        inputs=gr.State("True"),
-        outputs=feedback_elems["submit_feedback_btn"],
     ).then(
         chat,
         inputs=[chatbot],
@@ -526,7 +548,15 @@ with buster_app:
         clear_sources,
         outputs=[*sources_textboxes]
     ).then(
-        clear_feedback_form,
+        toggle_visibility,
+        inputs=gr.State(False),
+        outputs=feedback_elems["submitted_message"],
+    ).then(
+        toggle_visibility,
+        inputs=gr.State(False),
+        outputs=feedback_elems["show_additional_feedback"],
+    ).then(
+      clear_feedback_form,
         outputs=[
             feedback_elems["overall_experience"],
             feedback_elems["clear_answer"],
@@ -534,6 +564,7 @@ with buster_app:
             feedback_elems["safe_answer"],
             feedback_elems["relevant_sources"],
             feedback_elems["relevant_sources_selection"],
+            feedback_elems["relevant_sources_order"],
             feedback_elems["extra_info"],
         ]
     ).then(
