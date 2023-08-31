@@ -411,10 +411,7 @@ def setup_terms_and_conditions():
 
 
 with buster_app:
-    # TODO: trigger a proper change to update
-
-    # # state variables are client-side and are reset every time a client refreshes the page
-    # user_completions = gr.State([])
+    # state variables are client-side and are reset every time a client refreshes the page
     # store the users' last completion here
     last_completion = gr.State()
 
