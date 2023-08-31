@@ -2,7 +2,7 @@ import copy
 import logging
 import os
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 import gradio as gr
 import pandas as pd
@@ -30,14 +30,124 @@ current_dir = Path(__file__).resolve().parent
 documents_metadata_file = str(current_dir / "documents_metadata.csv")
 documents_metadata = pd.read_csv(documents_metadata_file)
 
-# Load the sample questions and split them by type
-questions_file = str(current_dir / "sample_questions.csv")
-questions = pd.read_csv(questions_file)
-relevant_questions = questions[questions.question_type == "relevant"].question.to_list()
-irrelevant_questions = questions[questions.question_type == "irrelevant"].question.to_list()
-trick_questions = questions[questions.question_type == "trick"].question.to_list()
+# sample questions
+example_questions = [
+    "Are there any AI policies related to AI adoption in the public sector in the UK?",
+    "How is Canada evaluating the success of its AI strategy?",
+    "Has the EU proposed specific legislation on AI?",
+]
 
 enable_terms_and_conditions = True
+
+app_name = "LLaWma 🦙"
+
+
+def hide_about_panel(accept_checkbox):
+    # Stay open while not accepted
+    open = not bool(accept_checkbox)
+    return {about_panel: gr.update(open=open)}
+
+
+def setup_feedback_form():
+    # Feedback
+    feedback_elems = {}
+    with gr.Box():
+        with gr.Row():
+            with gr.Box():
+                with gr.Column():
+                    gr.Markdown(
+                        f""" ## Thank You For Being Here!
+
+Thank you for being here and providing feedback on the model's outputs! Your feedback will help us make the tool as useful as possible for the community!
+
+Since this tool is still in its early stages of development, please only engage with it as a demo and not for use in a proper research context.
+
+We look forward to sharing with you an updated version of the product once we feel it's ready!
+"""
+                    )
+                    with gr.Row():
+                        overall_experience = gr.Radio(
+                            choices=["👍", "👎"], label="(*) Did you find what you were looking for?"
+                        )
+
+                    show_additional_feedback = gr.Group(visible=False)
+                    with show_additional_feedback:
+                        with gr.Column():
+                            clear_answer = gr.Radio(
+                                choices=["👍", "👎"], label="Was the generated answer clear and understandable?"
+                            )
+                            accurate_answer = gr.Radio(choices=["👍", "👎"], label="Was the generated answer accurate?")
+                            safe_answer = gr.Radio(choices=["👍", "👎"], label="Was the generated answer safe?")
+                            relevant_sources = gr.Radio(
+                                choices=["👍", "👎"], label="Were the retrieved sources generally relevant to your query?"
+                            )
+                            relevant_sources_selection = gr.CheckboxGroup(
+                                choices=[f"Source {i+1}" for i in range(max_sources)],
+                                label="Check all relevant sources",
+                            )
+                            relevant_sources_order = gr.Radio(
+                                choices=["👍", "👎"],
+                                label="Were the sources ranked appropriately, in order of relevance?",
+                            )
+
+                            extra_info = gr.Textbox(
+                                label="Enter any additional information",
+                                lines=3,
+                                placeholder="Enter more helpful information for us here...",
+                            )
+
+                    submit_feedback_btn = gr.Button("Submit Feedback!", variant="primary", interactive=False)
+                    with gr.Column(visible=False) as submitted_message:
+                        gr.Markdown("Feedback recorded, thank you! 📝")
+
+    # fmt: off
+    overall_experience.input(
+        toggle_visibility,
+        inputs=gr.State("True"),
+        outputs=show_additional_feedback
+    ).then(
+        toggle_interactivity,
+        inputs=gr.State(True),
+        outputs=submit_feedback_btn,
+    )
+    # fmt: on
+
+    # fmt: off
+    submit_feedback_btn.click(
+        toggle_visibility,
+        inputs=gr.State(False),
+        outputs=submitted_message,
+    ).then(
+        submit_feedback,
+        inputs=[
+            overall_experience, clear_answer, accurate_answer, safe_answer, relevant_sources, relevant_sources_order, relevant_sources_selection, extra_info, last_completion,
+        ],
+    ).success(
+        toggle_visibility,
+        inputs=gr.State(True),
+        outputs=submitted_message,
+    ).success(
+        toggle_interactivity,
+        inputs=gr.State(False),
+        outputs=submit_feedback_btn,
+    )
+
+    # fmt: on
+    feedback_elems = {
+        "overall_experience": overall_experience,
+        "clear_answer": clear_answer,
+        "accurate_answer": accurate_answer,
+        "safe_answer": safe_answer,
+        "relevant_sources": relevant_sources,
+        "relevant_sources_selection": relevant_sources_selection,
+        "relevant_sources_order": relevant_sources_order,
+        "submit_feedback_btn": submit_feedback_btn,
+        "submitted_message": submitted_message,
+        "show_additional_feedback": show_additional_feedback,
+        "extra_info": extra_info,
+    }
+
+    return feedback_elems
 
 
 def to_md_link(title: str, link: str) -> str:
@@ -70,11 +180,6 @@ def get_metadata_markdown(df) -> str:
     return markdown_text
 
 
-def append_completion(completion, user_completions):
-    user_completions.append(completion)
-    return user_completions
-
-
 def add_user_question(user_question: str, chat_history: Optional[ChatHistory] = None) -> ChatHistory:
     """Adds a user's question to the chat history.
 
@@ -103,13 +208,22 @@ def chat(chat_history: ChatHistory):
 
 
 def log_completion(
-    completion: Completion,
+    completion: Union[Completion, list[Completion]],
     request: gr.Request,
 ):
+    # TODO: add UID for each page visitor instead of username
+
+    # Get the proper mongo collection to save logs to
     collection = cfg.mongo_interaction_collection
 
+    # make sure it's always a list
+    if isinstance(completion, Completion):
+        user_completions = [completion]
+    else:
+        user_completions = completion
+
     interaction = Interaction(
-        user_completions=[completion],
+        user_completions=user_completions,
         time=get_utc_time(),
         username=request.username,
     )
@@ -117,17 +231,34 @@ def log_completion(
 
 
 def submit_feedback(
-    user_completions,
-    feedback_relevant_sources,
-    feedback_relevant_answer,
-    feedback_info,
+    overall_experience: str,
+    clear_answer: str,
+    accuracte_answer: str,
+    safe_answer: str,
+    relevant_sources: str,
+    relevant_sources_order: list[str],
+    relevant_sources_selection: str,
+    extra_info: str,
+    completion: Union[Completion, list[Completion]],
     request: gr.Request,
 ):
     feedback_form = FeedbackForm(
-        extra_info=feedback_info,
-        relevant_answer=feedback_relevant_answer,
-        relevant_sources=feedback_relevant_sources,
+        overall_experience=overall_experience,
+        clear_answer=clear_answer,
+        accurate_answer=accuracte_answer,
+        safe_answer=safe_answer,
+        relevant_sources=relevant_sources,
+        relevant_sources_order=relevant_sources_order,
+        relevant_sources_selection=relevant_sources_selection,
+        extra_info=extra_info,
     )
+
+    # make sure it's always a list
+    if isinstance(completion, Completion):
+        user_completions = [completion]
+    else:
+        user_completions = completion
+
     feedback = Interaction(
         user_completions=user_completions,
         form=feedback_form,
@@ -137,9 +268,14 @@ def submit_feedback(
     feedback.send(mongo_db, collection=cfg.mongo_feedback_collection)
 
 
-def toggle_feedback_visible(visible: bool):
-    """Toggles the visibility of the 'feedback submitted' message."""
-    return {feedback_submitted_message: gr.update(visible=visible)}
+def toggle_visibility(visible: bool):
+    """Toggles the visibility of the gradio element."""
+    return gr.update(visible=visible)
+
+
+def toggle_interactivity(interactive: bool):
+    """Toggles the visibility of the gradio element."""
+    return gr.update(interactive=interactive)
 
 
 def clear_sources():
@@ -150,10 +286,14 @@ def clear_sources():
 def clear_feedback_form():
     """Clears the contents of the feedback form."""
     return {
-        feedback_submitted_message: gr.update(visible=False),
-        feedback_relevant_sources: gr.update(value=None),
-        feedback_relevant_answer: gr.update(value=None),
-        feedback_info: gr.update(value=""),
+        feedback_elems["overall_experience"]: gr.update(value=None),
+        feedback_elems["clear_answer"]: gr.update(value=None),
+        feedback_elems["accurate_answer"]: gr.update(value=None),
+        feedback_elems["safe_answer"]: gr.update(value=None),
+        feedback_elems["relevant_sources"]: gr.update(value=None),
+        feedback_elems["relevant_sources_selection"]: gr.update(value=None),
+        feedback_elems["relevant_sources_order"]: gr.update(value=None),
+        feedback_elems["extra_info"]: gr.update(value=None),
     }
 
 
@@ -165,201 +305,143 @@ def reveal_app(checkbox: bool):
         return gr.Group.update(visible=False), gr.Group.update(visible=True)
 
 
+def display_sources():
+    with gr.Column(variant="panel"):
+        gr.Markdown(
+            """## Relevant Documents
+        All retrieved documents will be listed here in order of importance. If no answer was found, documents will not be displayed.
+        """
+        )
+        sources_textboxes = []
+        for i in range(max_sources):
+            with gr.Tab(f"Source {i + 1} 📝"):
+                t = gr.Markdown()
+            sources_textboxes.append(t)
+    return sources_textboxes
+
+
 buster_app = gr.Blocks()
 
 
-terms_and_conditions = """App Terms and Conditions
+def setup_about_panel():
+    with gr.Accordion(label=f"About {app_name}", open=True) as about_panel:
+        with gr.Row(variant="panel"):
+            with gr.Box():
+                gr.Markdown(
+                    f"""
 
-(NOTE: These are autogenerated by ChatGPT and is intended as a placeholder, DO NOT PUBLISH THESE)
-Welcome to our question answering bot app ("the App"). Your use of the App is subject to the following terms:
+                ## Welcome
+                Artificial intelligence is a field that's developing fast! In response, policy makers from around the world are creating guidelines, rules and regulations to keep up.
 
-1. Usage Agreement
+                Finding accurate and up-to-date information about regulatory changes can be difficult but crucial to share best practices, ensure interoperability and promote adherence to local laws and regulations. That's why we've created {app_name}.
 
-By using the App, you agree to these terms and any future changes.
+                {app_name} is a Q&A chatbot designed to provide relevant and high quality information about AI policies from around the world. Using this tool, your AI policy questions will be answered, accompanied by relevant analyses by the OECD's AI Observatory!
 
-2. App Purpose
+                ## How it works (and doesn't)
 
-The App provides question answering. It doesn't collect personal info. Interactions are stored for App improvement.
+                {app_name} uses Large Language Models (AI algorithms that work with text) to pinpoint sections of policy documents that are relevant to your question. Rather than presenting you with the specific policy section verbatim, {app_name} has been designed to summarize the information in a digestible format, so that the response you receive more naturally fits with the question you've posed.
+                """
+                )
 
-3. Data Collection
+            with gr.Box():
+                gr.Markdown(
+                    f"""
+                ## Risks
 
-a. The App records and stores interactions without personal info for enhancement.
+                We have done our best to make sure that the AI algorithms are __only__ taking information from what is available in the OECD AI Observatory’s Database; but, of course, Large Language Models (LLMs) are prone to fabrication. This means LLMs can make things up and present this made up information as if it were real, making it seem as if the information was found in a policy document. We therefore advise you to check the sources provided by the model to validate that the answer is in fact true. If you'd like to know exactly which documents the model can reference in its response, please see below.
 
-b. Non-personal data like device type may be collected for optimization.
 
-4. Data Use
+                ## Recommended usage
 
-a. Stored interactions improve App accuracy and functionality.
+                {app_name} can only answer specific types of questions, for example:
 
-b. Aggregated data is analyzed for user trends and better experience.
+                * Questions about policy documents that are currently in the OECD AI Observatory's database
+                * Questions that are posed in English and target English language documents;
+                * Questions for which the answer can be found in the text (i.e. the thinking has already been done by the author) these AI models are not able to write their own research report combining information across policy documents and analyzing them itself).
 
-5. Security
+                If your question is outside the scope of the recommended use, the model has been instructed not to answer.
+                """
+                )
 
-Data security measures are in place to prevent unauthorized access.
+    return about_panel
 
-6. Changes
 
-Terms may change; continued use means acceptance of changes.
+def setup_terms_and_conditions():
+    terms_and_conditions = """App Terms and Conditions
 
-7. Termination
+    (NOTE: These are autogenerated by ChatGPT and is intended as a placeholder, DO NOT PUBLISH THESE)
+    Welcome to our question answering bot app ("the App"). Your use of the App is subject to the following terms:
 
-Access can be terminated for breach of terms.
+    1. Usage Agreement
 
-8. Governing Law
+    By using the App, you agree to these terms and any future changes.
 
-Terms follow the laws of [Your Jurisdiction]. Disputes subject to [Your Jurisdiction]'s courts.
+    2. App Purpose
 
-9. Contact
+    The App provides question answering. It doesn't collect personal info. Interactions are stored for App improvement.
 
-Questions? Reach us at [Contact Email].
+    3. Data Collection
 
-Using the App means you've read, understood, and agreed to these terms. Thanks for using our question answering bot App!
-"""
+    a. The App records and stores interactions without personal info for enhancement.
 
-app_name = "LLaWma 🦙"
+    b. Non-personal data like device type may be collected for optimization.
 
-with buster_app:
-    # TODO: trigger a proper change to update
+    4. Data Use
 
-    # state variables are client-side and are reset every time a client refreshes the page
-    user_completions = gr.State([])
+    a. Stored interactions improve App accuracy and functionality.
 
-    gr.Markdown(f"<h1><center>{app_name}: A Question-Answering Bot for your documentation</center></h1>")
-    with gr.Row(variant="panel"):
-        with gr.Box():
-            gr.Markdown(
-                f"""
+    b. Aggregated data is analyzed for user trends and better experience.
 
-            ## Welcome
-            {app_name} is a question-answering chatbot on AI policies from various sources.
-            Using this platform, you can ask AI-policy questions and {app_name} will look for the most relevant policies at its disposal to formulate an answer.
-            All of its available sources are listed on the bottom of the page.
+    5. Security
 
-            ## How it works
-            This app uses language models to convert documents to their semanatic representations.
-            When a user asks a question, {app_name} compares it against all available documents at its disposal. It then retrieves the documents that are most relevant to your question and prompts ChatGPT with these documents to generate a response.
-            The answer and accompanying sources are then displayed so that you can verify the veracity of the generated responses.
-            """
-            )
+    Data security measures are in place to prevent unauthorized access.
 
-        with gr.Box():
-            gr.Markdown(
-                f"""
-            ## Limitations
+    6. Changes
 
-            {app_name} is intended to ***_only be used as a demo._*** While we have worked hard to make this as useful as possible, it is important to understand that there are no guarantees regarding the accuracy of its responses.
-            Like all language models, {app_name} might generate information that is not entirely reliable and sometimes hallucinate responses. To mitigate this, users are strongly advised to independently verify the information provided by the tool.
-            All sources available to the model are listed below.
+    Terms may change; continued use means acceptance of changes.
 
-            ## Recommended usage
+    7. Termination
 
-            For optimal results, employ {app_name} in scenarios where the answers to questions can be found concisely within the provided documentation.
-            For questions that demand complex reasoning spanning across an entire document, multiple documents or require contextual understanding, the performance of {app_name} might be limited.
+    Access can be terminated for breach of terms.
 
-            When the model fails to find relevant information, it will advise a user that it cannot answer a question.
-            The model is also instructed to ignore questions that are not directly related to AI policies.
-            """
-            )
+    8. Governing Law
+
+    Terms follow the laws of [Your Jurisdiction]. Disputes subject to [Your Jurisdiction]'s courts.
+
+    9. Contact
+
+    Questions? Reach us at [Contact Email].
+
+    Using the App means you've read, understood, and agreed to these terms. Thanks for using our question answering bot App!
+    """
 
     accept_terms_group = gr.Group(visible=enable_terms_and_conditions)
     with accept_terms_group:
         with gr.Column(variant="compact"):
             with gr.Box():
                 gr.Markdown(
-                    f"## Terms and Coniditions \n Welcome to {app_name} Before continuing, you must read and accept the terms and conditions."
+                    f"## Terms and Conditions \n Welcome to {app_name} Before continuing, you must read and accept the terms and conditions."
                 )
-                terms = gr.Textbox(terms_and_conditions, interactive=False, max_lines=10, label="Terms & Conditions")
-                # with gr.Box():
+                gr.Textbox(terms_and_conditions, interactive=False, max_lines=10, label="Terms & Conditions")
                 with gr.Column():
                     accept_checkbox = gr.Checkbox(label="I accept the terms.", interactive=True)
                     accept_terms = gr.Button("Enter", variant="primary")
+    return accept_terms_group, accept_checkbox, accept_terms
 
-    app_group_visible = False if enable_terms_and_conditions else True
-    app_group = gr.Box(visible=app_group_visible)
-    with app_group:
-        with gr.Row():
-            with gr.Column(scale=2, variant="panel"):
-                gr.Markdown("## Chatbot")
-                chatbot = gr.Chatbot()
-                message = gr.Textbox(
-                    label="Chat with 🦙",
-                    placeholder="Ask your question here...",
-                    lines=1,
-                )
-                submit = gr.Button(value="Send", variant="primary")
 
-                with gr.Column(variant="panel"):
-                    gr.Markdown("## Example questions")
-                    gr.Examples(
-                        examples=relevant_questions[0:5],
-                        inputs=message,
-                        label="Questions users could ask.",
-                    )
+def setup_additional_sources():
+    # Display additional sources
+    with gr.Box():
+        gr.Markdown(f"")
 
-            with gr.Row():
-                with gr.Column(variant="panel"):
-                    gr.Markdown(
-                        """## Relevant Documents
-                    All retrieved documents will be listed here in order of importance. If no answer was found, documents will not be displayed.
-                    """
-                    )
-                    sources_textboxes = []
-                    for i in range(max_sources):
-                        with gr.Tab(f"Source {i + 1} 📝"):
-                            t = gr.Markdown()
-                        sources_textboxes.append(t)
-
-                with gr.Column():
-                    gr.Markdown("## Parameters")
-                    metadata = [
-                        ("generation model", cfg.buster_cfg.completion_cfg["completion_kwargs"]["model"]),
-                        ("embedding model", cfg.buster_cfg.retriever_cfg["embedding_model"]),
-                    ]
-                    gr.HighlightedText(value=metadata, label="Parameters")
-
-        # Feedback
-        with gr.Box():
-            with gr.Row():
-                with gr.Box():
-                    with gr.Column():
-                        gr.Markdown("## Feedback Form")
-                        with gr.Row():
-                            feedback_relevant_sources = gr.Radio(
-                                choices=["👍", "👎"], label="Were any of the retrieved sources relevant?"
-                            )
-                        with gr.Row():
-                            feedback_relevant_answer = gr.Radio(
-                                choices=["👍", "👎"], label="Was the generated answer useful?"
-                            )
-
-                        feedback_info = gr.Textbox(
-                            label="Enter additional information (optional)",
-                            lines=3,
-                            placeholder="Enter more helpful information for us here...",
-                        )
-
-                        submit_feedback_btn = gr.Button("Submit Feedback!")
-                        with gr.Column(visible=False) as feedback_submitted_message:
-                            gr.Markdown("Feedback recorded, thank you! 📝")
-                with gr.Box():
-                    with gr.Column():
-                        gr.Markdown(
-                            f"""## Help Us Improve with Your Feedback! 👍👎
-    By filling out the feedback form, you're helping us understand what's working well and where we can make improvements on {app_name}.
-
-    Every thumbs up or thumbs down helps us determine how to improve {app_name}. Thank you for contributing to the evaluation of our app.
-
-    """
-                        )
-
-        # Display sources
-        with gr.Box():
+        gr.Markdown(
+            f"""## 📚 Sources
+        {app_name} has access to dozens of AI policy documents from various sources.
+        Below we list all of the sources that {app_name} has access to.
+        """
+        )
+        with gr.Accordion(open=False, label="Click to list all available sources 📚"):
             with gr.Column():
-                gr.Markdown(
-                    f"""## 📚 Sources
-                Here we list all of the sources that {app_name} has access to.
-                """
-                )
                 # TODO: Pick how to display the sources, 2 options for now
                 # Display the sources using a dataframe (rendering options limited)...
                 # gr.DataFrame(documents_metadata, headers=list(documents_metadata.columns), interactive=False)
@@ -367,34 +449,59 @@ with buster_app:
                 # ... Or display the sources using markdown.
                 gr.Markdown(get_metadata_markdown(documents_metadata))
 
-        gr.HTML("<center> Powered by <a href='https://github.com/jerpint/buster'>Buster</a> 🤖</center>")
 
-        # store the users' last completion here
-        completion = gr.State()
+with buster_app:
+    # state variables are client-side and are reset every time a client refreshes the page
+    # store the users' last completion here
+    last_completion = gr.State()
 
-        # fmt: off
-        submit_feedback_btn.click(
-            toggle_feedback_visible,
-            inputs=gr.State(False),
-            outputs=feedback_submitted_message,
-        ).then(
-            submit_feedback,
-            inputs=[
-                user_completions,
-                feedback_relevant_sources,
-                feedback_relevant_answer,
-                feedback_info,
-            ],
-        ).success(
-            toggle_feedback_visible,
-            inputs=gr.State(True),
-            outputs=feedback_submitted_message,
-        )
-        # If you rage click the subimt feedback button, it re-appears so you are confident it was recorded properly.
-        # fmt: on
+    gr.Markdown(f"<h1><center>{app_name}: A Question-Answering Bot for your documentation</center></h1>")
 
-    # Reval app if terms are accepted
-    accept_terms.click(reveal_app, inputs=accept_checkbox, outputs=[app_group, accept_terms_group])
+    about_panel = setup_about_panel()
+
+    accept_terms_group, accept_checkbox, accept_terms = setup_terms_and_conditions()
+
+    app_group_visible = False if enable_terms_and_conditions else True
+    app_group = gr.Box(visible=app_group_visible)
+    with app_group:
+        with gr.Row():
+            with gr.Column(scale=2, variant="panel"):
+                gr.Markdown("## Chatbot")
+                chatbot = gr.Chatbot(label=f"{app_name}")
+                message = gr.Textbox(
+                    label=f"Chat with {app_name}",
+                    placeholder="Ask your question here...",
+                    lines=1,
+                )
+                submit = gr.Button(value="Send", variant="primary")
+                sources_textboxes = display_sources()
+
+            with gr.Column():
+                gr.Markdown("## Example questions")
+                gr.Examples(
+                    examples=example_questions,
+                    inputs=message,
+                    label="Questions users could ask.",
+                )
+
+                feedback_elems = setup_feedback_form()
+
+        setup_additional_sources()
+
+    gr.HTML("<center> Powered by <a href='https://github.com/jerpint/buster'>Buster</a> 🤖</center>")
+
+    # fmt: off
+    # Reval app if terms are accepted, once accepted
+    accept_terms.click(
+        reveal_app,
+        inputs=accept_checkbox,
+        outputs=[app_group, accept_terms_group]
+    ).then(
+        hide_about_panel,
+        inputs=accept_checkbox,
+        outputs=about_panel,
+    )
+    # fmt: on
 
     # fmt: off
     submit.click(
@@ -403,22 +510,36 @@ with buster_app:
         clear_sources,
         outputs=[*sources_textboxes]
     ).then(
-        clear_feedback_form,
-        outputs=[feedback_submitted_message, feedback_relevant_sources, feedback_relevant_answer, feedback_info]
+        toggle_visibility,
+        inputs=gr.State(False),
+        outputs=feedback_elems["submitted_message"],
+    ).then(
+        toggle_visibility,
+        inputs=gr.State(False),
+        outputs=feedback_elems["show_additional_feedback"],
+    ).then(
+      clear_feedback_form,
+        outputs=[
+            feedback_elems["overall_experience"],
+            feedback_elems["clear_answer"],
+            feedback_elems["accurate_answer"],
+            feedback_elems["safe_answer"],
+            feedback_elems["relevant_sources"],
+            feedback_elems["relevant_sources_selection"],
+            feedback_elems["relevant_sources_order"],
+            feedback_elems["extra_info"],
+        ]
     ).then(
         chat,
         inputs=[chatbot],
-        outputs=[chatbot, completion],
+        outputs=[chatbot, last_completion],
     ).then(
         add_sources,
-        inputs=[completion, gr.State(max_sources)],
+        inputs=[last_completion, gr.State(max_sources)],
         outputs=[*sources_textboxes]
     ).then(
         log_completion,
-        inputs=completion,
-    ).then(
-        append_completion,
-        inputs=[completion, user_completions], outputs=[user_completions]
+        inputs=last_completion,
     )
 
     message.submit(
@@ -427,22 +548,36 @@ with buster_app:
         clear_sources,
         outputs=[*sources_textboxes]
     ).then(
-        clear_feedback_form,
-        outputs=[feedback_submitted_message, feedback_relevant_sources, feedback_relevant_answer, feedback_info]
+        toggle_visibility,
+        inputs=gr.State(False),
+        outputs=feedback_elems["submitted_message"],
+    ).then(
+        toggle_visibility,
+        inputs=gr.State(False),
+        outputs=feedback_elems["show_additional_feedback"],
+    ).then(
+      clear_feedback_form,
+        outputs=[
+            feedback_elems["overall_experience"],
+            feedback_elems["clear_answer"],
+            feedback_elems["accurate_answer"],
+            feedback_elems["safe_answer"],
+            feedback_elems["relevant_sources"],
+            feedback_elems["relevant_sources_selection"],
+            feedback_elems["relevant_sources_order"],
+            feedback_elems["extra_info"],
+        ]
     ).then(
         chat,
         inputs=[chatbot],
-        outputs=[chatbot, completion],
+        outputs=[chatbot, last_completion],
     ).then(
         add_sources,
-        inputs=[completion, gr.State(max_sources)],
+        inputs=[last_completion, gr.State(max_sources)],
         outputs=[*sources_textboxes]
     ).then(
         log_completion,
-        inputs=completion,
-    ).then(
-        append_completion,
-        inputs=[completion, user_completions], outputs=[user_completions]
+        inputs=last_completion,
     )
     # fmt: on
 
