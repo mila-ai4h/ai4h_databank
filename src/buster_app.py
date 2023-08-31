@@ -30,12 +30,12 @@ current_dir = Path(__file__).resolve().parent
 documents_metadata_file = str(current_dir / "documents_metadata.csv")
 documents_metadata = pd.read_csv(documents_metadata_file)
 
-# Load the sample questions and split them by type
-questions_file = str(current_dir / "sample_questions.csv")
-questions = pd.read_csv(questions_file)
-relevant_questions = questions[questions.question_type == "relevant"].question.to_list()
-irrelevant_questions = questions[questions.question_type == "irrelevant"].question.to_list()
-trick_questions = questions[questions.question_type == "trick"].question.to_list()
+# sample questions
+example_questions = [
+    "Are there any AI policies related to AI adoption in the public sector in the UK?",
+    "How is Canada evaluating the success of its AI strategy?",
+    "Has the EU proposed specific legislation on AI?",
+]
 
 enable_terms_and_conditions = True
 
@@ -287,7 +287,7 @@ def display_sources():
 buster_app = gr.Blocks()
 
 
-def init_about_panel():
+def setup_about_panel():
     with gr.Accordion(label="About Panel", open=True) as about_panel:
         with gr.Row(variant="panel"):
             with gr.Box():
@@ -399,7 +399,7 @@ with buster_app:
 
     gr.Markdown(f"<h1><center>{app_name}: A Question-Answering Bot for your documentation</center></h1>")
 
-    about_panel = init_about_panel()
+    about_panel = setup_about_panel()
 
     accept_terms_group, accept_checkbox, accept_terms = setup_terms_and_conditions()
 
@@ -421,7 +421,7 @@ with buster_app:
             with gr.Column():
                 gr.Markdown("## Example questions")
                 gr.Examples(
-                    examples=relevant_questions[0:5],
+                    examples=example_questions,
                     inputs=message,
                     label="Questions users could ask.",
                 )
@@ -430,18 +430,22 @@ with buster_app:
 
         # Display additional sources
         with gr.Box():
-            with gr.Column():
-                gr.Markdown(
-                    f"""## 📚 Sources
-                Here we list all of the sources that {app_name} has access to.
-                """
-                )
-                # TODO: Pick how to display the sources, 2 options for now
-                # Display the sources using a dataframe (rendering options limited)...
-                # gr.DataFrame(documents_metadata, headers=list(documents_metadata.columns), interactive=False)
+            gr.Markdown(f"")
 
-                # ... Or display the sources using markdown.
-                gr.Markdown(get_metadata_markdown(documents_metadata))
+            gr.Markdown(
+                f"""## 📚 Sources
+            {app_name} has access to dozens of AI policy documents from various sources.
+            Below we list all of the sources that {app_name} has access to.
+            """
+            )
+            with gr.Accordion(open=False, label="Click to list all available sources 📚"):
+                with gr.Column():
+                    # TODO: Pick how to display the sources, 2 options for now
+                    # Display the sources using a dataframe (rendering options limited)...
+                    # gr.DataFrame(documents_metadata, headers=list(documents_metadata.columns), interactive=False)
+
+                    # ... Or display the sources using markdown.
+                    gr.Markdown(get_metadata_markdown(documents_metadata))
 
         gr.HTML("<center> Powered by <a href='https://github.com/jerpint/buster'>Buster</a> 🤖</center>")
 
