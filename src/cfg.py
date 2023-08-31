@@ -49,8 +49,8 @@ mongo_cluster = os.getenv("AI4H_MONGODB_CLUSTER")
 mongo_uri = make_uri(mongo_username, mongo_password, mongo_cluster)
 mongo_db_data = os.getenv("AI4H_MONGODB_DB_DATA")
 
-mongo_db_feedback = os.getenv("AI4H_MONGODB_DB_FEEDBACK")
-mongo_db = init_db(mongo_username, mongo_password, mongo_cluster, mongo_db_feedback)
+mongo_db_logging = os.getenv("AI4H_MONGODB_DB_LOGGING")
+mongo_db = init_db(mongo_username, mongo_password, mongo_cluster, mongo_db_logging)
 
 mongo_feedback_collection = os.getenv("AI4H_MONGODB_FEEDBACK_COLLECTION")
 mongo_arena_collection = os.getenv("AI4H_MONGODB_ARENA_COLLECTION")
