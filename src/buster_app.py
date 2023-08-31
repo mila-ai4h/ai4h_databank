@@ -412,6 +412,28 @@ def setup_terms_and_conditions():
     return accept_terms_group, accept_checkbox, accept_terms
 
 
+def setup_additional_sources():
+    # Display additional sources
+    with gr.Box():
+        gr.Markdown(f"")
+
+        gr.Markdown(
+            f"""## 📚 Sources
+        {app_name} has access to dozens of AI policy documents from various sources.
+        Below we list all of the sources that {app_name} has access to.
+        """
+        )
+        with gr.Accordion(open=False, label="Click to list all available sources 📚"):
+            with gr.Column():
+                # TODO: Pick how to display the sources, 2 options for now
+                # Display the sources using a dataframe (rendering options limited)...
+                # gr.DataFrame(documents_metadata, headers=list(documents_metadata.columns), interactive=False)
+
+                # ... Or display the sources using markdown.
+                gr.Markdown(get_metadata_markdown(documents_metadata))
+
+
+
 with buster_app:
     # state variables are client-side and are reset every time a client refreshes the page
     # store the users' last completion here
@@ -448,26 +470,9 @@ with buster_app:
 
                 feedback_elems = setup_feedback_form()
 
-        # Display additional sources
-        with gr.Box():
-            gr.Markdown(f"")
+        setup_additional_sources()
 
-            gr.Markdown(
-                f"""## 📚 Sources
-            {app_name} has access to dozens of AI policy documents from various sources.
-            Below we list all of the sources that {app_name} has access to.
-            """
-            )
-            with gr.Accordion(open=False, label="Click to list all available sources 📚"):
-                with gr.Column():
-                    # TODO: Pick how to display the sources, 2 options for now
-                    # Display the sources using a dataframe (rendering options limited)...
-                    # gr.DataFrame(documents_metadata, headers=list(documents_metadata.columns), interactive=False)
-
-                    # ... Or display the sources using markdown.
-                    gr.Markdown(get_metadata_markdown(documents_metadata))
-
-        gr.HTML("<center> Powered by <a href='https://github.com/jerpint/buster'>Buster</a> 🤖</center>")
+    gr.HTML("<center> Powered by <a href='https://github.com/jerpint/buster'>Buster</a> 🤖</center>")
 
     # fmt: off
     # Reval app if terms are accepted, once accepted
