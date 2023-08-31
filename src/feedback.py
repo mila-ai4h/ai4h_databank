@@ -28,8 +28,20 @@ class StandardForm:
 class FeedbackForm(StandardForm):
     """Form on the original Buster app."""
 
-    relevant_answer: str
+    # Overall experience
+    overall_experience: str
+
+    # Answer Quality
+    clear_answer: str
+    accurate_answer: str
+    safe_answer: str
+
+    # Source Relevance
     relevant_sources: str
+    relevant_sources_order: str
+    relevant_sources_selection: list
+
+    # Additional Feedback
     extra_info: str
 
 

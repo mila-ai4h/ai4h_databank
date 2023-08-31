@@ -14,7 +14,7 @@ app = FastAPI()
 def add_auth(gradio_app):
     gradio_app.auth = check_auth
     gradio_app.auth_message = ""
-    gradio_app.queue()
+    gradio_app.queue(concurrency_count=16)
     return gradio_app
 
 
