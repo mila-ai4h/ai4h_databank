@@ -420,7 +420,7 @@ def setup_terms_and_conditions():
         with gr.Column(variant="compact"):
             with gr.Box():
                 gr.Markdown(
-                    f"## Terms and Coniditions \n Welcome to {app_name} Before continuing, you must read and accept the terms and conditions."
+                    f"## Terms and Conditions \n Welcome to {app_name} Before continuing, you must read and accept the terms and conditions."
                 )
                 gr.Textbox(terms_and_conditions, interactive=False, max_lines=10, label="Terms & Conditions")
                 with gr.Column():
