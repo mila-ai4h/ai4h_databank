@@ -38,6 +38,7 @@ class FeedbackForm(StandardForm):
 
     # Source Relevance
     relevant_sources: str
+    relevant_sources_order: str
     relevant_sources_selection: list
 
     # Additional Feedback

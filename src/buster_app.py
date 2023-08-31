@@ -2,7 +2,7 @@ import copy
 import logging
 import os
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 import gradio as gr
 import pandas as pd
@@ -81,6 +81,9 @@ We look forward to sharing with you an updated version of the product once we fe
                             relevant_sources = gr.Radio(
                                 choices=["👍", "👎"], label="Were the retrieved sources generally relevant to your query?"
                             )
+                            relevant_sources_order = gr.Radio(
+                                choices=["👍", "👎"], label="Were the sources ranked appropriately, in order of relevance?"
+                            )
                             relevant_sources_selection = gr.CheckboxGroup(
                                 choices=[f"Source {i+1}" for i in range(max_sources)],
                                 label="Check all relevant sources",
@@ -106,7 +109,7 @@ We look forward to sharing with you an updated version of the product once we fe
     ).then(
         submit_feedback,
         inputs=[
-            overall_experience, clear_answer, accurate_answer, safe_answer, relevant_sources, relevant_sources_selection, extra_info, user_completions
+            overall_experience, clear_answer, accurate_answer, safe_answer, relevant_sources, relevant_sources_order, relevant_sources_selection, extra_info, last_completion,
         ],
     ).success(
         toggle_visibility,
@@ -166,11 +169,6 @@ def get_metadata_markdown(df) -> str:
     return markdown_text
 
 
-def append_completion(completion, user_completions):
-    user_completions.append(completion)
-    return user_completions
-
-
 def add_user_question(user_question: str, chat_history: Optional[ChatHistory] = None) -> ChatHistory:
     """Adds a user's question to the chat history.
 
@@ -199,13 +197,20 @@ def chat(chat_history: ChatHistory):
 
 
 def log_completion(
-    completion: Completion,
+    completion: Union[Completion, list[Completion]],
     request: gr.Request,
 ):
+
+    # TODO: add UID for each page visitor instead of username
+
+    # Get the proper mongo collection to save logs to
     collection = cfg.mongo_interaction_collection
 
+    if isinstance(completion, Completion):
+        user_completions = [completion]
+
     interaction = Interaction(
-        user_completions=[completion],
+        user_completions=user_completions,
         time=get_utc_time(),
         username=request.username,
     )
@@ -213,14 +218,15 @@ def log_completion(
 
 
 def submit_feedback(
-    overall_experience,
-    clear_answer,
-    accuracte_answer,
-    safe_answer,
-    relevant_sources,
-    relevant_sources_selection,
-    extra_info,
-    user_completions,
+    overall_experience: str,
+    clear_answer: str,
+    accuracte_answer: str,
+    safe_answer: str,
+    relevant_sources: str,
+    relevant_sources_order: list[str],
+    relevant_sources_selection: str,
+    extra_info: str,
+    completion: Union[Completion, list[Completion]],
     request: gr.Request,
 ):
     feedback_form = FeedbackForm(
@@ -229,9 +235,14 @@ def submit_feedback(
         accurate_answer=accuracte_answer,
         safe_answer=safe_answer,
         relevant_sources=relevant_sources,
+        relevant_sources_order=relevant_sources_order,
         relevant_sources_selection=relevant_sources_selection,
         extra_info=extra_info,
     )
+
+    if isinstance(completion, Completion):
+        user_completions = [completion]
+
     feedback = Interaction(
         user_completions=user_completions,
         form=feedback_form,
@@ -299,8 +310,7 @@ def setup_about_panel():
     with gr.Accordion(label=f"About {app_name}", open=True) as about_panel:
         with gr.Row(variant="panel"):
             with gr.Box():
-                gr.Markdown(
-                    f"""
+                gr.Markdown(f"""
 
                 ## Welcome
                 Artificial intelligence is a field that's developing fast! In response, policy makers from around the world are creating guidelines, rules and regulations to keep up.
@@ -316,8 +326,7 @@ def setup_about_panel():
                 )
 
             with gr.Box():
-                gr.Markdown(
-                    f"""
+                gr.Markdown(f"""
                 ## Risks
 
                 We have done our best to make sure that the AI algorithms are __only__ taking information from what is available in the OECD AI Observatory’s Database; but, of course, Large Language Models (LLMs) are prone to fabrication. This means LLMs can make things up and present this made up information as if it were real, making it seem as if the information was found in a policy document. We therefore advise you to check the sources provided by the model to validate that the answer is in fact true. If you'd like to know exactly which documents the model can reference in its response, please see below.
@@ -404,8 +413,10 @@ def setup_terms_and_conditions():
 with buster_app:
     # TODO: trigger a proper change to update
 
-    # state variables are client-side and are reset every time a client refreshes the page
-    user_completions = gr.State([])
+    # # state variables are client-side and are reset every time a client refreshes the page
+    # user_completions = gr.State([])
+    # store the users' last completion here
+    last_completion = gr.State()
 
     gr.Markdown(f"<h1><center>{app_name}: A Question-Answering Bot for your documentation</center></h1>")
 
@@ -459,8 +470,6 @@ with buster_app:
 
         gr.HTML("<center> Powered by <a href='https://github.com/jerpint/buster'>Buster</a> 🤖</center>")
 
-        # store the users' last completion here
-        completion = gr.State()
 
     # fmt: off
     # Reval app if terms are accepted, once accepted
@@ -499,20 +508,15 @@ with buster_app:
     ).then(
         chat,
         inputs=[chatbot],
-        outputs=[chatbot, completion],
+        outputs=[chatbot, last_completion],
     ).then(
         add_sources,
-        inputs=[completion, gr.State(max_sources)],
+        inputs=[last_completion, gr.State(max_sources)],
         outputs=[*sources_textboxes]
     ).then(
         log_completion,
-        inputs=completion,
-    ).then(
-        append_completion,
-        inputs=[completion, user_completions], outputs=[user_completions]
+        inputs=last_completion,
     )
-    # TODO: i dont think we want to track all user_completions anymore, make sure this doesnt happen
-    # TODO: add UID for each page visit
 
     message.submit(
         add_user_question, [message], [chatbot]
@@ -533,17 +537,14 @@ with buster_app:
     ).then(
         chat,
         inputs=[chatbot],
-        outputs=[chatbot, completion],
+        outputs=[chatbot, last_completion],
     ).then(
         add_sources,
-        inputs=[completion, gr.State(max_sources)],
+        inputs=[last_completion, gr.State(max_sources)],
         outputs=[*sources_textboxes]
     ).then(
         log_completion,
-        inputs=completion,
-    ).then(
-        append_completion,
-        inputs=[completion, user_completions], outputs=[user_completions]
+        inputs=last_completion,
     )
     # fmt: on
 
