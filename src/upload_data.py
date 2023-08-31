@@ -13,22 +13,22 @@ def upload_data(
     pinecone_index: str,
     pinecone_namespace: str,
     mongo_uri: str,
-    mongo_db_name: str,
+    mongo_db_data: str,
     dataframe: pd.DataFrame,
 ):
     manager = DocumentsService(
-        pinecone_api_key, pinecone_env, pinecone_index, pinecone_namespace, mongo_uri, mongo_db_name
+        pinecone_api_key, pinecone_env, pinecone_index, pinecone_namespace, mongo_uri, mongo_db_data
     )
     manager.batch_add(dataframe)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Upload a CSV file containing chunks of data into the specified Pinecone namespace and Mongo database."
+        description="Upload a CSV file containing chunks of data into the specified Pinecone namespace and Mongo database.\nUsage: python upload_data.py <pinecone_namespace> <mongo_db_name> <filepath>"
     )
 
     parser.add_argument("pinecone_namespace", type=str, help="Pinecone namespace to use.")
-    parser.add_argument("mongo_db_name", type=str, help="Name of the mongo database to use.")
+    parser.add_argument("mongo_db_data", type=str, help="Name of the mongo database to store the data.")
     parser.add_argument(
         "filepath", type=str, help="Path to the csv containing the chunks. Will be loaded as a pandas dataframe."
     )
@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     # These are the new names
     pinecone_namespace = args.pinecone_namespace
-    mongo_db_name = args.mongo_db_name
+    mongo_db_data = args.mongo_db_data
 
     # Set pinecone creds
     pinecone_api_key = os.getenv("AI4H_PINECONE_API_KEY")
@@ -53,4 +53,4 @@ if __name__ == "__main__":
     # Read data
     df = pd.read_csv(args.filepath, delimiter="\t")
 
-    upload_data(pinecone_api_key, pinecone_env, pinecone_index, pinecone_namespace, mongo_uri, mongo_db_name, df)
+    upload_data(pinecone_api_key, pinecone_env, pinecone_index, pinecone_namespace, mongo_uri, mongo_db_data, df)
