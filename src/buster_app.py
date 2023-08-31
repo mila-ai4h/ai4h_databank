@@ -56,11 +56,13 @@ def setup_feedback_form():
             with gr.Box():
                 with gr.Column():
                     gr.Markdown(
-                        f"""## Help Us Improve with Your Feedback! 👍👎
-By filling out the feedback form, you're helping us understand what's working well and where we can make improvements on {app_name}.
+                        f""" ## Thank You For Being Here!
 
-Every thumbs up or thumbs down helps us determine how to improve {app_name}. Thank you for contributing to the evaluation of our app.
+Thank you for being here and providing feedback on the model's outputs! Your feedback will help us make the tool as useful as possible for the community!
 
+Since this tool is still in its early stages of development, please only engage with it as a demo and not for use in a proper research context.
+
+We look forward to sharing with you an updated version of the product once we feel it's ready!
 """
                     )
                     with gr.Row():
@@ -301,33 +303,35 @@ def setup_about_panel():
                     f"""
 
                 ## Welcome
-                {app_name} is a question-answering chatbot on AI policies from various sources.
-                Using this platform, you can ask AI-policy questions and {app_name} will look for the most relevant policies at its disposal to formulate an answer.
-                All of its available sources are listed on the bottom of the page.
+                Artificial intelligence is a field that's developing fast! In response, policy makers from around the world are creating guidelines, rules and regulations to keep up.
 
-                ## How it works
-                This app uses language models to convert documents to their semanatic representations.
-                When a user asks a question, {app_name} compares it against all available documents at its disposal. It then retrieves the documents that are most relevant to your question and prompts ChatGPT with these documents to generate a response.
-                The answer and accompanying sources are then displayed so that you can verify the veracity of the generated responses.
+                Finding accurate and up-to-date information about regulatory changes can be difficult but crucial to share best practices, ensure interoperability and promote adherence to local laws and regulations. That's why we've created {app_name}.
+
+                {app_name} is a Q&A chatbot designed to provide relevant and high quality information about AI policies from around the world. Using this tool, your AI policy questions will be answered, accompanied by relevant analyses by the OECD's AI Observatory!
+
+                ## How it works (and doesn't)
+
+                {app_name} uses Large Language Models (AI algorithms that work with text) to pinpoint sections of policy documents that are relevant to your question. Rather than presenting you with the specific policy section verbatim, {app_name} has been designed to summarize the information in a digestible format, so that the response you receive more naturally fits with the question you've posed.
                 """
                 )
 
             with gr.Box():
                 gr.Markdown(
                     f"""
-                ## Limitations
+                ## Risks
 
-                {app_name} is intended to ***_only be used as a demo._*** While we have worked hard to make this as useful as possible, it is important to understand that there are no guarantees regarding the accuracy of its responses.
-                Like all language models, {app_name} might generate information that is not entirely reliable and sometimes hallucinate responses. To mitigate this, users are strongly advised to independently verify the information provided by the tool.
-                All sources available to the model are listed below.
+                We have done our best to make sure that the AI algorithms are __only__ taking information from what is available in the OECD AI Observatory’s Database; but, of course, Large Language Models (LLMs) are prone to fabrication. This means LLMs can make things up and present this made up information as if it were real, making it seem as if the information was found in a policy document. We therefore advise you to check the sources provided by the model to validate that the answer is in fact true. If you'd like to know exactly which documents the model can reference in its response, please see below.
+
 
                 ## Recommended usage
 
-                For optimal results, employ {app_name} in scenarios where the answers to questions can be found concisely within the provided documentation.
-                For questions that demand complex reasoning spanning across an entire document, multiple documents or require contextual understanding, the performance of {app_name} might be limited.
+                {app_name} can only answer specific types of questions, for example:
 
-                When the model fails to find relevant information, it will advise a user that it cannot answer a question.
-                The model is also instructed to ignore questions that are not directly related to AI policies.
+                * Questions about policy documents that are currently in the OECD AI Observatory's database
+                * Questions that are posed in English and target English language documents;
+                * Questions for which the answer can be found in the text (i.e. the thinking has already been done by the author) these AI models are not able to write their own research report combining information across policy documents and analyzing them itself).
+
+                If your question is outside the scope of the recommended use, the model has been instructed not to answer.
                 """
                 )
 
