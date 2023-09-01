@@ -32,7 +32,13 @@ def upload_data(
     dataframe.rename(columns={"link": "url"}, inplace=True)
 
     manager = DocumentsService(
-        pinecone_api_key, pinecone_env, pinecone_index, pinecone_namespace, mongo_uri, mongo_db_data
+        pinecone_api_key,
+        pinecone_env,
+        pinecone_index,
+        pinecone_namespace,
+        mongo_uri,
+        mongo_db_data,
+        required_columns=["content", "url", "title", "source", "country", "year"],
     )
     manager.batch_add(dataframe)
 
