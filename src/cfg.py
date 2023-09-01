@@ -40,19 +40,17 @@ openai.organization = os.getenv("OPENAI_ORGANIZATION")
 pinecone_api_key = os.getenv("AI4H_PINECONE_API_KEY")
 pinecone_env = os.getenv("AI4H_PINECONE_ENV")
 pinecone_index = os.getenv("AI4H_PINECONE_INDEX")
+pinecone_namespace = os.getenv("AI4H_PINECONE_NAMESPACE")
 
 # set mongo creds
 mongo_username = os.getenv("AI4H_MONGODB_USERNAME")
 mongo_password = os.getenv("AI4H_MONGODB_PASSWORD")
 mongo_cluster = os.getenv("AI4H_MONGODB_CLUSTER")
 mongo_uri = make_uri(mongo_username, mongo_password, mongo_cluster)
-mongo_db_name = os.getenv("AI4H_MONGODB_DB_DATA")
+mongo_db_data = os.getenv("AI4H_MONGODB_DB_DATA")
 
-username = os.getenv("AI4H_MONGODB_USERNAME")
-password = os.getenv("AI4H_MONGODB_PASSWORD")
-cluster = os.getenv("AI4H_MONGODB_CLUSTER")
-db_name = os.getenv("AI4H_MONGODB_DB_NAME")
-mongo_db = init_db(username, password, cluster, db_name)
+mongo_db_logging = os.getenv("AI4H_MONGODB_DB_LOGGING")
+mongo_db = init_db(mongo_username, mongo_password, mongo_cluster, mongo_db_logging)
 
 mongo_feedback_collection = os.getenv("AI4H_MONGODB_FEEDBACK_COLLECTION")
 mongo_arena_collection = os.getenv("AI4H_MONGODB_ARENA_COLLECTION")
@@ -97,8 +95,9 @@ Q:
         "pinecone_api_key": pinecone_api_key,
         "pinecone_env": pinecone_env,
         "pinecone_index": pinecone_index,
+        "pinecone_namespace": pinecone_namespace,
         "mongo_uri": mongo_uri,
-        "mongo_db_name": mongo_db_name,
+        "mongo_db_name": mongo_db_data,
         "top_k": 3,
         "thresh": 0.7,
         "max_tokens": 3000,
