@@ -24,8 +24,12 @@ def upload_data(
     mongo_db_data: str,
     dataframe: pd.DataFrame,
 ):
+    # Make sure the chunks are not too big
     dataframe["content"] = dataframe["content"].apply(split_text)
     dataframe = dataframe.explode("content", ignore_index=True)
+
+    # Rename link to url
+    dataframe.rename(columns={"link": "url"}, inplace=True)
 
     manager = DocumentsService(
         pinecone_api_key, pinecone_env, pinecone_index, pinecone_namespace, mongo_uri, mongo_db_data
