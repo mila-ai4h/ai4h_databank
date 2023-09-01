@@ -7,6 +7,14 @@ from buster.documents_manager import DocumentsService
 from src.app_utils import make_uri
 
 
+def split_text(text: str, max_words: int = 500) -> list[str]:
+    words = text.split()
+    chunks = []
+    for i in range(0, len(words), max_words):
+        chunks.append(" ".join(words[i : i + max_words]))
+    return chunks
+
+
 def upload_data(
     pinecone_api_key: str,
     pinecone_env: str,
@@ -16,6 +24,9 @@ def upload_data(
     mongo_db_data: str,
     dataframe: pd.DataFrame,
 ):
+    dataframe["content"] = dataframe["content"].apply(split_text)
+    dataframe = dataframe.explode("content", ignore_index=True)
+
     manager = DocumentsService(
         pinecone_api_key, pinecone_env, pinecone_index, pinecone_namespace, mongo_uri, mongo_db_data
     )
