@@ -46,7 +46,7 @@ def busterbot(monkeypatch, run_expensive):
 
         # Patch embedding call to avoid computing embeddings
         monkeypatch.setattr(
-            ServiceRetriever, "get_embedding", lambda s, x, engine: [random.random() for _ in range(EMBEDDING_LENGTH)]
+            ServiceRetriever, "get_embedding", lambda s, x, model: [random.random() for _ in range(EMBEDDING_LENGTH)]
         )
         # set thresh = 1 to be sure that no documents get retrieved
         buster_cfg.retriever_cfg["thresh"] = 1
