@@ -77,7 +77,6 @@ We look forward to sharing with you an updated version of the product once we fe
                                 choices=["👍", "👎"], label="Was the generated answer clear and understandable?"
                             )
                             accurate_answer = gr.Radio(choices=["👍", "👎"], label="Was the generated answer accurate?")
-                            safe_answer = gr.Radio(choices=["👍", "👎"], label="Was the generated answer safe?")
                             relevant_sources = gr.Radio(
                                 choices=["👍", "👎"], label="Were the retrieved sources generally relevant to your query?"
                             )
@@ -120,7 +119,7 @@ We look forward to sharing with you an updated version of the product once we fe
     ).then(
         submit_feedback,
         inputs=[
-            overall_experience, clear_answer, accurate_answer, safe_answer, relevant_sources, relevant_sources_order, relevant_sources_selection, extra_info, last_completion,
+            overall_experience, clear_answer, accurate_answer, relevant_sources, relevant_sources_order, relevant_sources_selection, extra_info, last_completion,
         ],
     ).success(
         toggle_visibility,
@@ -137,7 +136,6 @@ We look forward to sharing with you an updated version of the product once we fe
         "overall_experience": overall_experience,
         "clear_answer": clear_answer,
         "accurate_answer": accurate_answer,
-        "safe_answer": safe_answer,
         "relevant_sources": relevant_sources,
         "relevant_sources_selection": relevant_sources_selection,
         "relevant_sources_order": relevant_sources_order,
@@ -234,7 +232,6 @@ def submit_feedback(
     overall_experience: str,
     clear_answer: str,
     accuracte_answer: str,
-    safe_answer: str,
     relevant_sources: str,
     relevant_sources_order: list[str],
     relevant_sources_selection: str,
@@ -246,7 +243,6 @@ def submit_feedback(
         overall_experience=overall_experience,
         clear_answer=clear_answer,
         accurate_answer=accuracte_answer,
-        safe_answer=safe_answer,
         relevant_sources=relevant_sources,
         relevant_sources_order=relevant_sources_order,
         relevant_sources_selection=relevant_sources_selection,
@@ -289,7 +285,6 @@ def clear_feedback_form():
         feedback_elems["overall_experience"]: gr.update(value=None),
         feedback_elems["clear_answer"]: gr.update(value=None),
         feedback_elems["accurate_answer"]: gr.update(value=None),
-        feedback_elems["safe_answer"]: gr.update(value=None),
         feedback_elems["relevant_sources"]: gr.update(value=None),
         feedback_elems["relevant_sources_selection"]: gr.update(value=None),
         feedback_elems["relevant_sources_order"]: gr.update(value=None),
@@ -523,7 +518,6 @@ with buster_app:
             feedback_elems["overall_experience"],
             feedback_elems["clear_answer"],
             feedback_elems["accurate_answer"],
-            feedback_elems["safe_answer"],
             feedback_elems["relevant_sources"],
             feedback_elems["relevant_sources_selection"],
             feedback_elems["relevant_sources_order"],
@@ -561,7 +555,6 @@ with buster_app:
             feedback_elems["overall_experience"],
             feedback_elems["clear_answer"],
             feedback_elems["accurate_answer"],
-            feedback_elems["safe_answer"],
             feedback_elems["relevant_sources"],
             feedback_elems["relevant_sources_selection"],
             feedback_elems["relevant_sources_order"],

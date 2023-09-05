@@ -34,7 +34,6 @@ class FeedbackForm(StandardForm):
     # Answer Quality
     clear_answer: str
     accurate_answer: str
-    safe_answer: str
 
     # Source Relevance
     relevant_sources: str
