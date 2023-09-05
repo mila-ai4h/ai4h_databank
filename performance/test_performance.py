@@ -95,8 +95,6 @@ def process_questions(busterbot, questions: pd.DataFrame) -> pd.DataFrame:
     results = questions.apply(answer_question, axis=1)
     results.reset_index().to_csv("results_detailed.csv", index=False)
 
-    logger.info(results.head())
-
     return results
 
 
