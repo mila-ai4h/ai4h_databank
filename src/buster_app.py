@@ -207,12 +207,20 @@ def chat(chat_history: ChatHistory):
 
 def log_completion(
     completion: Union[Completion, list[Completion]],
+    collection: str,
     request: gr.Request,
 ):
-    # TODO: add UID for each page visitor instead of username
+    """
+    Log user completions in a specified collection for analytics.
 
-    # Get the proper mongo collection to save logs to
-    collection = cfg.mongo_interaction_collection
+    Parameters:
+    completion (Union[Completion, list[Completion]]): A single completion or a list of completions
+        to log. Completions can be instances of the Completion class.
+    collection (str): The name of the MongoDB collection where the interactions will be stored.
+    request (gr.Request): The request object containing request metadata.
+    """
+
+    # TODO: add UID for each page visitor instead of username
 
     # make sure it's always a list
     if isinstance(completion, Completion):
@@ -445,6 +453,25 @@ def setup_additional_sources():
                 gr.Markdown(get_metadata_markdown(documents_metadata))
 
 
+def raise_flagging_message():
+    """Raises a red banner indicating that the content has been flagged."""
+    raise gr.Error(
+        "Thank you for flagging the content. Our moderation team will look closely at these samples. We appologize for any harm this might have caused you."
+    )
+
+
+def setup_flag_button():
+    """Sets up a flag button with some accompanying text explaining why we have it."""
+    with gr.Column(variant="compact"):
+        with gr.Box():
+            gr.Markdown(
+                """# Report Misuse
+    While we took many steps to ensure the tool is safe, we still rely on third parties for our LLM capabilities. Please let us know if any harmful content shows up by clicking the button below. You can also send us screenshots/concerns to mila.databank@gmail.com"""
+            )
+            flag_button = gr.Button(value="Flag Content 🚩")
+    return flag_button
+
+
 with buster_app:
     # state variables are client-side and are reset every time a client refreshes the page
     # store the users' last completion here
@@ -468,7 +495,7 @@ with buster_app:
                     placeholder="Ask your question here...",
                     lines=1,
                 )
-                submit = gr.Button(value="Send", variant="primary")
+                submit = gr.Button(value="Send ", variant="primary")
                 sources_textboxes = display_sources()
 
             with gr.Column():
@@ -480,6 +507,8 @@ with buster_app:
                 )
 
                 feedback_elems = setup_feedback_form()
+
+                flag_button = setup_flag_button()
 
         setup_additional_sources()
 
@@ -533,7 +562,7 @@ with buster_app:
         outputs=[*sources_textboxes]
     ).then(
         log_completion,
-        inputs=last_completion,
+        inputs=[last_completion, gr.State(cfg.mongo_interaction_collection)]
     )
 
     message.submit(
@@ -570,8 +599,16 @@ with buster_app:
         outputs=[*sources_textboxes]
     ).then(
         log_completion,
-        inputs=last_completion,
+        inputs=[last_completion, gr.State(cfg.mongo_interaction_collection)]
     )
+
+    flag_button.click(
+        log_completion,
+        inputs=[last_completion, gr.State(cfg.mongo_flagged_collection)]
+    ).then(
+        raise_flagging_message,
+    )
+
     # fmt: on
 
 
