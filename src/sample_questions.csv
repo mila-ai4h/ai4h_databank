@@ -1,4 +1,5 @@
 question,valid_question,valid_answer,question_type
+What is the least relevant key pillar of AI policy in Canada?,True,False,relevant
 Which European countries have AI policies?,True,True,relevant
 Which Latin American countries have AI policies?,True,True,relevant
 How many countries have a national AI strategy?,True,True,relevant
