@@ -17,7 +17,6 @@ def test_read_write_feedbackform():
         overall_experience="yes",
         clear_answer="yes",
         accurate_answer="yes",
-        safe_answer="yes",
         relevant_sources="yes",
         relevant_sources_selection=["source 1", "source 2"],
         relevant_sources_order="yes",
@@ -30,7 +29,6 @@ def test_read_write_feedbackform():
     assert ff.overall_experience == ff_back.overall_experience
     assert ff.clear_answer == ff_back.clear_answer
     assert ff.accurate_answer == ff_back.accurate_answer
-    assert ff.safe_answer == ff_back.safe_answer
     assert ff.relevant_sources == ff_back.relevant_sources
     assert ff.relevant_sources_order == ff_back.relevant_sources_order
     assert ff.relevant_sources_selection == ff_back.relevant_sources_selection
@@ -63,7 +61,6 @@ def test_read_write_feedback():
             overall_experience="yes",
             clear_answer="yes",
             accurate_answer="yes",
-            safe_answer="yes",
             relevant_sources="yes",
             relevant_sources_selection=["source 1", "source 2"],
             relevant_sources_order="yes",
