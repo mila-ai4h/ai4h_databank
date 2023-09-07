@@ -16,9 +16,11 @@ jobs:
           AI4H_MONGODB_PASSWORD: ${{ secrets.AI4H_MONGODB_PASSWORD }}
           AI4H_MONGODB_CLUSTER: ${{ secrets.AI4H_MONGODB_CLUSTER }}
           AI4H_MONGODB_DB_DATA: ${{ vars.AI4H_MONGODB_DB_DATA }}
+          AI4H_MONGODB_DB_LOGGING: ${{ vars.AI4H_MONGODB_DB_LOGGING }}
           AI4H_PINECONE_API_KEY: ${{ secrets.AI4H_PINECONE_API_KEY }}
           AI4H_PINECONE_ENV: ${{ secrets.AI4H_PINECONE_ENV }}
           AI4H_PINECONE_INDEX: ${{ vars.AI4H_PINECONE_INDEX }}
+          AI4H_PINECONE_NAMESPACE: ${{ vars.AI4H_PINECONE_NAMESPACE }}
         run: |
           python3 -m pip install --upgrade pip
           pip install -e .[tests]
