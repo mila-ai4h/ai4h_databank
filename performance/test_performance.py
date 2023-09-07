@@ -125,9 +125,8 @@ def compute_summary(results: pd.DataFrame) -> pd.DataFrame:
 def detect_according_to_the_documentation(results: pd.DataFrame) -> tuple[int, int]:
     forbidden_expressions = [
         "according to the documentation",
-        "according to the provided documents",
         "based on the documentation",
-        "based on the provided documents",
+        "the provided documents",
     ]
 
     def detect_forbidden_expression(answer):
@@ -162,3 +161,18 @@ def test_summary(busterbot):
     fail, total = detect_according_to_the_documentation(results)
     summary = compute_summary(results)
     write_markdown_results(summary, fail, total)
+
+
+def test_detect_according_to_the_documentation():
+    questions = pd.DataFrame(
+        {
+            "answer_text": [
+                "According to the documentation, this is a unit test",
+                "I have a lot of information and can answer cool questions",
+                "French have the best cheese, based on the provided documents.",
+            ]
+        }
+    )
+    fail, total = detect_according_to_the_documentation(questions)
+    assert fail == 2
+    assert total == 3
