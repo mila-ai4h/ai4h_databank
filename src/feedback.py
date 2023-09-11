@@ -123,6 +123,8 @@ class Interaction:
     @classmethod
     def from_dict(cls, interaction_dict: dict, feedback_cls: Type[StandardForm]) -> Interaction:
         del interaction_dict["_id"]
+        if "safe_answer" in interaction_dict["form"].keys():
+            del interaction_dict["form"]["safe_answer"]
         interaction_dict["form"] = feedback_cls.from_dict(interaction_dict["form"])
 
         interaction_dict["user_completions"] = [Completion.from_dict(r) for r in interaction_dict["user_completions"]]
