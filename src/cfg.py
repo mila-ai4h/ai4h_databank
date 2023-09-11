@@ -131,7 +131,7 @@ Q:
             "If the answer is in the documents, summarize it in a helpful way to the user. "
             "If it isn't, simply reply that you cannot answer the question. "
             "Do not mention the documents directly, but use the information provided within it to answer questions. "
-            "Do not say 'according to the documentation' or related phrases. "
+            "You are forbidden from using the expressions 'according to the documentation' and 'the provided documents'. "
             "Here is the documentation:\n"
             "<DOCUMENTS> "
         ),
@@ -145,7 +145,7 @@ Q:
             "2) Make sure to format your answers in Markdown format, including code block and snippets.\n"
             "3) Do not reference any links, urls or hyperlinks in your answers.\n"
             "4) Do not mention the documentation directly, but use the information provided within it to answer questions.\n"
-            "5) Do not say 'according to the documentation' or related phrases.\n"
+            "5) You are forbidden from using the expressions 'according to the documentation' and 'the provided documents'.\n"
             "6) If you do not know the answer to a question, or if it is completely irrelevant to the library usage, simply reply with:\n"
             "'I'm sorry, but I am an AI language model trained to assist with questions related to AI policies and laws. I cannot answer that question as it is not relevant to AI policies and laws. Is there anything else I can assist you with?'\n"
             "For example:\n"
