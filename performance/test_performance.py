@@ -70,7 +70,7 @@ def busterbot(monkeypatch, run_expensive):
 
 
 def process_questions(busterbot, questions: pd.DataFrame) -> pd.DataFrame:
-    @retry(wait=wait_exponential(multiplier=1, min=4, max=10), stop_after_attempt=5)
+    @retry(wait=wait_exponential(multiplier=1, min=4, max=10), stop=stop_after_attempt(5))
     def answer_question(question):
         completion = busterbot.process_input(question.question)
         return pd.Series(
