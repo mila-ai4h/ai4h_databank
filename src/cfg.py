@@ -64,8 +64,8 @@ buster_cfg = BusterConfig(
             "I'm sorry, but I am an AI language model trained to assist with questions related to AI. I cannot answer that question as it is not relevant to the library or its usage. Is there anything else I can assist you with?",
             "I cannot answer this question based on the information I have available",
             "The provided documents do not contain information on your given topic",
-            "The provided documents do not directly address the question",
-            "The provided documents do not directly address the question. I cannot answer this question based on the information I have available.",
+            "The information provided do not directly address the question",
+            "The information provided do not directly address the question. I cannot answer this question based on the information I have available.",
         ],
         "unknown_threshold": 0.84,
         "embedding_model": "text-embedding-ada-002",
@@ -130,7 +130,7 @@ Q:
             "You can only respond to a question if the content necessary to answer the question is contained in the information provided to you. "
             "If the answer is in the documents, summarize it in a helpful way to the user. "
             "If it isn't, simply reply that you cannot answer the question. "
-            "Do not mention the documents directly, but use the information provided within them to answer the question. "
+            "Do not mention the documents directly, but use the information available within them to answer the question. "
             "You are forbidden from using the expressions 'according to the documentation' and 'the provided documents'. "
             "Here is the information available to you:\n"
             "<INFORMATION> "
@@ -146,7 +146,7 @@ Q:
             "3) Do not reference any links, urls or hyperlinks in your answers.\n"
             "4) Do not mention the documentation directly, but use the information provided within it to answer questions.\n"
             "5) You are forbidden from using the expressions 'according to the documentation' and 'the provided documents'.\n"
-            "6) If the information provided does not directly address the question, simply state that you do not have the information required to answer. Do not summarize what is available to you. "
+            "6) If the information available to you does not directly address the question, simply state that you do not have the information required to answer. Do not summarize what is available to you. "
             "For example, say: 'I cannot answer this question based on the information I have available'."
             "Now answer the following question:\n"
         ),
