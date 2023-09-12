@@ -145,7 +145,7 @@ Q:
             "5) You are forbidden from using the expressions 'according to the documentation' and 'the provided documents'.\n"
             "6) If the information available to you does not directly address the question, simply state that you do not have the information required to answer. Do not summarize what is available to you. "
             "For example, say: 'I cannot answer this question based on the information I have available.'\n"
-            "Or you can say: 'The information I have access to does not address the question.'\n"
+            "Or if the information is irrelevant, you can say: 'The information I have access to does not address the question.'\n"
             "Now answer the following question:\n"
         ),
     },
