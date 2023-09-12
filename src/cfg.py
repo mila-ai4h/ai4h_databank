@@ -146,12 +146,7 @@ Q:
             "3) Do not reference any links, urls or hyperlinks in your answers.\n"
             "4) Do not mention the documentation directly, but use the information provided within it to answer questions.\n"
             "5) You are forbidden from using the expressions 'according to the documentation' and 'the provided documents'.\n"
-            "6) If you do not know the answer to a question, or if it is completely irrelevant to the library usage, simply reply with:\n"
-            "'I'm sorry, but I am an AI language model trained to assist with questions related to AI policies and laws. I cannot answer that question as it is not relevant to AI policies and laws. Is there anything else I can assist you with?'\n"
-            "For example:\n"
-            "Q: What is the meaning of life for a qa bot?\n"
-            "A: I'm sorry, but I am an AI language model trained to assist with questions related to AI policies and laws. I cannot answer that question as it is not relevant to AI policies and laws. Is there anything else I can assist you with?\n"
-            "7) If the provided documents do not directly address the question, simply state that the provided documents don't answer the question. Do not summarize what they do contain. "
+            "6) If the provided documents do not directly address the question, simply state that you do not have the information required to answer. Do not summarize what they do contain. "
             "For example: 'I cannot answer this question based on the information I have available'."
             "Now answer the following question:\n"
         ),
