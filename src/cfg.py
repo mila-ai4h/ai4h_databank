@@ -61,16 +61,13 @@ mongo_flagged_collection = os.getenv("AI4H_MONGODB_FLAGGED_COLLECTION")
 buster_cfg = BusterConfig(
     validator_cfg={
         "unknown_response_templates": [
-            "I'm sorry, but I am an AI language model trained to assist with questions related to AI. I cannot answer that question as it is not relevant to the library or its usage. Is there anything else I can assist you with?",
             "I cannot answer this question based on the information I have available",
-            "The provided documents do not contain information on your given topic",
-            "The information provided do not directly address the question",
-            "The information provided do not directly address the question. I cannot answer this question based on the information I have available.",
+            "The information I have access to does not address the question",
         ],
         "unknown_threshold": 0.84,
         "embedding_model": "text-embedding-ada-002",
         "use_reranking": True,
-        "invalid_question_response": "This question does not seem relevant to AI policies.",
+        "invalid_question_response": "I cannot answer this question as it does not seem relevant to AI policies. If you believe this is a mistake, please provide feedback through the panel on the right side.",
         "check_question_prompt": """You are a chatbot answering questions on behalf of the OECD specifically on AI policies.
 Your first job is to determine whether or not a question is valid, and should be answered.
 For a question to be considered valid, it must be related to AI and policies.
@@ -147,7 +144,8 @@ Q:
             "4) Do not mention the documentation directly, but use the information provided within it to answer questions.\n"
             "5) You are forbidden from using the expressions 'according to the documentation' and 'the provided documents'.\n"
             "6) If the information available to you does not directly address the question, simply state that you do not have the information required to answer. Do not summarize what is available to you. "
-            "For example, say: 'I cannot answer this question based on the information I have available'."
+            "For example, say: 'I cannot answer this question based on the information I have available.'\n"
+            "Or you can say: 'The information I have access to does not address the question.'\n"
             "Now answer the following question:\n"
         ),
     },
