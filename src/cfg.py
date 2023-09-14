@@ -4,7 +4,7 @@ import os
 import openai
 from buster.busterbot import Buster, BusterConfig
 from buster.completers import ChatGPTCompleter, DocumentAnswerer
-from buster.formatters.documents import DocumentsFormatter
+from buster.formatters.documents import DocumentsFormatter, DocumentsFormatterJSON
 from buster.formatters.prompts import PromptFormatter
 from buster.retriever import Retriever, ServiceRetriever
 from buster.tokenizers import Tokenizer
@@ -120,7 +120,7 @@ Q:
     },
     documents_formatter_cfg={
         "max_tokens": 3500,
-        "formatter": "{content}",
+        "columns": ["content", "source", "title"],
     },
     prompt_formatter_cfg={
         "max_tokens": 3500,
@@ -131,12 +131,11 @@ Q:
             "If the answer is in the documents, summarize it in a helpful way to the user. "
             "If it isn't, simply reply that you cannot answer the question. "
             "Do not refer to the documents directly, but use the information provided within it to answer questions. "
+            "Always cite which document you pulled information from. "
             "Do not say 'according to the documentation' or related phrases. "
             "Here is the documentation:\n"
-            "<DOCUMENTS> "
         ),
         "text_after_docs": (
-            "<\\DOCUMENTS>\n"
             "REMEMBER:\n"
             "You are a chatbot assistant answering questions about artificial intelligence (AI) policies and laws. "
             "You represent the OECD AI Policy Observatory. "
@@ -152,6 +151,7 @@ Q:
             "Q: What is the meaning of life for a qa bot?\n"
             "A: I'm sorry, but I am an AI language model trained to assist with questions related to AI policies and laws. I cannot answer that question as it is not relevant to AI policies and laws. Is there anything else I can assist you with?\n"
             "7) If the provided documents do not directly address the question, simply state that the provided documents don't answer the question. Do not summarize what they do contain. "
+            "8) Always cite which document you pulled information from. "
             "For example: 'I cannot answer this question based on the information I have available'."
             "Now answer the following question:\n"
         ),
@@ -159,13 +159,12 @@ Q:
 )
 
 
-def setup_buster(buster_cfg):
+def setup_buster(buster_cfg, DocFormatter: DocumentsFormatter = DocumentsFormatterJSON):
     retriever: Retriever = ServiceRetriever(**buster_cfg.retriever_cfg)
     tokenizer = WordTokenizer(**buster_cfg.tokenizer_cfg)
-    # tokenizer = GPTTokenizer(**buster_cfg.tokenizer_cfg)
     document_answerer: DocumentAnswerer = DocumentAnswerer(
         completer=ChatGPTCompleter(**buster_cfg.completion_cfg),
-        documents_formatter=DocumentsFormatter(tokenizer=tokenizer, **buster_cfg.documents_formatter_cfg),
+        documents_formatter=DocFormatter(tokenizer=tokenizer, **buster_cfg.documents_formatter_cfg),
         prompt_formatter=PromptFormatter(tokenizer=tokenizer, **buster_cfg.prompt_formatter_cfg),
         **buster_cfg.documents_answerer_cfg,
     )
