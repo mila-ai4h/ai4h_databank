@@ -28,65 +28,32 @@ mongo_db = cfg.mongo_db
 questions = pd.read_csv("sample_questions.csv")
 relevant_questions = questions[questions.question_type == "relevant"].question.to_list()
 
-# Set up a version of buster with gpt 3.5
-buster_new_prompt_cfg = copy.deepcopy(buster_cfg)
-# buster_new_prompt_cfg.completion_cfg["completion_kwargs"]["model"] = "gpt-3.5-turbo"
-buster_new_prompt_cfg.documents_formatter_cfg = {
+buster_1_cfg = copy.deepcopy(buster_cfg)
+buster_1_cfg.documents_formatter_cfg = {
         "max_tokens": 3500,
         "columns": ["content", "source", "title"],
 }
-buster_new_prompt_cfg.prompt_formatter_cfg = {
-        "max_tokens": 3500,
-        "text_before_docs": (
-            "You are a chatbot assistant answering questions about artificial intelligence (AI) policies and laws. "
-            "You represent the OECD AI Policy Observatory. "
-            "You can only respond to a question if the content necessary to answer the question is contained in the following provided documents. "
-            "If the answer is in the documents, summarize it in a helpful way to the user. "
-            "If it isn't, simply reply that you cannot answer the question. "
-            "Do not refer to the documents directly, but use the information provided within it to answer questions. "
-            "Always cite which document you pulled information from. "
-            "Do not say 'according to the documentation' or related phrases. "
-            "Here is the documentation:\n"
-        ),
-        "text_after_docs": (
-            "REMEMBER:\n"
-            "You are a chatbot assistant answering questions about artificial intelligence (AI) policies and laws. "
-            "You represent the OECD AI Policy Observatory. "
-            "Here are the rules you must follow:\n"
-            "1) You must only respond with information contained in the documents above. Say you do not know if the information is not provided.\n"
-            "2) Make sure to format your answers in Markdown format, including code block and snippets.\n"
-            "3) Do not reference any links, urls or hyperlinks in your answers.\n"
-            "4) Do not refer to the documentation directly, but use the information provided within it to answer questions.\n"
-            "5) Do not say 'according to the documentation' or related phrases.\n"
-            "6) If you do not know the answer to a question, or if it is completely irrelevant to the library usage, simply reply with:\n"
-            "'I'm sorry, but I am an AI language model trained to assist with questions related to AI policies and laws. I cannot answer that question as it is not relevant to AI policies and laws. Is there anything else I can assist you with?'\n"
-            "For example:\n"
-            "Q: What is the meaning of life for a qa bot?\n"
-            "A: I'm sorry, but I am an AI language model trained to assist with questions related to AI policies and laws. I cannot answer that question as it is not relevant to AI policies and laws. Is there anything else I can assist you with?\n"
-            "7) If the provided documents do not directly address the question, simply state that the provided documents don't answer the question. Do not summarize what they do contain. "
-            "8) Always cite which document you pulled information from. "
-            "For example: 'I cannot answer this question based on the information I have available'."
-            "Now answer the following question:\n"
-        ),
-}
-buster_new_prompt = setup_buster(buster_new_prompt_cfg, DocFormatter=DocumentsFormatterJSON)
+buster_1 = setup_buster(buster_1_cfg, DocFormatter=DocumentsFormatterJSON)
+buster_1_reveal_name = "latest prompt"
 
 
 # Set up a version of buster with gpt 4
-buster_old_prompt_cfg = copy.deepcopy(buster_cfg)
-buster_old_prompt_cfg.prompt_formatter_cfg = {
+buster_2_cfg = copy.deepcopy(buster_cfg)
+buster_2_cfg.prompt_formatter_cfg = {
         "max_tokens": 3500,
         "text_before_docs": (
             "You are a chatbot assistant answering questions about artificial intelligence (AI) policies and laws. "
             "You represent the OECD AI Policy Observatory. "
-            "You can only respond to a question if the content necessary to answer the question is contained in the following provided documents. "
+            "You can only respond to a question if the content necessary to answer the question is contained in the information provided to you. "
             "If the answer is in the documents, summarize it in a helpful way to the user. "
             "If it isn't, simply reply that you cannot answer the question. "
-            "Do not refer to the documents directly, but use the information provided within it to answer questions. "
-            "Do not say 'according to the documentation' or related phrases. "
-            "Here is the documentation:\n"
+            "Do not mention the documents directly, but use the information available within them to answer the question. "
+            "You are forbidden from using the expressions 'according to the documentation' and 'the provided documents'. "
+            "Here is the information available to you:\n"
+            "<INFORMATION> "
         ),
         "text_after_docs": (
+            "<\\INFORMATION>\n"
             "REMEMBER:\n"
             "You are a chatbot assistant answering questions about artificial intelligence (AI) policies and laws. "
             "You represent the OECD AI Policy Observatory. "
@@ -94,24 +61,25 @@ buster_old_prompt_cfg.prompt_formatter_cfg = {
             "1) You must only respond with information contained in the documents above. Say you do not know if the information is not provided.\n"
             "2) Make sure to format your answers in Markdown format, including code block and snippets.\n"
             "3) Do not reference any links, urls or hyperlinks in your answers.\n"
-            "4) Do not refer to the documentation directly, but use the information provided within it to answer questions.\n"
-            "5) Do not say 'according to the documentation' or related phrases.\n"
+            "4) Do not mention the documentation directly, but use the information provided within it to answer questions.\n"
+            "5) You are forbidden from using the expressions 'according to the documentation' and 'the provided documents'.\n"
             "6) If you do not know the answer to a question, or if it is completely irrelevant to the library usage, simply reply with:\n"
             "'I'm sorry, but I am an AI language model trained to assist with questions related to AI policies and laws. I cannot answer that question as it is not relevant to AI policies and laws. Is there anything else I can assist you with?'\n"
             "For example:\n"
             "Q: What is the meaning of life for a qa bot?\n"
             "A: I'm sorry, but I am an AI language model trained to assist with questions related to AI policies and laws. I cannot answer that question as it is not relevant to AI policies and laws. Is there anything else I can assist you with?\n"
-            "7) If the provided documents do not directly address the question, simply state that the provided documents don't answer the question. Do not summarize what they do contain. "
-            "For example: 'I cannot answer this question based on the information I have available'."
+            "7) If the information available to you does not directly address the question, simply state that you do not have the information required to answer. Do not summarize what is available to you. "
+            "For example, say: 'I cannot answer this question based on the information I have available.'\n"
             "Now answer the following question:\n"
         ),
+
 }
-buster_old_prompt_cfg.documents_formatter_cfg = {
+buster_2_cfg.documents_formatter_cfg = {
         "max_tokens": 3500,
         "formatter": "{content}",
 }
-
-buster_old_prompt = setup_buster(buster_old_prompt_cfg, DocFormatter=DocumentsFormatterHTML)
+buster_2 = setup_buster(buster_2_cfg, DocFormatter=DocumentsFormatterHTML)
+buster_2_reveal_name = "old prompt"
 
 # Useful to set when trying out new features locally so you don't have to wait for new streams each time.
 # Set to True to enable.
@@ -174,22 +142,22 @@ def submit_feedback(completion_left, completion_right, current_question, vote, e
     feedback.send(mongo_db, collection=cfg.mongo_arena_collection)
 
 
-async def process_input_35(question):
+async def process_input_buster_1(question):
     """Run buster with chatGPT"""
-    return buster_new_prompt.process_input(question)
+    return buster_1.process_input(question)
 
 
-async def process_input_4(question):
+async def process_input_buster_2(question):
     """Run buster with GPT-4"""
-    return buster_old_prompt.process_input(question)
+    return buster_2.process_input(question)
 
 
 async def run_models_async(question):
     """Run different buster instances async. Shuffles the resulting models."""
-    completion_35, completion_4 = await asyncio.gather(process_input_35(question), process_input_4(question))
-    completion_35.codename = "new prompt"
-    completion_4.codename = "old prompt"
-    completions = [completion_35, completion_4]
+    completion_1, completion_2 = await asyncio.gather(process_input_buster_1(question), process_input_buster_2(question))
+    completion_1.codename = buster_1_reveal_name
+    completion_2.codename = buster_2_reveal_name
+    completions = [completion_1, completion_2]
     random.shuffle(completions)
     return completions[0], completions[1]
 
