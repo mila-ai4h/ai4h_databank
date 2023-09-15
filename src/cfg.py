@@ -61,16 +61,13 @@ mongo_flagged_collection = os.getenv("AI4H_MONGODB_FLAGGED_COLLECTION")
 buster_cfg = BusterConfig(
     validator_cfg={
         "unknown_response_templates": [
-            "I'm sorry, but I am an AI language model trained to assist with questions related to AI. I cannot answer that question as it is not relevant to the library or its usage. Is there anything else I can assist you with?",
             "I cannot answer this question based on the information I have available",
-            "The provided documents do not contain information on your given topic",
-            "The provided documents do not directly address the question",
-            "The provided documents do not directly address the question. I cannot answer this question based on the information I have available.",
+            "The information I have access to does not address the question",
         ],
         "unknown_threshold": 0.84,
         "embedding_model": "text-embedding-ada-002",
         "use_reranking": True,
-        "invalid_question_response": "This question does not seem relevant to AI policies.",
+        "invalid_question_response": "I cannot answer this question as it does not seem relevant to AI policies. If you believe this is a mistake, please provide feedback through the panel on the right side.",
         "check_question_prompt": """You are a chatbot answering questions on behalf of the OECD specifically on AI policies.
 Your first job is to determine whether or not a question is valid, and should be answered.
 For a question to be considered valid, it must be related to AI and policies.
@@ -127,16 +124,16 @@ Q:
         "text_before_docs": (
             "You are a chatbot assistant answering questions about artificial intelligence (AI) policies and laws. "
             "You represent the OECD AI Policy Observatory. "
-            "You can only respond to a question if the content necessary to answer the question is contained in the following provided documents. "
+            "You can only respond to a question if the content necessary to answer the question is contained in the information provided to you. "
             "If the answer is in the documents, summarize it in a helpful way to the user. "
             "If it isn't, simply reply that you cannot answer the question. "
-            "Do not refer to the documents directly, but use the information provided within it to answer questions. "
-            "Do not say 'according to the documentation' or related phrases. "
-            "Here is the documentation:\n"
-            "<DOCUMENTS> "
+            "Do not mention the documents directly, but use the information available within them to answer the question. "
+            "You are forbidden from using the expressions 'according to the documentation' and 'the provided documents'. "
+            "Here is the information available to you:\n"
+            "<INFORMATION> "
         ),
         "text_after_docs": (
-            "<\\DOCUMENTS>\n"
+            "<\\INFORMATION>\n"
             "REMEMBER:\n"
             "You are a chatbot assistant answering questions about artificial intelligence (AI) policies and laws. "
             "You represent the OECD AI Policy Observatory. "
@@ -144,15 +141,15 @@ Q:
             "1) You must only respond with information contained in the documents above. Say you do not know if the information is not provided.\n"
             "2) Make sure to format your answers in Markdown format, including code block and snippets.\n"
             "3) Do not reference any links, urls or hyperlinks in your answers.\n"
-            "4) Do not refer to the documentation directly, but use the information provided within it to answer questions.\n"
-            "5) Do not say 'according to the documentation' or related phrases.\n"
+            "4) Do not mention the documentation directly, but use the information provided within it to answer questions.\n"
+            "5) You are forbidden from using the expressions 'according to the documentation' and 'the provided documents'.\n"
             "6) If you do not know the answer to a question, or if it is completely irrelevant to the library usage, simply reply with:\n"
             "'I'm sorry, but I am an AI language model trained to assist with questions related to AI policies and laws. I cannot answer that question as it is not relevant to AI policies and laws. Is there anything else I can assist you with?'\n"
             "For example:\n"
             "Q: What is the meaning of life for a qa bot?\n"
             "A: I'm sorry, but I am an AI language model trained to assist with questions related to AI policies and laws. I cannot answer that question as it is not relevant to AI policies and laws. Is there anything else I can assist you with?\n"
-            "7) If the provided documents do not directly address the question, simply state that the provided documents don't answer the question. Do not summarize what they do contain. "
-            "For example: 'I cannot answer this question based on the information I have available'."
+            "7) If the information available to you does not directly address the question, simply state that you do not have the information required to answer. Do not summarize what is available to you. "
+            "For example, say: 'I cannot answer this question based on the information I have available.'\n"
             "Now answer the following question:\n"
         ),
     },
