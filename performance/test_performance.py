@@ -28,6 +28,7 @@ from buster.formatters.prompts import PromptFormatter
 from buster.retriever import Retriever, ServiceRetriever
 from buster.tokenizers import GPTTokenizer
 from buster.validators import QuestionAnswerValidator, Validator
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 from src import cfg
 
@@ -69,6 +70,7 @@ def busterbot(monkeypatch, run_expensive):
 
 
 def process_questions(busterbot, questions: pd.DataFrame) -> pd.DataFrame:
+    @retry(wait=wait_exponential(multiplier=1, min=4, max=10), stop=stop_after_attempt(5))
     def answer_question(question):
         completion = busterbot.process_input(question.question)
         return pd.Series(
@@ -101,19 +103,28 @@ def process_questions(busterbot, questions: pd.DataFrame) -> pd.DataFrame:
 def compute_summary(results: pd.DataFrame) -> pd.DataFrame:
     results.drop(columns=["answer_text"], inplace=True)
 
-    summary = results.groupby("question_type").agg({"answer_relevant": ["sum", "count"]}).reset_index()
+    summary = (
+        results.groupby("question_type")
+        .agg({"question_relevant": ["sum", "count"], "answer_relevant": ["sum", "count"]})
+        .reset_index()
+    )
     summary.columns = ["_".join(col).strip() for col in summary.columns.values]
     summary.rename(columns={"question_type_": "Category"}, inplace=True)
     column_order = ["Category"] + [col for col in summary.columns if col not in ["Category"]]
     summary = summary.loc[:, column_order]
 
-    summary["Answered questions"] = summary.apply(
-        lambda x: f"{x['answer_relevant_sum']} / {x['answer_relevant_count']}", axis=1
+    summary["Relevant questions"] = summary.apply(
+        lambda x: f"{x['question_relevant_sum']} / {x['question_relevant_count']} ({x['question_relevant_sum'] / x['question_relevant_count'] * 100:04.2f} %)",
+        axis=1,
     )
-    summary["(%)"] = (summary["answer_relevant_sum"] / summary["answer_relevant_count"]).apply(
-        lambda x: f"{x * 100:04.2f} %"
+    summary["Relevant answers"] = summary.apply(
+        lambda x: f"{x['answer_relevant_sum']} / {x['answer_relevant_count']} ({x['answer_relevant_sum'] / x['answer_relevant_count'] * 100:04.2f} %)",
+        axis=1,
     )
-    summary.drop(columns=["answer_relevant_sum", "answer_relevant_count"], inplace=True)
+    summary.drop(
+        columns=["question_relevant_sum", "question_relevant_count", "answer_relevant_sum", "answer_relevant_count"],
+        inplace=True,
+    )
     summary.set_index("Category", inplace=True)
 
     logger.info(summary)
@@ -148,7 +159,7 @@ def write_markdown_results(summary: pd.DataFrame, fail: int, total: int):
     markdown_summary += "\n\n"
 
     markdown_summary += "# Expressions Detector\n\n"
-    markdown_summary += f"- **According to the documentation**: {fail} / {total}\n"
+    markdown_summary += f"- **According to the documentation**: {fail} / {total} ({fail / total * 100:04.2f} %)\n"
 
     with open("results_summary.md", "w") as f:
         f.write(markdown_summary)
