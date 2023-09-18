@@ -1,4 +1,4 @@
-buster-doctalk==1.0.18
+buster-doctalk==1.0.19
 gradio==3.44.3
 pymongo==4.5.0
 gunicorn==21.2.0
