@@ -447,10 +447,16 @@ def setup_additional_sources():
             with gr.Column():
                 # TODO: Pick how to display the sources, 2 options for now
                 # Display the sources using a dataframe (rendering options limited)...
-                # gr.DataFrame(documents_metadata, headers=list(documents_metadata.columns), interactive=False)
+                documents_metadata["Report"] = documents_metadata.apply(
+                    lambda row: to_md_link(row["Title"], row["Link"]), axis=1
+                )
+                sub_df = documents_metadata[["Country", "Year", "Report"]]
+                gr.DataFrame(
+                    sub_df, headers=list(sub_df.columns), interactive=False, datatype=["number", "str", "markdown"]
+                )
 
                 # ... Or display the sources using markdown.
-                gr.Markdown(get_metadata_markdown(documents_metadata))
+                # gr.Markdown(get_metadata_markdown(documents_metadata))
 
 
 def raise_flagging_message():
