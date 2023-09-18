@@ -142,13 +142,23 @@ def submit_feedback(completion_left, completion_right, current_question, vote, e
 
 
 async def process_input_buster_1(question):
-    """Run buster with chatGPT"""
-    return buster_1.process_input(question)
+    """Process input with buster_1."""
+    completion = buster_1.process_input(question)
+
+    # Add reveal name
+    completion.codename = buster_1_reveal_name
+
+    return completion
 
 
 async def process_input_buster_2(question):
-    """Run buster with GPT-4"""
-    return buster_2.process_input(question)
+    """Process input with buster_2."""
+    completion = buster_2.process_input(question)
+
+    # Add reveal name
+    completion.codename = buster_2_reveal_name
+
+    return completion
 
 
 async def run_models_async(question):
@@ -156,8 +166,8 @@ async def run_models_async(question):
     completion_1, completion_2 = await asyncio.gather(
         process_input_buster_1(question), process_input_buster_2(question)
     )
-    completion_1.codename = buster_1_reveal_name
-    completion_2.codename = buster_2_reveal_name
+
+    # Shuffle the completions and return them
     completions = [completion_1, completion_2]
     random.shuffle(completions)
     return completions[0], completions[1]
