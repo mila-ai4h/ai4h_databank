@@ -1,4 +1,4 @@
-git+https://github.com/jerpint/buster@v1.0.16
-gradio==3.41.2
+buster-doctalk==1.0.18
+gradio==3.44.3
 pymongo==4.5.0
 gunicorn==21.2.0
