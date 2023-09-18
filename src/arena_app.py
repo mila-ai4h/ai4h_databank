@@ -8,7 +8,7 @@ from itertools import zip_longest
 import gradio as gr
 import pandas as pd
 from buster.completers import Completion
-from buster.formatters.documents import DocumentsFormatterJSON, DocumentsFormatterHTML
+from buster.formatters.documents import DocumentsFormatterHTML, DocumentsFormatterJSON
 
 import cfg
 from cfg import buster_cfg, setup_buster
@@ -30,8 +30,8 @@ relevant_questions = questions[questions.question_type == "relevant"].question.t
 
 buster_1_cfg = copy.deepcopy(buster_cfg)
 buster_1_cfg.documents_formatter_cfg = {
-        "max_tokens": 3500,
-        "columns": ["content", "source", "title"],
+    "max_tokens": 3500,
+    "columns": ["content", "source", "title"],
 }
 buster_1 = setup_buster(buster_1_cfg, DocFormatter=DocumentsFormatterJSON)
 buster_1_reveal_name = "latest prompt"
@@ -40,43 +40,42 @@ buster_1_reveal_name = "latest prompt"
 # Set up a version of buster with gpt 4
 buster_2_cfg = copy.deepcopy(buster_cfg)
 buster_2_cfg.prompt_formatter_cfg = {
-        "max_tokens": 3500,
-        "text_before_docs": (
-            "You are a chatbot assistant answering questions about artificial intelligence (AI) policies and laws. "
-            "You represent the OECD AI Policy Observatory. "
-            "You can only respond to a question if the content necessary to answer the question is contained in the information provided to you. "
-            "If the answer is in the documents, summarize it in a helpful way to the user. "
-            "If it isn't, simply reply that you cannot answer the question. "
-            "Do not mention the documents directly, but use the information available within them to answer the question. "
-            "You are forbidden from using the expressions 'according to the documentation' and 'the provided documents'. "
-            "Here is the information available to you:\n"
-            "<INFORMATION> "
-        ),
-        "text_after_docs": (
-            "<\\INFORMATION>\n"
-            "REMEMBER:\n"
-            "You are a chatbot assistant answering questions about artificial intelligence (AI) policies and laws. "
-            "You represent the OECD AI Policy Observatory. "
-            "Here are the rules you must follow:\n"
-            "1) You must only respond with information contained in the documents above. Say you do not know if the information is not provided.\n"
-            "2) Make sure to format your answers in Markdown format, including code block and snippets.\n"
-            "3) Do not reference any links, urls or hyperlinks in your answers.\n"
-            "4) Do not mention the documentation directly, but use the information provided within it to answer questions.\n"
-            "5) You are forbidden from using the expressions 'according to the documentation' and 'the provided documents'.\n"
-            "6) If you do not know the answer to a question, or if it is completely irrelevant to the library usage, simply reply with:\n"
-            "'I'm sorry, but I am an AI language model trained to assist with questions related to AI policies and laws. I cannot answer that question as it is not relevant to AI policies and laws. Is there anything else I can assist you with?'\n"
-            "For example:\n"
-            "Q: What is the meaning of life for a qa bot?\n"
-            "A: I'm sorry, but I am an AI language model trained to assist with questions related to AI policies and laws. I cannot answer that question as it is not relevant to AI policies and laws. Is there anything else I can assist you with?\n"
-            "7) If the information available to you does not directly address the question, simply state that you do not have the information required to answer. Do not summarize what is available to you. "
-            "For example, say: 'I cannot answer this question based on the information I have available.'\n"
-            "Now answer the following question:\n"
-        ),
-
+    "max_tokens": 3500,
+    "text_before_docs": (
+        "You are a chatbot assistant answering questions about artificial intelligence (AI) policies and laws. "
+        "You represent the OECD AI Policy Observatory. "
+        "You can only respond to a question if the content necessary to answer the question is contained in the information provided to you. "
+        "If the answer is in the documents, summarize it in a helpful way to the user. "
+        "If it isn't, simply reply that you cannot answer the question. "
+        "Do not mention the documents directly, but use the information available within them to answer the question. "
+        "You are forbidden from using the expressions 'according to the documentation' and 'the provided documents'. "
+        "Here is the information available to you:\n"
+        "<INFORMATION> "
+    ),
+    "text_after_docs": (
+        "<\\INFORMATION>\n"
+        "REMEMBER:\n"
+        "You are a chatbot assistant answering questions about artificial intelligence (AI) policies and laws. "
+        "You represent the OECD AI Policy Observatory. "
+        "Here are the rules you must follow:\n"
+        "1) You must only respond with information contained in the documents above. Say you do not know if the information is not provided.\n"
+        "2) Make sure to format your answers in Markdown format, including code block and snippets.\n"
+        "3) Do not reference any links, urls or hyperlinks in your answers.\n"
+        "4) Do not mention the documentation directly, but use the information provided within it to answer questions.\n"
+        "5) You are forbidden from using the expressions 'according to the documentation' and 'the provided documents'.\n"
+        "6) If you do not know the answer to a question, or if it is completely irrelevant to the library usage, simply reply with:\n"
+        "'I'm sorry, but I am an AI language model trained to assist with questions related to AI policies and laws. I cannot answer that question as it is not relevant to AI policies and laws. Is there anything else I can assist you with?'\n"
+        "For example:\n"
+        "Q: What is the meaning of life for a qa bot?\n"
+        "A: I'm sorry, but I am an AI language model trained to assist with questions related to AI policies and laws. I cannot answer that question as it is not relevant to AI policies and laws. Is there anything else I can assist you with?\n"
+        "7) If the information available to you does not directly address the question, simply state that you do not have the information required to answer. Do not summarize what is available to you. "
+        "For example, say: 'I cannot answer this question based on the information I have available.'\n"
+        "Now answer the following question:\n"
+    ),
 }
 buster_2_cfg.documents_formatter_cfg = {
-        "max_tokens": 3500,
-        "formatter": "{content}",
+    "max_tokens": 3500,
+    "formatter": "{content}",
 }
 buster_2 = setup_buster(buster_2_cfg, DocFormatter=DocumentsFormatterHTML)
 buster_2_reveal_name = "old prompt"
@@ -154,7 +153,9 @@ async def process_input_buster_2(question):
 
 async def run_models_async(question):
     """Run different buster instances async. Shuffles the resulting models."""
-    completion_1, completion_2 = await asyncio.gather(process_input_buster_1(question), process_input_buster_2(question))
+    completion_1, completion_2 = await asyncio.gather(
+        process_input_buster_1(question), process_input_buster_2(question)
+    )
     completion_1.codename = buster_1_reveal_name
     completion_2.codename = buster_2_reveal_name
     completions = [completion_1, completion_2]
