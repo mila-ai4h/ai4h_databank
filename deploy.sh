@@ -2,72 +2,73 @@
 
 set -e
 
+# Constants
 DEPLOY_TYPE=$1
-TMP_DEPLOY_DIR=deploy
+TMP_DEPLOY_DIR="deploy"
+DEV_URL="https://huggingface.co/spaces/databank-ai4h/buster-dev"
+PROD_URL="https://huggingface.co/spaces/databank-ai4h/buster-prod"
 
-# Check if the deployment type argument is provided
-if [ -z "$DEPLOY_TYPE" ]; then
-  echo "Error: Please provide the deployment type argument ('dev' or 'prod')."
-  echo "Usage: $0 <deployment_type>"
-  exit 1
-fi
+# Check and set deployment URL
+set_deploy_url() {
+  if [ -z "$DEPLOY_TYPE" ]; then
+    echo "Error: Please provide the deployment type argument ('dev' or 'prod')."
+    echo "Usage: $0 <deployment_type>"
+    exit 1
+  elif [ "$DEPLOY_TYPE" = "dev" ]; then
+    SPACE_URL=$DEV_URL
+    echo "Deploying to dev space at $SPACE_URL"
+  elif [ "$DEPLOY_TYPE" = "prod" ]; then
+    SPACE_URL=$PROD_URL
+    echo "Deploying to prod space at $SPACE_URL"
+  else
+    echo "Error: Invalid DEPLOY_TYPE. Valid values are 'dev' or 'prod'."
+    exit 1
+  fi
+}
 
-# Print the current branch and commit hash
-CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-CURRENT_COMMIT=$(git rev-parse HEAD)
-echo "Deploying from branch: $CURRENT_BRANCH"
-echo "Commit hash: $CURRENT_COMMIT"
+# Print current branch and commit details
+print_git_details() {
+  CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  CURRENT_COMMIT=$(git rev-parse HEAD)
+  echo "Deploying from branch: $CURRENT_BRANCH"
+  echo "Commit hash: $CURRENT_COMMIT"
+}
 
-# Clean up the previous deployment
-rm -rf $TMP_DEPLOY_DIR
-mkdir -p $TMP_DEPLOY_DIR
-mkdir -p $TMP_DEPLOY_DIR/src
+# Prepare deployment directory
+prepare_deploy_dir() {
+  rm -rf $TMP_DEPLOY_DIR
+  mkdir -p $TMP_DEPLOY_DIR/src
+  cp requirements.txt $TMP_DEPLOY_DIR/
+  cp src/*.py src/documents_metadata.csv $TMP_DEPLOY_DIR/src/
+  cd $TMP_DEPLOY_DIR
+}
 
-# Add requirements file
-cp requirements.txt $TMP_DEPLOY_DIR/
-
-# Add source code needed
-cp src/*.py src/sample_questions.csv $TMP_DEPLOY_DIR/src/
-
-# Change directory to $TMP_DEPLOY_DIR folder
-cd $TMP_DEPLOY_DIR
-
-# Create the README configuration (necessary for Hugging Face space)
-echo '---
+# Create README for Hugging Face space
+create_readme() {
+  echo '---
 title: Buster
 emoji: 💻
 colorFrom: pink
 colorTo: green
 sdk: gradio
-sdk_version: 3.39.0
 app_file: src/buster_app.py
 python: 3.11
 pinned: false
 ---' > README.md
+}
 
-# Additional actions for dev deployment, if needed
-if [ "$DEPLOY_TYPE" = "dev" ]; then
-  echo "Performing dev-specific actions..."
-  # Add any specific actions for dev here
-fi
+# Initialize and push to git
+git_operations() {
+  git init
+  git add -A
+  git commit -m "Deploy app"
+  git remote add space $SPACE_URL
+  git push --force space main
+}
 
-# Additional actions for prod deployment, if needed
-if [ "$DEPLOY_TYPE" = "prod" ]; then
-  echo "Performing prod-specific actions..."
-  # Add any specific actions for prod here
-fi
-
-# Initialize a new, temporary git repository, add the files, and commit them
-git init
-git add -A
-git commit -m "Deploy app"
-
-# Set the remote URL based on the deployment type
-if [ "$DEPLOY_TYPE" = "dev" ]; then
-  git remote add space https://huggingface.co/spaces/databank-ai4h/buster-dev
-elif [ "$DEPLOY_TYPE" = "prod" ]; then
-  git remote add space https://huggingface.co/spaces/databank-ai4h/buster-prod
-fi
-
-# Push all files to the Hugging Face space
-git push --force space main
+# Main execution
+set_deploy_url
+print_git_details
+prepare_deploy_dir
+create_readme
+git_operations
