@@ -22,7 +22,7 @@ jobs:
       - name: unit tests
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          HUB_TOKEN: ${{ secrets.HUB_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
           AI4H_MONGODB_USERNAME: ${{ secrets.AI4H_MONGODB_USERNAME }}
           AI4H_MONGODB_PASSWORD: ${{ secrets.AI4H_MONGODB_PASSWORD }}
           AI4H_MONGODB_CLUSTER: ${{ secrets.AI4H_MONGODB_CLUSTER }}
@@ -56,5 +56,5 @@ jobs:
         uses: actions/checkout@v3
       - name: Deploy to huggingface Space
         env:
-          HUB_TOKEN: ${{ secrets.HUB_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: sh scripts/deploy_hf_space.sh prod

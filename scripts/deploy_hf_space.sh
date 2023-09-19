@@ -6,12 +6,13 @@ set -e
 DEPLOY_TYPE=$1
 TMP_DEPLOY_DIR=${2:-"deploy"}
 
+
 # SPACE URLS
 DEV_URL="https://huggingface.co/spaces/databank-ai4h/buster-dev"
 PROD_URL="https://huggingface.co/spaces/databank-ai4h/buster-prod"
 
 # Authenticate to huggingface for push
-huggingface-cli login --token $HUB_TOKEN
+huggingface-cli login --token $HF_TOKEN
 
 # Check and set deployment URL
 set_deploy_url() {
