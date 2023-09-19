@@ -11,7 +11,12 @@ from buster.completers import Completion
 import cfg
 from cfg import setup_buster
 from feedback import FeedbackForm, Interaction
-from src.app_utils import add_sources, check_auth, get_utc_time, verify_required_env_vars
+from src.app_utils import (
+    add_sources,
+    check_auth,
+    get_utc_time,
+    verify_required_env_vars,
+)
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)

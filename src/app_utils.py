@@ -23,6 +23,7 @@ def verify_required_env_vars(required_vars: list[str]):
     else:
         logger.info("All environment variables are set appropriately.")
 
+
 def make_uri(username: str, password: str, cluster: str) -> str:
     """Create mongodb uri."""
     uri = (
