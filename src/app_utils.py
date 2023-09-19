@@ -16,6 +16,13 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
+def verify_required_env_vars(required_vars: list[str]):
+    unset_vars = [var for var in required_vars if os.getenv(var) is None]
+    if len(unset_vars) > 0:
+        logger.warning(f"Lisf of env. variables that weren't set: {unset_vars}")
+    else:
+        logger.info("All environment variables are set appropriately.")
+
 def make_uri(username: str, password: str, cluster: str) -> str:
     """Create mongodb uri."""
     uri = (
