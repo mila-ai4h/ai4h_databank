@@ -1,4 +1,4 @@
-git+https://github.com/jerpint/buster@v1.0.16
+git+https://github.com/jerpint/buster@v1.0.19
 gradio==3.41.2
 pymongo==4.5.0
 gunicorn==21.2.0
