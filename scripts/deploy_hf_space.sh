@@ -70,6 +70,9 @@ pinned: false
 # Initialize and push to git
 git_operations() {
   git init
+  git branch -m main
+  git config user.email "jerpint@gmail.com"
+  git config user.name "Jeremy Pinto"
   git add -A
   git commit -m "Deploy app"
   git remote add space $SPACE_URL
