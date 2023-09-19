@@ -57,4 +57,4 @@ jobs:
       - name: Deploy to huggingface Space
         env:
           HUB_TOKEN: ${{ secrets.HUB_TOKEN }}
-        run: deploy_space.sh dev
+        run: sh scripts/deploy_hf_space.sh dev
