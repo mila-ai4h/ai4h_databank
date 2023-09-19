@@ -10,6 +10,9 @@ TMP_DEPLOY_DIR=${2:-"deploy"}
 DEV_URL="https://huggingface.co/spaces/databank-ai4h/buster-dev"
 PROD_URL="https://huggingface.co/spaces/databank-ai4h/buster-prod"
 
+# Authenticate to huggingface for push
+huggingface-cli login --token $HUB_TOKEN
+
 # Check and set deployment URL
 set_deploy_url() {
   if [ -z "$DEPLOY_TYPE" ]; then
@@ -69,6 +72,7 @@ pinned: false
 
 # Initialize and push to git
 git_operations() {
+  git config --global init.defaultBranch main
   git init
   git branch -m main
   git config user.email "jerpint@gmail.com"
