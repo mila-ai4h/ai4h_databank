@@ -2,9 +2,11 @@
 
 set -e
 
-# Constants
+# User Args
 DEPLOY_TYPE=$1
-TMP_DEPLOY_DIR="deploy"
+TMP_DEPLOY_DIR=${2:-"deploy"}
+
+# SPACE URLS
 DEV_URL="https://huggingface.co/spaces/databank-ai4h/buster-dev"
 PROD_URL="https://huggingface.co/spaces/databank-ai4h/buster-prod"
 
@@ -12,7 +14,7 @@ PROD_URL="https://huggingface.co/spaces/databank-ai4h/buster-prod"
 set_deploy_url() {
   if [ -z "$DEPLOY_TYPE" ]; then
     echo "Error: Please provide the deployment type argument ('dev' or 'prod')."
-    echo "Usage: $0 <deployment_type>"
+    echo "Usage: $0 <deployment_type> [deploy_directory]"
     exit 1
   elif [ "$DEPLOY_TYPE" = "dev" ]; then
     SPACE_URL=$DEV_URL
@@ -24,6 +26,14 @@ set_deploy_url() {
     echo "Error: Invalid DEPLOY_TYPE. Valid values are 'dev' or 'prod'."
     exit 1
   fi
+}
+
+# Check and set deployment directory
+set_deploy_dir() {
+  if [ -z "$TMP_DEPLOY_DIR" ]; then
+    TMP_DEPLOY_DIR="deploy"
+  fi
+  echo "Using deployment directory: $TMP_DEPLOY_DIR"
 }
 
 # Print current branch and commit details
@@ -68,6 +78,7 @@ git_operations() {
 
 # Main execution
 set_deploy_url
+set_deploy_dir
 print_git_details
 prepare_deploy_dir
 create_readme
