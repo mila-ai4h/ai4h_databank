@@ -11,10 +11,36 @@ from buster.completers import Completion
 import cfg
 from cfg import setup_buster
 from feedback import FeedbackForm, Interaction
-from src.app_utils import add_sources, check_auth, get_utc_time
+from src.app_utils import (
+    add_sources,
+    check_auth,
+    get_utc_time,
+    verify_required_env_vars,
+)
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
+
+required_env_vars = [
+    "AI4H_USERNAME",
+    "AI4H_PASSWORD",
+    "AI4H_MONGODB_USERNAME",
+    "AI4H_MONGODB_PASSWORD",
+    "AI4H_MONGODB_DB_LOGGING",
+    "AI4H_MONGODB_CLUSTER",
+    "AI4H_MONGODB_DB_DATA",
+    "AI4H_MONGODB_FEEDBACK_COLLECTION",
+    "AI4H_MONGODB_FLAGGED_COLLECTION",
+    "AI4H_MONGODB_INTERACTION_COLLECTION",
+    "AI4H_PINECONE_API_KEY",
+    "AI4H_PINECONE_ENV",
+    "AI4H_PINECONE_INDEX",
+    "AI4H_PINECONE_NAMESPACE",
+    "OPENAI_API_KEY",
+    "OPENAI_ORGANIZATION",
+]
+
+verify_required_env_vars(required_vars=required_env_vars)
 
 # Typehint for chatbot history
 ChatHistory = list[list[Optional[str], Optional[str]]]
