@@ -8,8 +8,8 @@ TMP_DEPLOY_DIR=${2:-"deploy"}
 
 
 # SPACE URLS
-DEV_URL="https://huggingface.co/spaces/databank-ai4h/buster-dev"
-PROD_URL="https://huggingface.co/spaces/databank-ai4h/buster-prod"
+DEV_URL="https://$HF_USERNAME:$HF_TOKEN@huggingface.co/spaces/databank-ai4h/buster-dev"
+PROD_URL="https://$HF_USERNAME:$HF_TOKEN@huggingface.co/spaces/databank-ai4h/buster-prod"
 
 # Authenticate to huggingface for push
 huggingface-cli login --token $HF_TOKEN
@@ -22,10 +22,10 @@ set_deploy_url() {
     exit 1
   elif [ "$DEPLOY_TYPE" = "dev" ]; then
     SPACE_URL=$DEV_URL
-    echo "Deploying to dev space at $SPACE_URL"
+    echo "Deploying to **dev** space"
   elif [ "$DEPLOY_TYPE" = "prod" ]; then
     SPACE_URL=$PROD_URL
-    echo "Deploying to prod space at $SPACE_URL"
+    echo "Deploying to **prod** space"
   else
     echo "Error: Invalid DEPLOY_TYPE. Valid values are 'dev' or 'prod'."
     exit 1
