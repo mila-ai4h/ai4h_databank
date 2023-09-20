@@ -33,7 +33,7 @@ buster_1_cfg.documents_formatter_cfg = {
     "max_tokens": 3500,
     "columns": ["content", "source", "title"],
 }
-buster_1 = setup_buster(buster_1_cfg, DocFormatter=DocumentsFormatterJSON)
+buster_1 = setup_buster(buster_1_cfg, doc_formatter_cls=DocumentsFormatterJSON)
 buster_1_reveal_name = "latest prompt"
 
 
@@ -77,7 +77,7 @@ buster_2_cfg.documents_formatter_cfg = {
     "max_tokens": 3500,
     "formatter": "{content}",
 }
-buster_2 = setup_buster(buster_2_cfg, DocFormatter=DocumentsFormatterHTML)
+buster_2 = setup_buster(buster_2_cfg, doc_formatter_cls=DocumentsFormatterHTML)
 buster_2_reveal_name = "old prompt"
 
 # Useful to set when trying out new features locally so you don't have to wait for new streams each time.
