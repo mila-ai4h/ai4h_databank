@@ -22,7 +22,7 @@ jobs:
       - name: unit tests
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          HUB_TOKEN: ${{ secrets.HUB_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
           AI4H_MONGODB_USERNAME: ${{ secrets.AI4H_MONGODB_USERNAME }}
           AI4H_MONGODB_PASSWORD: ${{ secrets.AI4H_MONGODB_PASSWORD }}
           AI4H_MONGODB_CLUSTER: ${{ secrets.AI4H_MONGODB_CLUSTER }}
@@ -36,7 +36,7 @@ jobs:
           python3 -m pip install --upgrade pip
           pip install -e .[tests]
           pytest --ignore=performance
-  deploy-prod:
+  deploy-prod-heroku:
     needs: tests
     runs-on: ubuntu-latest
     steps:
@@ -48,3 +48,17 @@ jobs:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_app_name: ${{ vars.HEROKU_PROD_SERVER }}
           heroku_email: ${{ vars.HEROKU_EMAIL }}
+  deploy-prod-hf-space:
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Deploy to huggingface Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_USERNAME: ${{ secrets.HF_USERNAME }}
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install huggingface_hub
+          sh scripts/deploy_hf_space.sh prod

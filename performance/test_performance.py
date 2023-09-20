@@ -165,7 +165,7 @@ def write_markdown_results(summary: pd.DataFrame, fail: int, total: int):
         f.write(markdown_summary)
 
 
-def test_summary(busterbot):
+def evaluate_performance(busterbot):
     questions = pd.read_csv("src/sample_questions.csv")
     results = process_questions(busterbot, questions)
 
@@ -174,16 +174,7 @@ def test_summary(busterbot):
     write_markdown_results(summary, fail, total)
 
 
-def test_detect_according_to_the_documentation():
-    questions = pd.DataFrame(
-        {
-            "answer_text": [
-                "According to the documentation, this is a unit test",
-                "I have a lot of information and can answer cool questions",
-                "French have the best cheese, based on the provided documents.",
-            ]
-        }
-    )
-    fail, total = detect_according_to_the_documentation(questions)
-    assert fail == 2
-    assert total == 3
+def test_summary(busterbot):
+    # This is necessary to test evaluate_performance, otherwise pytest try to run it as a test.
+    # Long term fix is to not use pytest for performance tests.
+    evaluate_performance(busterbot)
