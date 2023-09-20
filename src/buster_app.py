@@ -344,7 +344,7 @@ def display_sources():
         sources_textboxes = []
         for i in range(max_sources):
             with gr.Tab(f"Source {i + 1} 📝"):
-                t = gr.Markdown()
+                t = gr.Markdown(latex_delimiters=[])
             sources_textboxes.append(t)
     return sources_textboxes
 
