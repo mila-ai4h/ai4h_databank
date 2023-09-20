@@ -159,12 +159,12 @@ Q:
 )
 
 
-def setup_buster(buster_cfg, DocFormatter: DocumentsFormatter = DocumentsFormatterJSON):
+def setup_buster(buster_cfg, doc_formatter_cls: DocumentsFormatter = DocumentsFormatterJSON):
     retriever: Retriever = ServiceRetriever(**buster_cfg.retriever_cfg)
     tokenizer = WordTokenizer(**buster_cfg.tokenizer_cfg)
     document_answerer: DocumentAnswerer = DocumentAnswerer(
         completer=ChatGPTCompleter(**buster_cfg.completion_cfg),
-        documents_formatter=DocumentsFormatterJSON(tokenizer=tokenizer, **buster_cfg.documents_formatter_cfg),
+        documents_formatter=doc_formatter_cls(tokenizer=tokenizer, **buster_cfg.documents_formatter_cfg),
         prompt_formatter=PromptFormatter(tokenizer=tokenizer, **buster_cfg.prompt_formatter_cfg),
         **buster_cfg.documents_answerer_cfg,
     )
