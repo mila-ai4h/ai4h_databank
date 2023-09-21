@@ -308,6 +308,11 @@ def toggle_interactivity(interactive: bool):
     return gr.update(interactive=interactive)
 
 
+def clear_message():
+    """Clears the contents of the message box."""
+    return gr.update(value="")
+
+
 def clear_sources():
     """Clears all the documents in the tabs"""
     return ["" for _ in range(max_sources)]
@@ -562,6 +567,9 @@ with buster_app:
     submit.click(
         add_user_question, [message], [chatbot]
     ).then(
+        clear_message,
+        outputs=[message]
+    ).then(
         clear_sources,
         outputs=[*sources_textboxes]
     ).then(
@@ -598,6 +606,9 @@ with buster_app:
 
     message.submit(
         add_user_question, [message], [chatbot]
+    ).then(
+        clear_message,
+        outputs=[message]
     ).then(
         clear_sources,
         outputs=[*sources_textboxes]
