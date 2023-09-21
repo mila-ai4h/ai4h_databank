@@ -308,6 +308,11 @@ def toggle_interactivity(interactive: bool):
     return gr.update(interactive=interactive)
 
 
+def clear_message():
+    """Clears the contents of the message box."""
+    return gr.update(value="")
+
+
 def clear_sources():
     """Clears all the documents in the tabs"""
     return ["" for _ in range(max_sources)]
@@ -594,6 +599,9 @@ with buster_app:
     ).then(
         log_completion,
         inputs=[last_completion, gr.State(cfg.mongo_interaction_collection)]
+    ).then(
+        clear_message,
+        outputs=[message]
     )
 
     message.submit(
