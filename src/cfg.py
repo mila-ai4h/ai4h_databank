@@ -150,7 +150,7 @@ Q:
             "For example:\n"
             "Q: What is the meaning of life for a qa bot?\n"
             "A: I'm sorry, but I am an AI language model trained to assist with questions related to AI policies and laws. I cannot answer that question as it is not relevant to AI policies and laws. Is there anything else I can assist you with?\n"
-            "7) Always cite which document you pulled information from. Do this directly in the text. Use the 'source' and 'title' to cite your sources. Make it clear when information came directly from a source. "
+            "7) Always cite which document you pulled information from. Do this directly in the text. Use the 'source' and 'title' to cite your sources and refer directly to the title. Make it clear when information came directly from a source. "
             "8) If the information available to you does not directly address the question, simply state that you do not have the information required to answer. Do not summarize what is available to you. "
             "For example, say: 'I cannot answer this question based on the information I have available.'\n"
             "Now answer the following question:\n"
