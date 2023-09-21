@@ -567,6 +567,9 @@ with buster_app:
     submit.click(
         add_user_question, [message], [chatbot]
     ).then(
+        clear_message,
+        outputs=[message]
+    ).then(
         clear_sources,
         outputs=[*sources_textboxes]
     ).then(
@@ -599,13 +602,13 @@ with buster_app:
     ).then(
         log_completion,
         inputs=[last_completion, gr.State(cfg.mongo_interaction_collection)]
-    ).then(
-        clear_message,
-        outputs=[message]
     )
 
     message.submit(
         add_user_question, [message], [chatbot]
+    ).then(
+        clear_message,
+        outputs=[message]
     ).then(
         clear_sources,
         outputs=[*sources_textboxes]
