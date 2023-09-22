@@ -57,6 +57,21 @@ mongo_arena_collection = os.getenv("AI4H_MONGODB_ARENA_COLLECTION")
 mongo_interaction_collection = os.getenv("AI4H_MONGODB_INTERACTION_COLLECTION")
 mongo_flagged_collection = os.getenv("AI4H_MONGODB_FLAGGED_COLLECTION")
 
+app_name = "AIS 👀"
+
+# sample questions
+example_questions = [
+    "Are there any AI policies related to AI adoption in the public sector in the UK?",
+    "How is Canada evaluating the success of its AI strategy?",
+    "Has the EU proposed specific legislation on AI?",
+]
+
+
+disclaimer = """I'm a bot 🤖 and can sometimes give inaccurate information.
+Always verify the integrity of my statements using the sources provided below 📝
+
+If something doesn't look right, you can use the feedback form to help me improve 😇
+"""
 
 buster_cfg = BusterConfig(
     validator_cfg={

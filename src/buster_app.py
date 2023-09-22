@@ -45,6 +45,9 @@ verify_required_env_vars(required_vars=required_env_vars)
 # Typehint for chatbot history
 ChatHistory = list[list[Optional[str], Optional[str]]]
 
+app_name = cfg.app_name
+example_questions = cfg.example_questions
+disclaimer = cfg.disclaimer
 mongo_db = cfg.mongo_db
 buster_cfg = copy.deepcopy(cfg.buster_cfg)
 buster = setup_buster(buster_cfg=buster_cfg)
@@ -56,16 +59,14 @@ current_dir = Path(__file__).resolve().parent
 documents_metadata_file = str(current_dir / "documents_metadata.csv")
 documents_metadata = pd.read_csv(documents_metadata_file)
 
-# sample questions
-example_questions = [
-    "Are there any AI policies related to AI adoption in the public sector in the UK?",
-    "How is Canada evaluating the success of its AI strategy?",
-    "Has the EU proposed specific legislation on AI?",
-]
-
 enable_terms_and_conditions = True
 
-app_name = "AIS 👀"
+
+def add_disclaimer(completion: Completion, chat_history: ChatHistory, disclaimer: str = disclaimer):
+    """Add a disclaimer response if the answer was relevant."""
+    if completion.answer_relevant:
+        chat_history.append([None, disclaimer])
+    return chat_history
 
 
 def hide_about_panel(accept_checkbox):
@@ -507,10 +508,14 @@ with buster_app:
     with app_group:
         with gr.Row():
             with gr.Column(scale=2, variant="panel"):
-                gr.Markdown("## Chatbot")
-                chatbot = gr.Chatbot(label=f"{app_name}")
+                gr.Markdown(
+                    """## Chatbot
+                Ask your questions below. Keep in mind this tool is meant to be used as a demo and can sometimes provide inaccurate information. Always verify the integrity of the information using the provided sources."""
+                )
+
+                chatbot = gr.Chatbot(label="Demo")
                 message = gr.Textbox(
-                    label=f"Chat with {app_name}",
+                    label=f"Chat with {cfg.app_name}",
                     placeholder="Ask your question here...",
                     lines=1,
                 )
@@ -583,6 +588,10 @@ with buster_app:
         inputs=[last_completion, gr.State(max_sources)],
         outputs=[*sources_textboxes]
     ).then(
+        add_disclaimer,
+        inputs=[last_completion, chatbot],
+        outputs=chatbot
+    ).then(
         log_completion,
         inputs=[last_completion, gr.State(cfg.mongo_interaction_collection)]
     )
@@ -622,6 +631,10 @@ with buster_app:
         add_sources,
         inputs=[last_completion, gr.State(max_sources)],
         outputs=[*sources_textboxes]
+    ).then(
+        add_disclaimer,
+        inputs=[last_completion, chatbot],
+        outputs=chatbot
     ).then(
         log_completion,
         inputs=[last_completion, gr.State(cfg.mongo_interaction_collection)]
