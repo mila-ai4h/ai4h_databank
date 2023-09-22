@@ -4,7 +4,7 @@ import os
 import openai
 from buster.busterbot import Buster, BusterConfig
 from buster.completers import ChatGPTCompleter, DocumentAnswerer
-from buster.formatters.documents import DocumentsFormatterHTML
+from buster.formatters.documents import DocumentsFormatter, DocumentsFormatterJSON
 from buster.formatters.prompts import PromptFormatter
 from buster.retriever import Retriever, ServiceRetriever
 from buster.tokenizers import Tokenizer
@@ -132,7 +132,7 @@ Q:
     },
     documents_formatter_cfg={
         "max_tokens": 3500,
-        "formatter": "{content}",
+        "columns": ["content", "source", "title"],
     },
     prompt_formatter_cfg={
         "max_tokens": 3500,
@@ -140,15 +140,17 @@ Q:
             "You are a chatbot assistant answering questions about artificial intelligence (AI) policies and laws. "
             "You represent the OECD AI Policy Observatory. "
             "You can only respond to a question if the content necessary to answer the question is contained in the information provided to you. "
-            "If the answer is in the documents, summarize it in a helpful way to the user. "
+            "The information will be provided in a json format. "
+            "If the answer is found in the information provided, summarize it in a helpful way to the user. "
             "If it isn't, simply reply that you cannot answer the question. "
+            "Do not refer to the documents directly, but use the information provided within it to answer questions. "
+            "Always cite which document you pulled information from. "
+            "Do not say 'according to the documentation' or related phrases. "
             "Do not mention the documents directly, but use the information available within them to answer the question. "
             "You are forbidden from using the expressions 'according to the documentation' and 'the provided documents'. "
-            "Here is the information available to you:\n"
-            "<INFORMATION> "
+            "Here is the information available to you in a json table:\n"
         ),
         "text_after_docs": (
-            "<\\INFORMATION>\n"
             "REMEMBER:\n"
             "You are a chatbot assistant answering questions about artificial intelligence (AI) policies and laws. "
             "You represent the OECD AI Policy Observatory. "
@@ -163,7 +165,8 @@ Q:
             "For example:\n"
             "Q: What is the meaning of life for a qa bot?\n"
             "A: I'm sorry, but I am an AI language model trained to assist with questions related to AI policies and laws. I cannot answer that question as it is not relevant to AI policies and laws. Is there anything else I can assist you with?\n"
-            "7) If the information available to you does not directly address the question, simply state that you do not have the information required to answer. Do not summarize what is available to you. "
+            "7) Always cite which document you pulled information from. Do this directly in the text. You can refer directly to the title in-line with your answer. Make it clear when information came directly from a source. "
+            "8) If the information available to you does not directly address the question, simply state that you do not have the information required to answer. Do not summarize what is available to you. "
             "For example, say: 'I cannot answer this question based on the information I have available.'\n"
             "Now answer the following question:\n"
         ),
@@ -171,13 +174,12 @@ Q:
 )
 
 
-def setup_buster(buster_cfg):
+def setup_buster(buster_cfg, doc_formatter_cls: DocumentsFormatter = DocumentsFormatterJSON):
     retriever: Retriever = ServiceRetriever(**buster_cfg.retriever_cfg)
     tokenizer = WordTokenizer(**buster_cfg.tokenizer_cfg)
-    # tokenizer = GPTTokenizer(**buster_cfg.tokenizer_cfg)
     document_answerer: DocumentAnswerer = DocumentAnswerer(
         completer=ChatGPTCompleter(**buster_cfg.completion_cfg),
-        documents_formatter=DocumentsFormatterHTML(tokenizer=tokenizer, **buster_cfg.documents_formatter_cfg),
+        documents_formatter=doc_formatter_cls(tokenizer=tokenizer, **buster_cfg.documents_formatter_cfg),
         prompt_formatter=PromptFormatter(tokenizer=tokenizer, **buster_cfg.prompt_formatter_cfg),
         **buster_cfg.documents_answerer_cfg,
     )

@@ -8,6 +8,7 @@ from itertools import zip_longest
 import gradio as gr
 import pandas as pd
 from buster.completers import Completion
+from buster.formatters.documents import DocumentsFormatterHTML, DocumentsFormatterJSON
 
 import cfg
 from cfg import buster_cfg, setup_buster
@@ -27,15 +28,57 @@ mongo_db = cfg.mongo_db
 questions = pd.read_csv("sample_questions.csv")
 relevant_questions = questions[questions.question_type == "relevant"].question.to_list()
 
-# Set up a version of buster with gpt 3.5
-buster_35_cfg = copy.deepcopy(buster_cfg)
-buster_35_cfg.completion_cfg["completion_kwargs"]["model"] = "gpt-3.5-turbo"
-buster_35 = setup_buster(buster_35_cfg)
+buster_1_cfg = copy.deepcopy(buster_cfg)
+buster_1_cfg.documents_formatter_cfg = {
+    "max_tokens": 3500,
+    "columns": ["content", "source", "title"],
+}
+buster_1 = setup_buster(buster_1_cfg, doc_formatter_cls=DocumentsFormatterJSON)
+buster_1_reveal_name = "latest prompt"
+
 
 # Set up a version of buster with gpt 4
-buster_4_cfg = copy.deepcopy(buster_cfg)
-buster_4_cfg.completion_cfg["completion_kwargs"]["model"] = "gpt-4"
-buster_4 = setup_buster(buster_4_cfg)
+buster_2_cfg = copy.deepcopy(buster_cfg)
+buster_2_cfg.prompt_formatter_cfg = {
+    "max_tokens": 3500,
+    "text_before_docs": (
+        "You are a chatbot assistant answering questions about artificial intelligence (AI) policies and laws. "
+        "You represent the OECD AI Policy Observatory. "
+        "You can only respond to a question if the content necessary to answer the question is contained in the information provided to you. "
+        "If the answer is in the documents, summarize it in a helpful way to the user. "
+        "If it isn't, simply reply that you cannot answer the question. "
+        "Do not mention the documents directly, but use the information available within them to answer the question. "
+        "You are forbidden from using the expressions 'according to the documentation' and 'the provided documents'. "
+        "Here is the information available to you:\n"
+        "<INFORMATION> "
+    ),
+    "text_after_docs": (
+        "<\\INFORMATION>\n"
+        "REMEMBER:\n"
+        "You are a chatbot assistant answering questions about artificial intelligence (AI) policies and laws. "
+        "You represent the OECD AI Policy Observatory. "
+        "Here are the rules you must follow:\n"
+        "1) You must only respond with information contained in the documents above. Say you do not know if the information is not provided.\n"
+        "2) Make sure to format your answers in Markdown format, including code block and snippets.\n"
+        "3) Do not reference any links, urls or hyperlinks in your answers.\n"
+        "4) Do not mention the documentation directly, but use the information provided within it to answer questions.\n"
+        "5) You are forbidden from using the expressions 'according to the documentation' and 'the provided documents'.\n"
+        "6) If you do not know the answer to a question, or if it is completely irrelevant to the library usage, simply reply with:\n"
+        "'I'm sorry, but I am an AI language model trained to assist with questions related to AI policies and laws. I cannot answer that question as it is not relevant to AI policies and laws. Is there anything else I can assist you with?'\n"
+        "For example:\n"
+        "Q: What is the meaning of life for a qa bot?\n"
+        "A: I'm sorry, but I am an AI language model trained to assist with questions related to AI policies and laws. I cannot answer that question as it is not relevant to AI policies and laws. Is there anything else I can assist you with?\n"
+        "7) If the information available to you does not directly address the question, simply state that you do not have the information required to answer. Do not summarize what is available to you. "
+        "For example, say: 'I cannot answer this question based on the information I have available.'\n"
+        "Now answer the following question:\n"
+    ),
+}
+buster_2_cfg.documents_formatter_cfg = {
+    "max_tokens": 3500,
+    "formatter": "{content}",
+}
+buster_2 = setup_buster(buster_2_cfg, doc_formatter_cls=DocumentsFormatterHTML)
+buster_2_reveal_name = "old prompt"
 
 # Useful to set when trying out new features locally so you don't have to wait for new streams each time.
 # Set to True to enable.
@@ -98,20 +141,34 @@ def submit_feedback(completion_left, completion_right, current_question, vote, e
     feedback.send(mongo_db, collection=cfg.mongo_arena_collection)
 
 
-async def process_input_35(question):
-    """Run buster with chatGPT"""
-    return buster_35.process_input(question)
+async def process_input_buster_1(question):
+    """Process input with buster_1."""
+    completion = buster_1.process_input(question)
+
+    # Add reveal name
+    completion.codename = buster_1_reveal_name
+
+    return completion
 
 
-async def process_input_4(question):
-    """Run buster with GPT-4"""
-    return buster_4.process_input(question)
+async def process_input_buster_2(question):
+    """Process input with buster_2."""
+    completion = buster_2.process_input(question)
+
+    # Add reveal name
+    completion.codename = buster_2_reveal_name
+
+    return completion
 
 
 async def run_models_async(question):
     """Run different buster instances async. Shuffles the resulting models."""
-    completion_35, completion_4 = await asyncio.gather(process_input_35(question), process_input_4(question))
-    completions = [completion_35, completion_4]
+    completion_1, completion_2 = await asyncio.gather(
+        process_input_buster_1(question), process_input_buster_2(question)
+    )
+
+    # Shuffle the completions and return them
+    completions = [completion_1, completion_2]
     random.shuffle(completions)
     return completions[0], completions[1]
 
@@ -168,7 +225,7 @@ async def bot_response_stream(
 
 def get_model_from_completion(completion: Completion) -> str:
     """Returns the model name of a given completer."""
-    return completion.completion_kwargs["model"]
+    return completion.codename
 
 
 def reveal_models(completion_left: Completion, completion_right: Completion) -> str:
@@ -255,7 +312,7 @@ with arena_app:
         sources_textboxes = []
         for i in range(3):
             with gr.Tab(f"Source {i + 1} 📝"):
-                t = gr.Markdown()
+                t = gr.Markdown(latex_delimiters=[])
             sources_textboxes.append(t)
 
     gr.Examples(
