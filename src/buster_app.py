@@ -666,4 +666,4 @@ with buster_app:
 if os.getenv("MOUNT_GRADIO_APP") is None:
     logger.info("launching app via gradio")
     buster_app.queue(concurrency_count=16)
-    buster_app.launch(share=False, auth=check_auth)
+    buster_app.launch(share=False)
