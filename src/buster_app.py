@@ -14,6 +14,7 @@ from feedback import FeedbackForm, Interaction
 from src.app_utils import (
     add_sources,
     check_auth,
+    get_session_id,
     get_utc_time,
     verify_required_env_vars,
 )
@@ -234,6 +235,7 @@ def chat(chat_history: ChatHistory):
 def log_completion(
     completion: Union[Completion, list[Completion]],
     collection: str,
+    session_id: str,
     request: gr.Request,
 ):
     """
@@ -254,10 +256,13 @@ def log_completion(
     else:
         user_completions = completion
 
+    # If a login page was used, use the username otherwise use the session_id
+    username = request.username if request.username is not None else session_id
+
     interaction = Interaction(
         user_completions=user_completions,
         time=get_utc_time(),
-        username=request.username,
+        username=username,
     )
     interaction.send(mongo_db, collection=collection)
 
@@ -509,9 +514,12 @@ def setup_flag_button():
 
 
 with buster_app:
-    # state variables are client-side and are reset every time a client refreshes the page
-    # store the users' last completion here
+    # State variables are client-side and are reset every time a client refreshes the page
+    # Store the users' last completion here
     last_completion = gr.State()
+
+    # A unique identifier that resets every time a page is refreshed
+    session_id = gr.State(get_session_id)
 
     gr.Markdown(f"<h1><center>{app_name}: A Question-Answering Bot for your documentation</center></h1>")
 
@@ -601,7 +609,7 @@ with buster_app:
         outputs=[*sources_textboxes]
     ).then(
         log_completion,
-        inputs=[last_completion, gr.State(cfg.mongo_interaction_collection)]
+        inputs=[last_completion, gr.State(cfg.mongo_interaction_collection), session_id]
     )
 
     message.submit(
@@ -641,12 +649,12 @@ with buster_app:
         outputs=[*sources_textboxes]
     ).then(
         log_completion,
-        inputs=[last_completion, gr.State(cfg.mongo_interaction_collection)]
+        inputs=[last_completion, gr.State(cfg.mongo_interaction_collection), session_id]
     )
 
     flag_button.click(
         log_completion,
-        inputs=[last_completion, gr.State(cfg.mongo_flagged_collection)]
+        inputs=[last_completion, gr.State(cfg.mongo_flagged_collection), session_id]
     ).then(
         raise_flagging_message,
     )
