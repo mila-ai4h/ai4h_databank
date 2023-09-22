@@ -94,7 +94,7 @@ We look forward to sharing with you an updated version of the product once we fe
                     )
                     with gr.Row():
                         overall_experience = gr.Radio(
-                            choices=["👍", "👎"], label="(*) Did you find what you were looking for?"
+                            choices=["👍", "👎"], label="Did you find what you were looking for?"
                         )
 
                     show_additional_feedback = gr.Group(visible=False)
