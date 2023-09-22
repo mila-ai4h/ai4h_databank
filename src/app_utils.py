@@ -1,5 +1,6 @@
 import logging
 import os
+import uuid
 from datetime import datetime, timezone
 from urllib.parse import quote_plus
 
@@ -14,6 +15,11 @@ PASSWORD = os.getenv("AI4H_PASSWORD")
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
+
+
+def get_session_id() -> str:
+    """Generate a uuid for each user."""
+    return str(uuid.uuid1())
 
 
 def verify_required_env_vars(required_vars: list[str]):
