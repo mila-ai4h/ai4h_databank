@@ -1,9 +1,7 @@
 question,valid_question,valid_answer,question_type
-What is the least relevant key pillar of AI policy in Canada?,True,False,relevant
 Which European countries have AI policies?,True,True,relevant
 Which Latin American countries have AI policies?,True,True,relevant
 How many countries have a national AI strategy?,True,True,relevant
-How many African countries have a national AI strategy?,True,True,relevant
 What are the most common AI policies?,True,True,relevant
 What are some examples of success factors for AI strategies?,True,True,relevant
 How are countries monitoring and evaluating AI policy implementation?,True,True,relevant
@@ -21,12 +19,8 @@ What are the main priorities of the Australian AI Action Plan?,True,True,relevan
 Which sectors does France’s AI policies focus on?,True,True,relevant
 What are three AI policy examples in the USA?,True,True,relevant
 What areas of the AI ecosystem does Germany's AI strategy tend to focus on?,True,True,relevant
-Which OECD AI Principles seem most important in Germany’s AI national strategy?,True,True,relevant
 What are the most important AI policies in Canada ?,True,True,relevant
-"What are the strengths, weaknesses, opportunities and threats of Ireland’s AI ecosystem?",True,True,relevant
-In what way does Canada implement the OECD AI Principles?,True,True,relevant
 To which extent is Australia's AI Ethics Framework aligned to the OECD AI Principles?,True,True,relevant
-What qualitative questions were asked in the UK AI ecosystem survey?,True,True,relevant
 How were stakeholders consulted in the elaboration of the AI national strategy of Colombia?,True,True,relevant
 What are the key pillars of France’s national AI strategy?,True,True,relevant
 Are there AI policies in Portugal related to transparency?,True,True,relevant
@@ -54,8 +48,6 @@ Are there any policies in the United States related to data centres and compute 
 What official bodies are responsible for AI strategy in the UK?,True,True,relevant
 Which part of the government is responsible for AI policies in Serbia?,True,True,relevant
 Which parts of the Finnish government are involved in AI policymaking?,True,True,relevant
-Are there any AI regulatory sandboxes in Spain?,True,True,relevant
-Are there any AI regulatory sandboxes in Japan?,True,True,relevant
 Which countries have established ethics or oversight bodies for AI?,True,True,relevant
 What is the timeline of Slovenia’s implementation of its national AI strategy?,True,True,relevant
 What is the timeline of Korea’s implementation of its national AI strategy?,True,True,relevant
@@ -138,3 +130,4 @@ What is the impact of South Africa's 2025 AI for Wildlife Conservation policy?,T
 How have the Middle East's AI for Renewable Energy regulations affected the global energy market since their implementation in 2019?,True,False,trick
 "What are the key takeaways from the Beijing Accord on AI Transparency, adopted in 2026?",True,False,trick
 How has the AI in Agriculture Act of 2021 changed farming practices in Mexico?,True,False,trick
+What is the least relevant key pillar of AI policy in Canada?,True,False,trick
