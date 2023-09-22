@@ -654,7 +654,7 @@ with buster_app:
 
     flag_button.click(
         log_completion,
-        inputs=[last_completion, gr.State(cfg.mongo_interaction_collection), session_id]
+        inputs=[last_completion, gr.State(cfg.mongo_flagged_collection), session_id]
     ).then(
         raise_flagging_message,
     )
