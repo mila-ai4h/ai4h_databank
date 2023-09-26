@@ -375,7 +375,7 @@ def setup_about_panel():
 
                 Finding accurate and up-to-date information about regulatory changes can be difficult but crucial to share best practices, ensure interoperability and promote adherence to local laws and regulations. That's why we've created {app_name}.
 
-                {app_name} is a Q&A chatbot designed to provide relevant and high quality information about AI policies from around the world. Using this tool, your AI policy questions will be answered, accompanied by relevant analyses by the OECD's AI Observatory!
+                {app_name} is a Q&A search engine designed to provide relevant and high quality information about AI policies from around the world. Using this tool, your AI policy questions will be answered, accompanied by relevant analyses by the OECD's AI Observatory!
 
                 ## How it works (and doesn't)
 
@@ -517,8 +517,8 @@ with buster_app:
         with gr.Row():
             with gr.Column(scale=2, variant="panel"):
                 gr.Markdown(
-                    """## Chatbot
-                Ask your questions below. Keep in mind this tool is meant to be used as a demo and can sometimes provide inaccurate information. Always verify the integrity of the information using the provided sources."""
+                    """## Search
+                Ask your AI policy questions below. Keep in mind this tool is a demo and can sometimes provide inaccurate information. Always verify the integrity of the information using the provided sources."""
                 )
 
                 chatbot = gr.Chatbot(label="Demo")
