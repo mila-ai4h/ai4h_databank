@@ -596,10 +596,6 @@ with buster_app:
         inputs=[last_completion, gr.State(max_sources)],
         outputs=[*sources_textboxes]
     ).then(
-        add_disclaimer,
-        inputs=[last_completion, chatbot],
-        outputs=chatbot
-    ).then(
         log_completion,
         inputs=[last_completion, gr.State(cfg.mongo_interaction_collection), session_id]
     )
@@ -639,10 +635,6 @@ with buster_app:
         add_sources,
         inputs=[last_completion, gr.State(max_sources)],
         outputs=[*sources_textboxes]
-    ).then(
-        add_disclaimer,
-        inputs=[last_completion, chatbot],
-        outputs=chatbot
     ).then(
         log_completion,
         inputs=[last_completion, gr.State(cfg.mongo_interaction_collection), session_id]
