@@ -166,7 +166,7 @@ def write_markdown_results(summary: pd.DataFrame, fail: int, total: int):
 
 
 def evaluate_performance(busterbot):
-    questions = pd.read_csv("src/sample_questions.csv")
+    questions = pd.read_csv("data/sample_questions.csv")
     results = process_questions(busterbot, questions)
 
     fail, total = detect_according_to_the_documentation(results)
