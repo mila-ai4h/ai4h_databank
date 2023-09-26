@@ -1,5 +1,3 @@
-import os
-
 import gradio as gr
 from fastapi import FastAPI
 from starlette.responses import RedirectResponse
