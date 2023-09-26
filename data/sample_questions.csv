@@ -13,7 +13,7 @@ Which countries have set up AI research centres?,True,True,relevant
 What are the main policies to foster AI skills in EU countries?,True,True,relevant
 Which countries are developing AI policies aimed at either reducing emissions or fostering the green transition?,True,True,relevant
 Which countries have established a dedicated (either digital or AI) ministry to advance their policies?,True,True,relevant
-Which countries are collaborating to foster cross-border AI policy initiatives?/ which policies have more than one financing country?,True,True,relevant
+Which countries are collaborating to foster cross-border AI policy initiatives?,True,True,relevant
 What is the focus of Italy’s AI policy strategy?,True,True,relevant
 What are the main priorities of the Australian AI Action Plan?,True,True,relevant
 Which sectors does France’s AI policies focus on?,True,True,relevant
@@ -33,10 +33,12 @@ Are there AI policies in the UK related to privacy and data governance?,True,Tru
 Are there AI policies in Japan related to accountability?,True,True,relevant
 Are there AI policies in Singapore promoting human-centred values?,True,True,relevant
 Are there AI policies in the US related to transparency?,True,True,relevant
-"Are there any AI policies in Germany focusing on [sector e.g. healthcare, mobility]?",True,True,relevant
+Are there any AI policies in Germany focusing on healthcare?,True,True,relevant
+Are there any AI policies in Germany focusing on mobility?,True,True,relevant
 Are there any AI policies related to AI adoption in the public sector in the UK?,True,True,relevant
 Are there any AI policies related to AI adoption in the public sector in France?,True,True,relevant
-"Are there any policies targeted to attracting and retaining private investments in AI in Canada? Are there any policies targeted to 	attracting and retaining private investments in AI in Germany?	"",""",True,True,relevant
+Are there any policies targeted to attracting and retaining private investments in AI in Canada?,True,True,relevant
+Are there any policies targeted to attracting and retaining private investments in AI in Germany?,True,True,relevant
 "Are there any policies targeted to increasing diversity in AI in the Netherlands (e.g. by supporting the inclusion of women, minorities, vulnerable groups, etc. in AI development and use)?",True,True,relevant
 Are there any policies targeted to attracting and retaining AI talent in the United Kingdom?,True,True,relevant
 Are there any incentives to foster the creation of AI start-ups in Serbia? Are there any barriers?,True,True,relevant
@@ -53,7 +55,7 @@ What is the timeline of Slovenia’s implementation of its national AI strategy?
 What is the timeline of Korea’s implementation of its national AI strategy?,True,True,relevant
 In which year has the second phase of France’s national AI strategy started?,True,True,relevant
 How is Canada evaluating the success of its AI strategy?,True,True,relevant
-What are the indicators listed in the Egypt AI strategy to monitor progress of	actions?,True,True,relevant
+What are the indicators listed in the Egypt AI strategy to monitor progress of actions?,True,True,relevant
 How much is the United Kingdom’s AI strategy investing in AI?,True,True,relevant
 What is the budget of the French national AI strategy?,True,True,relevant
 Has the EU proposed specific legislation on AI?,True,True,relevant

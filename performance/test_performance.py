@@ -27,7 +27,7 @@ from buster.busterbot import Buster
 from buster.completers import ChatGPTCompleter, DocumentAnswerer
 from buster.formatters.documents import DocumentsFormatterJSON
 from buster.formatters.prompts import PromptFormatter
-from buster.retriever import Retriever, ServiceRetriever
+from buster.retriever import ServiceRetriever
 from buster.tokenizers import GPTTokenizer
 from buster.validators import QuestionAnswerValidator, Validator
 from src import cfg
@@ -75,24 +75,30 @@ def process_questions(busterbot, questions: pd.DataFrame) -> pd.DataFrame:
     @retry(wait=wait_exponential(multiplier=1, min=4, max=10), stop=stop_after_attempt(5))
     def answer_question(question):
         completion = busterbot.process_input(question.question)
+        sources_titles = completion.matched_documents.title.tolist()
+        sources_column = [f"source_{i}" for i in range(len(sources_titles))]
         return pd.Series(
             [
                 question.question,
                 question.question_type,
                 question.valid_question,
                 question.valid_answer,
+                question.group,
                 completion.question_relevant,
                 completion.answer_relevant,
                 completion.answer_text,
+                *sources_titles,
             ],
             index=[
                 "question",
                 "question_type",
                 "valid_question",
                 "valid_answer",
+                "group",
                 "question_relevant",
                 "answer_relevant",
                 "answer_text",
+                *sources_column,
             ],
         )
 
