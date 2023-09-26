@@ -1,23 +1,20 @@
 import copy
 import logging
-import os
-from pathlib import Path
 from typing import Optional, Union
 
 import gradio as gr
 import pandas as pd
-from buster.completers import Completion
 
-import cfg
-from cfg import setup_buster
-from feedback import FeedbackForm, Interaction
+import src.cfg as cfg
+from buster.completers import Completion
 from src.app_utils import (
     add_sources,
-    check_auth,
     get_session_id,
     get_utc_time,
     verify_required_env_vars,
 )
+from src.cfg import setup_buster
+from src.feedback import FeedbackForm, Interaction
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -53,11 +50,10 @@ mongo_db = cfg.mongo_db
 buster_cfg = copy.deepcopy(cfg.buster_cfg)
 buster = setup_buster(buster_cfg=buster_cfg)
 max_sources = cfg.buster_cfg.retriever_cfg["top_k"]
-
-current_dir = Path(__file__).resolve().parent
+data_dir = cfg.data_dir
 
 # get documents metadata
-documents_metadata_file = str(current_dir / "documents_metadata.csv")
+documents_metadata_file = str(data_dir / "documents_metadata.csv")
 documents_metadata = pd.read_csv(documents_metadata_file)
 
 enable_terms_and_conditions = True
@@ -648,10 +644,3 @@ with buster_app:
     )
 
     # fmt: on
-
-
-# True when launching using gradio entrypoint
-if os.getenv("MOUNT_GRADIO_APP") is None:
-    logger.info("launching app via gradio")
-    buster_app.queue(concurrency_count=16)
-    buster_app.launch(share=False)

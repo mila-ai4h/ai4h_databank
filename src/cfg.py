@@ -1,7 +1,9 @@
 import logging
 import os
+from pathlib import Path
 
 import openai
+
 from buster.busterbot import Buster, BusterConfig
 from buster.completers import ChatGPTCompleter, DocumentAnswerer
 from buster.formatters.documents import DocumentsFormatter, DocumentsFormatterJSON
@@ -9,7 +11,6 @@ from buster.formatters.prompts import PromptFormatter
 from buster.retriever import Retriever, ServiceRetriever
 from buster.tokenizers import Tokenizer
 from buster.validators import QuestionAnswerValidator, Validator
-
 from src.app_utils import init_db, make_uri
 
 logger = logging.getLogger(__name__)
@@ -56,6 +57,12 @@ mongo_feedback_collection = os.getenv("AI4H_MONGODB_FEEDBACK_COLLECTION")
 mongo_arena_collection = os.getenv("AI4H_MONGODB_ARENA_COLLECTION")
 mongo_interaction_collection = os.getenv("AI4H_MONGODB_INTERACTION_COLLECTION")
 mongo_flagged_collection = os.getenv("AI4H_MONGODB_FLAGGED_COLLECTION")
+
+
+# Set relative path to data dir
+current_dir = Path(__file__).resolve().parent
+data_dir = current_dir.parent / "data"  # ../data
+
 
 app_name = "AIS 👀"
 
