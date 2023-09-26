@@ -4,17 +4,17 @@ from typing import Optional, Union
 
 import gradio as gr
 import pandas as pd
-from buster.completers import Completion
 
 import src.cfg as cfg
-from src.cfg import setup_buster
-from src.feedback import FeedbackForm, Interaction
+from buster.completers import Completion
 from src.app_utils import (
     add_sources,
     get_session_id,
     get_utc_time,
     verify_required_env_vars,
 )
+from src.cfg import setup_buster
+from src.feedback import FeedbackForm, Interaction
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)

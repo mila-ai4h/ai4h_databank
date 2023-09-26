@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 
 import openai
+
 from buster.busterbot import Buster, BusterConfig
 from buster.completers import ChatGPTCompleter, DocumentAnswerer
 from buster.formatters.documents import DocumentsFormatter, DocumentsFormatterJSON
@@ -10,7 +11,6 @@ from buster.formatters.prompts import PromptFormatter
 from buster.retriever import Retriever, ServiceRetriever
 from buster.tokenizers import Tokenizer
 from buster.validators import QuestionAnswerValidator, Validator
-
 from src.app_utils import init_db, make_uri
 
 logger = logging.getLogger(__name__)

@@ -21,6 +21,8 @@ import random
 
 import pandas as pd
 import pytest
+from tenacity import retry, stop_after_attempt, wait_exponential
+
 from buster.busterbot import Buster
 from buster.completers import ChatGPTCompleter, DocumentAnswerer
 from buster.formatters.documents import DocumentsFormatterJSON
@@ -28,8 +30,6 @@ from buster.formatters.prompts import PromptFormatter
 from buster.retriever import Retriever, ServiceRetriever
 from buster.tokenizers import GPTTokenizer
 from buster.validators import QuestionAnswerValidator, Validator
-from tenacity import retry, stop_after_attempt, wait_exponential
-
 from src import cfg
 
 logger = logging.getLogger(__name__)

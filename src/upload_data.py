@@ -2,8 +2,8 @@ import argparse
 import os
 
 import pandas as pd
-from buster.documents_manager import DocumentsService
 
+from buster.documents_manager import DocumentsService
 from src.app_utils import make_uri
 
 

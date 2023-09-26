@@ -7,13 +7,13 @@ from itertools import zip_longest
 
 import gradio as gr
 import pandas as pd
-from buster.completers import Completion
-from buster.formatters.documents import DocumentsFormatterHTML, DocumentsFormatterJSON
 
 import src.cfg as cfg
-from src.cfg import setup_buster, buster_cfg
-from src.feedback import ComparisonForm, Interaction
+from buster.completers import Completion
+from buster.formatters.documents import DocumentsFormatterHTML, DocumentsFormatterJSON
 from src.app_utils import add_sources, get_utc_time
+from src.cfg import buster_cfg, setup_buster
+from src.feedback import ComparisonForm, Interaction
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
