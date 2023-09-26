@@ -10,10 +10,10 @@ import pandas as pd
 from buster.completers import Completion
 from buster.formatters.documents import DocumentsFormatterHTML, DocumentsFormatterJSON
 
-import cfg
-from cfg import buster_cfg, setup_buster
-from feedback import ComparisonForm, Interaction
-from src.app_utils import add_sources, check_auth, get_utc_time
+import src.cfg as cfg
+from src.cfg import setup_buster, buster_cfg
+from src.feedback import ComparisonForm, Interaction
+from src.app_utils import add_sources, get_utc_time
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
