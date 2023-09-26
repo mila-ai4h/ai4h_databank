@@ -1,6 +1,5 @@
 import copy
 import logging
-import os
 from pathlib import Path
 from typing import Optional, Union
 
@@ -13,7 +12,6 @@ from cfg import setup_buster
 from feedback import FeedbackForm, Interaction
 from src.app_utils import (
     add_sources,
-    check_auth,
     get_session_id,
     get_utc_time,
     verify_required_env_vars,
@@ -648,10 +646,3 @@ with buster_app:
     )
 
     # fmt: on
-
-
-# True when launching using gradio entrypoint
-if os.getenv("MOUNT_GRADIO_APP") is None:
-    logger.info("launching app via gradio")
-    buster_app.queue(concurrency_count=16)
-    buster_app.launch(share=False)
