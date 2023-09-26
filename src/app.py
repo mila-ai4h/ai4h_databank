@@ -5,8 +5,8 @@ from fastapi import FastAPI
 from starlette.responses import RedirectResponse
 
 from app_utils import check_auth
-from arena_app import arena_app
-from buster_app import buster_app
+from arena.arena_app import arena_app
+from buster.buster_app import buster_app
 
 app = FastAPI()
 

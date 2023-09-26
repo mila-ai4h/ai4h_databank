@@ -1,5 +1,6 @@
 import logging
 import os
+from pathlib import Path
 
 import openai
 from buster.busterbot import Buster, BusterConfig
@@ -56,6 +57,12 @@ mongo_feedback_collection = os.getenv("AI4H_MONGODB_FEEDBACK_COLLECTION")
 mongo_arena_collection = os.getenv("AI4H_MONGODB_ARENA_COLLECTION")
 mongo_interaction_collection = os.getenv("AI4H_MONGODB_INTERACTION_COLLECTION")
 mongo_flagged_collection = os.getenv("AI4H_MONGODB_FLAGGED_COLLECTION")
+
+
+# Set relative path to data dir
+current_dir = Path(__file__).resolve().parent
+data_dir = current_dir.parent / "data"  # ../data
+
 
 app_name = "AIS 👀"
 

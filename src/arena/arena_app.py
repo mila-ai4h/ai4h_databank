@@ -24,8 +24,11 @@ max_sources = cfg.buster_cfg.retriever_cfg["top_k"]
 # db that will be logged to
 mongo_db = cfg.mongo_db
 
+# Path where data is found
+data_dir = cfg.data_dir
+
 # Load the sample questions and split them by type
-questions = pd.read_csv("sample_questions.csv")
+questions = pd.read_csv(str(data_dir / "sample_questions.csv"))
 relevant_questions = questions[questions.question_type == "relevant"].question.to_list()
 
 buster_1_cfg = copy.deepcopy(buster_cfg)
@@ -397,9 +400,3 @@ with arena_app:
         show_success
     )
     # fmt: on
-
-
-if os.getenv("MOUNT_GRADIO_APP") is None:
-    logger.info("launching gradio arena app")
-    arena_app.queue(concurrency_count=16)
-    arena_app.launch(share=False, auth=check_auth)

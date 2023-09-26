@@ -1,15 +1,14 @@
 import copy
 import logging
-from pathlib import Path
 from typing import Optional, Union
 
 import gradio as gr
 import pandas as pd
 from buster.completers import Completion
 
-import cfg
-from cfg import setup_buster
-from feedback import FeedbackForm, Interaction
+import src.cfg as cfg
+from src.cfg import setup_buster
+from src.feedback import FeedbackForm, Interaction
 from src.app_utils import (
     add_sources,
     get_session_id,
@@ -51,11 +50,10 @@ mongo_db = cfg.mongo_db
 buster_cfg = copy.deepcopy(cfg.buster_cfg)
 buster = setup_buster(buster_cfg=buster_cfg)
 max_sources = cfg.buster_cfg.retriever_cfg["top_k"]
-
-current_dir = Path(__file__).resolve().parent
+data_dir = cfg.data_dir
 
 # get documents metadata
-documents_metadata_file = str(current_dir / "documents_metadata.csv")
+documents_metadata_file = str(data_dir / "documents_metadata.csv")
 documents_metadata = pd.read_csv(documents_metadata_file)
 
 enable_terms_and_conditions = True
