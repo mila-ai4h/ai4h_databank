@@ -6,9 +6,10 @@ from typing import Any, Type
 
 import pandas as pd
 import pymongo
-from buster.completers.base import Completion
 from fastapi.encoders import jsonable_encoder
 from pyparsing import Optional
+
+from buster.completers.base import Completion
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)

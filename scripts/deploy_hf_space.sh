@@ -52,8 +52,15 @@ print_git_details() {
 prepare_deploy_dir() {
   rm -rf $TMP_DEPLOY_DIR
   mkdir -p $TMP_DEPLOY_DIR/src
+  mkdir -p $TMP_DEPLOY_DIR/data
+
+  # Copy over required files
   cp requirements.txt $TMP_DEPLOY_DIR/
-  cp src/*.py src/documents_metadata.csv $TMP_DEPLOY_DIR/src/
+  cp -r src/buster/  $TMP_DEPLOY_DIR/src/buster/
+  cp src/feedback.py src/cfg.py src/app_utils.py $TMP_DEPLOY_DIR/src/
+  cp data/documents_metadata.csv $TMP_DEPLOY_DIR/data
+
+  # make folder cwd
   cd $TMP_DEPLOY_DIR
 }
 
@@ -65,7 +72,7 @@ emoji: 💻
 colorFrom: pink
 colorTo: green
 sdk: gradio
-app_file: src/buster_app.py
+app_file: src/buster/gradio_app.py
 python: 3.11
 pinned: false
 ---' > README.md

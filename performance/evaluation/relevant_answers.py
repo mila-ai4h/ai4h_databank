@@ -4,9 +4,9 @@ import os
 
 import openai
 import pandas as pd
-from buster.busterbot import Buster
 from tqdm import tqdm
 
+from buster.busterbot import Buster
 from src import cfg
 
 logger = logging.getLogger(__name__)

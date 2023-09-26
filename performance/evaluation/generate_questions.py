@@ -4,8 +4,8 @@ import re
 
 import openai
 import pandas as pd
-from buster.completers import ChatGPTCompleter
 
+from buster.completers import ChatGPTCompleter
 from src.cfg import retriever
 
 logger = logging.getLogger(__name__)
