@@ -165,13 +165,18 @@ def detect_according_to_the_documentation(results: pd.DataFrame) -> tuple[int, i
 def measure_robustness(results: pd.DataFrame) -> pd.DataFrame:
     results = results[results.question_type.str.startswith("relevant")]
     grouped = results.groupby("group")["question_relevant"].sum().reset_index()
-    question_counts = grouped["question_relevant"].value_counts().sort_index()
+    question_counts = grouped["question_relevant"].value_counts().sort_index().rename("Relevant questions")
 
     grouped = results.groupby("group")["answer_relevant"].sum().reset_index()
-    answer_counts = grouped["answer_relevant"].value_counts().sort_index()
+    answer_counts = grouped["answer_relevant"].value_counts().sort_index().rename("Relevant answers")
 
     counts = pd.concat([question_counts, answer_counts], axis=1).T
     max_val = results.groupby("group").size().iloc[0]
+    for i in range(max_val + 1):
+        if i not in counts.columns:
+            counts[i] = 0
+    counts = counts.reindex(sorted(counts.columns), axis=1)
+
     counts.rename(columns=lambda x: f"{x} / {max_val}", inplace=True)
     counts.fillna(0, inplace=True)
 
@@ -189,13 +194,14 @@ def write_markdown_results(summary: pd.DataFrame, fail: int, total: int, variant
 
     markdown_summary += "# Expressions Detector\n\n"
     markdown_summary += f"- **According to the documentation**: {fail} / {total} ({fail / total * 100:04.2f} %)\n"
-
     markdown_summary += "\n\n"
+
     markdown_summary += "# Robustness\n\n"
     markdown_summary += "Each relevant question has 4 variants. The model should behave similarly for all variants.\n"
     markdown_summary += "## Relevance Robustness\n"
-    markdown_summary += "This is the distribution of relevance for both questions and answers. For example, question_relevant at 3 /5 means how many groups had 3 / 5 questions judged relevant.\n"
+    markdown_summary += "This is the distribution of relevance for both questions and answers. For example, question_relevant at 3 / 5 means how many groups had 3 / 5 questions judged relevant.\n"
     markdown_summary += variants.to_markdown(tablefmt="github")
+    markdown_summary += "\n\n"
 
     with open("results_summary.md", "w") as f:
         f.write(markdown_summary)
@@ -203,7 +209,7 @@ def write_markdown_results(summary: pd.DataFrame, fail: int, total: int, variant
 
 def evaluate_performance(busterbot):
     questions = pd.read_csv("data/sample_questions_variants.csv")
-    results = process_questions(busterbot, questions)
+    results = process_questions(busterbot, questions[0:3])
 
     fail, total = detect_according_to_the_documentation(results)
     summary = compute_summary(results)

@@ -23,7 +23,7 @@ def create_question_variants(question: str, n_variant: int = 4) -> list[str]:
     messages = [
         {
             "role": "system",
-            "content": f"Rephrase the following question in {n_variant} different ways as a Python list:",
+            "content": f"Rephrase the following question in {n_variant} different ways as a Python list. Use a variety of language fluency levels, from perfect english to broken english. Question:",
         },
         {"role": "user", "content": question},
     ]
@@ -73,7 +73,7 @@ def create_all_variants(questions: pd.DataFrame, n_variant: int = 4) -> pd.DataF
 
             variants = create_question_variants(row.question, n_variant)
             new_df["question"] = [row.question] + variants
-            new_df["question_type"] = ["relevant (original)"] + ["relevant (variant)"] * n_variant
+            new_df["question_type"] = ["relevant (original)"] + ["relevant (variants)"] * n_variant
 
             new_df["group"] = row.name
             new_df["is_original"] = [True] + [False] * n_variant
