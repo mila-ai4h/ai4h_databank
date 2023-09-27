@@ -64,13 +64,19 @@ def create_all_variants(questions: pd.DataFrame, n_variant: int = 4) -> pd.DataF
     """
 
     def generate_variants(row):
-        new_df = pd.concat([row] * (n_variant + 1), axis=1).T
+        if row.question_type != "relevant":
+            new_df = pd.concat([row], axis=1).T
+            new_df["group"] = row.name
+            new_df["is_original"] = True
+        else:
+            new_df = pd.concat([row] * (n_variant + 1), axis=1).T
 
-        variants = create_question_variants(row.question, n_variant)
-        new_df["question"] = [row.question] + variants
+            variants = create_question_variants(row.question, n_variant)
+            new_df["question"] = [row.question] + variants
+            new_df["question_type"] = ["relevant (original)"] + ["relevant (variant)"] * n_variant
 
-        new_df["group"] = row.name
-        new_df["is_original"] = [True] + [False] * n_variant
+            new_df["group"] = row.name
+            new_df["is_original"] = [True] + [False] * n_variant
 
         return new_df
 
