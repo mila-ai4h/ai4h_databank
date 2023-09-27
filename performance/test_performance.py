@@ -75,7 +75,10 @@ def process_questions(busterbot, questions: pd.DataFrame) -> pd.DataFrame:
     @retry(wait=wait_exponential(multiplier=1, min=4, max=10), stop=stop_after_attempt(5))
     def answer_question(question):
         completion = busterbot.process_input(question.question)
-        sources_titles = completion.matched_documents.title.tolist()
+        if "title" in completion.matched_documents.columns:
+            sources_titles = completion.matched_documents.title.tolist()
+        else:
+            sources_titles = ["" for _ in range(3)]
         sources_column = [f"source_{i}" for i in range(len(sources_titles))]
         return pd.Series(
             [
