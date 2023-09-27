@@ -146,13 +146,25 @@ def read_collection(
     feedback_cls: Optional[Type[StandardForm]] = None,
     filters: Optional[dict] = None,
 ) -> pd.DataFrame:
-    """Read a collection from mongodb.
+    """
+    Retrieve data from a MongoDB collection and return it as a pandas DataFrame.
 
-    Returns the data in a dataframe for convenience.
+    Parameters:
+    - mongo_db (pymongo.database.Database): The MongoDB database instance.
+    - collection (str): The name of the MongoDB collection to read from.
+    - feedback_cls (Optional[Type[StandardForm]]): A class to which the retrieved data might be mapped.
+      If the collection contains instances of Interaction, this is not needed. If a form is attached
+      (i.e., interaction["form"] exists), it should be provided.
+    - filters (Optional[dict]): A dictionary of filters to apply to the mongodb query. If not provided,
+      all items in the collection are returned. E.g., to get interactions from a specific user,
+      use `filters={"username": <username>}`.
 
-    If the collection is an instance of Interaction, no feedback_cls is required. However, if a form is attached, i.e. entry["form"]
-    By default, return all items in the collection. If filters are provided, return only items that matches the filters.
-    For example, to get just the interactions from a specific user, use filters={"username": <username>}.
+    Returns:
+    - pd.DataFrame: A DataFrame containing the retrieved data. Data is flattened for convenience.
+
+    Notes:
+    - Interactions that cannot be processed are skipped, and a log message is generated with the
+      count of retrieved and skipped entries.
     """
     flattened_interactions = []
     skipped_interactions = []
