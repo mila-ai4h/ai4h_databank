@@ -144,17 +144,19 @@ def read_collection(
     mongo_db: pymongo.database.Database,
     collection: str,
     feedback_cls: Optional[Type[StandardForm]] = None,
+    filters: Optional[dict] = None,
 ) -> pd.DataFrame:
     """Read a collection from mongodb.
 
     Returns the data in a dataframe for convenience.
 
     If the collection is an instance of Interaction, no feedback_cls is required. However, if a form is attached, i.e. entry["form"]
-
+    By default, return all items in the collection. If filters are provided, return only items that matches the filters.
+    For example, to get just the interactions from a specific user, use filters={"username": <username>}.
     """
     flattened_interactions = []
     skipped_interactions = []
-    interactions = mongo_db[collection].find()
+    interactions = mongo_db[collection].find(filters)
     for interaction in interactions:
         try:
             flattened_interaction = Interaction.from_dict(interaction, feedback_cls=feedback_cls).flatten()
