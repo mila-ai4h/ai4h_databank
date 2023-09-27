@@ -122,34 +122,46 @@ class Interaction:
         return jsonable_encoder(to_encode, custom_encoder=custom_encoder)
 
     @classmethod
-    def from_dict(cls, interaction_dict: dict, feedback_cls: Type[StandardForm]) -> Interaction:
-        del interaction_dict["_id"]
-        if "safe_answer" in interaction_dict["form"].keys():
-            del interaction_dict["form"]["safe_answer"]
-        interaction_dict["form"] = feedback_cls.from_dict(interaction_dict["form"])
+    def from_dict(cls, interaction_dict: dict, feedback_cls: Optional[Type[StandardForm]] = None) -> Interaction:
+        # remove the _id from mongodb
+        if "_id" in interaction_dict.keys():
+            del interaction_dict["_id"]
 
         interaction_dict["user_completions"] = [Completion.from_dict(r) for r in interaction_dict["user_completions"]]
+
+        if "form" in interaction_dict.keys():
+            # The interaction contained a type of form, e.g. feedback form, parse it accordingly
+
+            # Make sure the user specified a feedback_cls
+            assert feedback_cls is not None, "You must specify which type of feedback it is"
+
+            interaction_dict["form"] = feedback_cls.from_dict(interaction_dict["form"])
 
         return cls(**interaction_dict)
 
 
-def read_feedback(
+def read_collection(
     mongo_db: pymongo.database.Database,
     collection: str,
-    filters: dict = None,
-    feedback_cls: Type[StandardForm] = FeedbackForm,
+    feedback_cls: Optional[Type[StandardForm]] = None,
 ) -> pd.DataFrame:
-    """Read feedback from mongodb.
+    """Read a collection from mongodb.
 
-    By default, return all feedback. If filters are provided, return only feedback that matches the filters.
-    For example, to get just the feedback from a specific session, use filters={"username": <username>}.
+    Returns the data in a dataframe for convenience.
+
+    If the collection is an instance of Interaction, no feedback_cls is required. However, if a form is attached, i.e. entry["form"]
+
     """
-    try:
-        feedback = mongo_db[collection].find(filters)
-        feedback = [Interaction.from_dict(f, feedback_cls).flatten() for f in feedback]
-        feedback = pd.DataFrame(feedback)
+    flattened_interactions = []
+    skipped_interactions = []
+    interactions = mongo_db[collection].find()
+    for interaction in interactions:
+        try:
+            flattened_interaction = Interaction.from_dict(interaction, feedback_cls=feedback_cls).flatten()
+            flattened_interactions.append(flattened_interaction)
+        except Exception as err:
+            skipped_interactions.append(interaction)
 
-        return feedback
-    except Exception as err:
-        logger.exception("Something went wrong reading from mongodb")
-        return pd.DataFrame()
+    logger.info(f"Retrieved {len(flattened_interactions)} entries. Skipped {len(skipped_interactions)} entries")
+
+    return pd.DataFrame(flattened_interactions)
