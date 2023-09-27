@@ -45,6 +45,8 @@ def busterbot(monkeypatch, run_expensive):
     if not run_expensive:
         random.seed(42)
 
+        # Patch question relevance call
+        monkeypatch.setattr(QuestionAnswerValidator, "check_question_relevance", lambda s, q: (True, "mocked response"))
         # Patch embedding call to avoid computing embeddings
         monkeypatch.setattr(
             ServiceRetriever, "get_embedding", lambda s, x, model: [random.random() for _ in range(EMBEDDING_LENGTH)]
