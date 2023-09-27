@@ -24,8 +24,8 @@ def test_detect_according_to_the_documentation():
 
 def test_evaluate_performance(monkeypatch, busterbot):
     questions = pd.DataFrame(
-        [["What is the least relevant key pillar of AI policy in Canada?", True, False, "relevant"]],
-        columns=["question", "valid_question", "valid_answer", "question_type"],
+        [["What is the least relevant key pillar of AI policy in Canada?", True, False, "relevant", 0, True]],
+        columns=["question", "valid_question", "valid_answer", "question_type", "group", "is_original"],
     )
 
     # Patch csv file to use

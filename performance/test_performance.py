@@ -160,7 +160,7 @@ def detect_according_to_the_documentation(results: pd.DataFrame) -> tuple[int, i
 
 
 def measure_robustness(results: pd.DataFrame) -> pd.DataFrame:
-    results = results[results.question_type.startswith("relevant")]
+    results = results[results.question_type.str.startswith("relevant")]
     grouped = results.groupby("group")["question_relevant"].sum().reset_index()
     question_counts = grouped["question_relevant"].value_counts().sort_index()
 
