@@ -1,0 +1,383 @@
+question,valid_question,valid_answer,question_type,group,is_original
+Which European countries have AI policies?,True,True,relevant (original),0,True
+Which countries in Europe have policies on AI?,True,True,relevant (variant),0,False
+Can you list the European countries that have AI policies?,True,True,relevant (variant),0,False
+Which European nations have implemented AI policies?,True,True,relevant (variant),0,False
+Do you know which European countries have policies for AI?,True,True,relevant (variant),0,False
+Which Latin American countries have AI policies?,True,True,relevant (original),1,True
+Which countries in Latin America have policies on AI?,True,True,relevant (variant),1,False
+Can you list the Latin American countries that have AI policies?,True,True,relevant (variant),1,False
+Which Latin American nations have implemented AI policies?,True,True,relevant (variant),1,False
+"In Latin America, which countries have established policies on AI?",True,True,relevant (variant),1,False
+How many countries have a national AI strategy?,True,True,relevant (original),2,True
+What is the number of countries that have a national AI strategy?,True,True,relevant (variant),2,False
+How many nations have implemented a national AI strategy?,True,True,relevant (variant),2,False
+What's the count of countries with a national AI strategy?,True,True,relevant (variant),2,False
+Can you tell me the number of countries with a national AI strategy?,True,True,relevant (variant),2,False
+What are the most common AI policies?,True,True,relevant (original),3,True
+What are the prevalent AI policies?,True,True,relevant (variant),3,False
+Can you list the most common AI policies?,True,True,relevant (variant),3,False
+What are the typical AI policies?,True,True,relevant (variant),3,False
+Which AI policies are most common?,True,True,relevant (variant),3,False
+What are some examples of success factors for AI strategies?,True,True,relevant (original),4,True
+Can you provide some examples of success factors for AI strategies?,True,True,relevant (variant),4,False
+What could be some success factors for AI strategies?,True,True,relevant (variant),4,False
+Could you list some success factors for AI strategies?,True,True,relevant (variant),4,False
+What might be some examples of success factors for AI strategies?,True,True,relevant (variant),4,False
+How are countries monitoring and evaluating AI policy implementation?,True,True,relevant (original),5,True
+What methods are countries using to monitor and evaluate AI policy implementation?,True,True,relevant (variant),5,False
+How is the implementation of AI policies being monitored and evaluated by countries?,True,True,relevant (variant),5,False
+In what ways are countries assessing and tracking the implementation of AI policies?,True,True,relevant (variant),5,False
+What are the strategies countries are employing to monitor and evaluate the implementation of AI policies?,True,True,relevant (variant),5,False
+What are the most common AI policies related to transparency?,True,True,relevant (original),6,True
+What are the prevalent AI policies regarding transparency?,True,True,relevant (variant),6,False
+What are the typical transparency-related AI policies?,True,True,relevant (variant),6,False
+Which AI policies are most common in relation to transparency?,True,True,relevant (variant),6,False
+What are the most frequently seen AI policies concerning transparency?,True,True,relevant (variant),6,False
+Which countries have a register of AI systems used in the public sector?,True,True,relevant (original),7,True
+What countries maintain a registry of AI systems utilized in the public sector?,True,True,relevant (variant),7,False
+Can you list the countries that have a register of AI systems in the public sector?,True,True,relevant (variant),7,False
+In which countries is there a register of AI systems used in the public sector?,True,True,relevant (variant),7,False
+Which nations have a public sector register of AI systems?,True,True,relevant (variant),7,False
+Which countries have AI policies (regulations) on the use of AI in the workplace?,True,True,relevant (original),8,True
+Which nations have regulations regarding the use of AI in the workplace?,True,True,relevant (variant),8,False
+Can you list the countries that have AI policies for workplace use?,True,True,relevant (variant),8,False
+Which countries have implemented AI policies for its use in the workplace?,True,True,relevant (variant),8,False
+In which countries are there AI policies regulating its use in the workplace?,True,True,relevant (variant),8,False
+Which countries have conducted an evaluation of their national AI strategy?,True,True,relevant (original),9,True
+Which nations have assessed their national AI strategy?,True,True,relevant (variant),9,False
+What countries have performed an evaluation of their national AI strategy?,True,True,relevant (variant),9,False
+Can you list the countries that have evaluated their national AI strategy?,True,True,relevant (variant),9,False
+Which countries have carried out an assessment of their national AI strategy?,True,True,relevant (variant),9,False
+Which countries have set up AI research centres?,True,True,relevant (original),10,True
+Which nations have established AI research facilities?,True,True,relevant (variant),10,False
+In which countries are AI research centres located?,True,True,relevant (variant),10,False
+Can you list the countries that have AI research centres?,True,True,relevant (variant),10,False
+Which countries are home to AI research centres?,True,True,relevant (variant),10,False
+What are the main policies to foster AI skills in EU countries?,True,True,relevant (original),11,True
+What are the primary strategies to promote AI abilities in EU nations?,True,True,relevant (variant),11,False
+What are the key measures to encourage AI competencies in European Union countries?,True,True,relevant (variant),11,False
+What are the principal policies to enhance AI skills in countries of the EU?,True,True,relevant (variant),11,False
+What are the chief strategies to boost AI capabilities in EU countries?,True,True,relevant (variant),11,False
+Which countries are developing AI policies aimed at either reducing emissions or fostering the green transition?,True,True,relevant (original),12,True
+Which nations are formulating AI strategies to lower emissions or promote the green transition?,True,True,relevant (variant),12,False
+Can you list the countries that are creating AI policies for reducing emissions or encouraging the green transition?,True,True,relevant (variant),12,False
+Which countries are working on AI policies with the goal of emission reduction or green transition enhancement?,True,True,relevant (variant),12,False
+Can you name the countries that are developing AI policies focused on either emission reduction or the promotion of the green transition?,True,True,relevant (variant),12,False
+Which countries have established a dedicated (either digital or AI) ministry to advance their policies?,True,True,relevant (original),13,True
+"Which nations have set up a specific ministry for the advancement of their policies, be it digital or AI?",True,True,relevant (variant),13,False
+"What countries have created a dedicated ministry, digital or AI, to progress their policies?",True,True,relevant (variant),13,False
+"In which countries is there a dedicated ministry, either digital or AI, for the promotion of their policies?",True,True,relevant (variant),13,False
+"Can you list the countries that have a dedicated ministry, whether digital or AI, to further their policies?",True,True,relevant (variant),13,False
+Which countries are collaborating to foster cross-border AI policy initiatives?,True,True,relevant (original),14,True
+Which nations are working together to promote cross-border AI policy initiatives?,True,True,relevant (variant),14,False
+Which countries are jointly promoting cross-border AI policy initiatives?,True,True,relevant (variant),14,False
+Can you name the countries that are collaborating on cross-border AI policy initiatives?,True,True,relevant (variant),14,False
+Which countries are in collaboration for the advancement of cross-border AI policy initiatives?,True,True,relevant (variant),14,False
+What is the focus of Italy’s AI policy strategy?,True,True,relevant (original),15,True
+What does Italy's AI policy strategy primarily concentrate on?,True,True,relevant (variant),15,False
+What is the main emphasis of Italy's AI policy strategy?,True,True,relevant (variant),15,False
+What is the central point of Italy's AI policy strategy?,True,True,relevant (variant),15,False
+What is the primary concern of Italy's AI policy strategy?,True,True,relevant (variant),15,False
+What are the main priorities of the Australian AI Action Plan?,True,True,relevant (original),16,True
+What are the primary focuses of the Australian AI Action Plan?,True,True,relevant (variant),16,False
+What are the key objectives of the Australian AI Action Plan?,True,True,relevant (variant),16,False
+What are the main goals of the Australian AI Action Plan?,True,True,relevant (variant),16,False
+What are the principal aims of the Australian AI Action Plan?,True,True,relevant (variant),16,False
+Which sectors does France’s AI policies focus on?,True,True,relevant (original),17,True
+What are the sectors targeted by France's AI policies?,True,True,relevant (variant),17,False
+Can you name the sectors that France's AI policies are focused on?,True,True,relevant (variant),17,False
+Which areas are the focus of France's AI policies?,True,True,relevant (variant),17,False
+What sectors are the emphasis of AI policies in France?,True,True,relevant (variant),17,False
+What are three AI policy examples in the USA?,True,True,relevant (original),18,True
+Can you name three examples of AI policy in the USA?,True,True,relevant (variant),18,False
+What are three examples of AI policy in the United States?,True,True,relevant (variant),18,False
+Could you provide three examples of AI policy in the USA?,True,True,relevant (variant),18,False
+What three AI policies are there in the USA?,True,True,relevant (variant),18,False
+What areas of the AI ecosystem does Germany's AI strategy tend to focus on?,True,True,relevant (original),19,True
+What are the main focuses of Germany's AI strategy in the AI ecosystem?,True,True,relevant (variant),19,False
+"In the AI ecosystem, where does Germany's AI strategy primarily concentrate?",True,True,relevant (variant),19,False
+What parts of the AI ecosystem are primarily targeted by Germany's AI strategy?,True,True,relevant (variant),19,False
+Where in the AI ecosystem does Germany's AI strategy mainly apply?,True,True,relevant (variant),19,False
+What are the most important AI policies in Canada ?,True,True,relevant (original),20,True
+What are the key AI policies in Canada?,True,True,relevant (variant),20,False
+Can you list the most significant AI policies in Canada?,True,True,relevant (variant),20,False
+What are the primary AI policies in Canada?,True,True,relevant (variant),20,False
+Which AI policies are considered most important in Canada?,True,True,relevant (variant),20,False
+To which extent is Australia's AI Ethics Framework aligned to the OECD AI Principles?,True,True,relevant (original),21,True
+How much does Australia's AI Ethics Framework align with the OECD AI Principles?,True,True,relevant (variant),21,False
+How closely does the AI Ethics Framework of Australia match the OECD AI Principles?,True,True,relevant (variant),21,False
+What is the level of alignment between Australia's AI Ethics Framework and the OECD AI Principles?,True,True,relevant (variant),21,False
+To what degree does the AI Ethics Framework in Australia correspond to the OECD AI Principles?,True,True,relevant (variant),21,False
+How were stakeholders consulted in the elaboration of the AI national strategy of Colombia?,True,True,relevant (original),22,True
+What methods were used to consult stakeholders in the development of Colombia's AI national strategy?,True,True,relevant (variant),22,False
+In what way were stakeholders involved in the creation of the AI national strategy of Colombia?,True,True,relevant (variant),22,False
+How did the consultation process with stakeholders occur for the AI national strategy of Colombia?,True,True,relevant (variant),22,False
+What was the process of stakeholder consultation in the formulation of Colombia's AI national strategy?,True,True,relevant (variant),22,False
+What are the key pillars of France’s national AI strategy?,True,True,relevant (original),23,True
+What are the main elements of France's national AI strategy?,True,True,relevant (variant),23,False
+What are the fundamental components of the national AI strategy of France?,True,True,relevant (variant),23,False
+What constitutes the national AI strategy of France?,True,True,relevant (variant),23,False
+What are the primary aspects of France's national AI strategy?,True,True,relevant (variant),23,False
+Are there AI policies in Portugal related to transparency?,True,True,relevant (original),24,True
+Does Portugal have AI policies related to transparency?,True,True,relevant (variant),24,False
+Are transparency-related AI policies present in Portugal?,True,True,relevant (variant),24,False
+"In Portugal, are there any AI policies concerning transparency?",True,True,relevant (variant),24,False
+Is there any transparency-related AI policy in Portugal?,True,True,relevant (variant),24,False
+Are there AI policies in the EU related to explainability?,True,True,relevant (original),25,True
+Does the EU have AI policies related to explainability?,True,True,relevant (variant),25,False
+Are explainability-related AI policies present in the EU?,True,True,relevant (variant),25,False
+"In the EU, are there policies about AI explainability?",True,True,relevant (variant),25,False
+Is there any policy in the EU that relates to AI explainability?,True,True,relevant (variant),25,False
+Are there AI policies in France related to robustness?,True,True,relevant (original),26,True
+Does France have AI policies related to robustness?,True,True,relevant (variant),26,False
+Are robustness-related AI policies present in France?,True,True,relevant (variant),26,False
+"In France, are there any AI policies concerning robustness?",True,True,relevant (variant),26,False
+Is there any robustness-related AI policy in France?,True,True,relevant (variant),26,False
+Are there AI policies in Israel related to security?,True,True,relevant (original),27,True
+Does Israel have AI policies related to security?,True,True,relevant (variant),27,False
+Are there any security-related AI policies in Israel?,True,True,relevant (variant),27,False
+Is there any AI security policy in Israel?,True,True,relevant (variant),27,False
+Does Israel implement any AI policies for security?,True,True,relevant (variant),27,False
+Are there AI policies in Denmark related to safety?,True,True,relevant (original),28,True
+Does Denmark have safety-related AI policies?,True,True,relevant (variant),28,False
+Are safety policies for AI present in Denmark?,True,True,relevant (variant),28,False
+"In Denmark, are there policies about AI safety?",True,True,relevant (variant),28,False
+Is there any policy in Denmark that relates to AI safety?,True,True,relevant (variant),28,False
+Are there AI policies in the UK related to fairness?,True,True,relevant (original),29,True
+Does the UK have AI policies related to fairness?,True,True,relevant (variant),29,False
+Are there any fairness-related AI policies in the UK?,True,True,relevant (variant),29,False
+Is there any AI policy in the UK that deals with fairness?,True,True,relevant (variant),29,False
+Does fairness feature in any AI policies in the UK?,True,True,relevant (variant),29,False
+Are there AI policies in the UK related to privacy and data governance?,True,True,relevant (original),30,True
+Does the UK have AI policies related to privacy and data governance?,True,True,relevant (variant),30,False
+Are privacy and data governance covered in the UK's AI policies?,True,True,relevant (variant),30,False
+Is there any AI policy in the UK that deals with privacy and data governance?,True,True,relevant (variant),30,False
+Do AI policies in the UK address issues of privacy and data governance?,True,True,relevant (variant),30,False
+Are there AI policies in Japan related to accountability?,True,True,relevant (original),31,True
+Does Japan have AI policies related to accountability?,True,True,relevant (variant),31,False
+Are there any accountability-related AI policies in Japan?,True,True,relevant (variant),31,False
+Is Japan implementing AI policies concerning accountability?,True,True,relevant (variant),31,False
+Does accountability in AI policies exist in Japan?,True,True,relevant (variant),31,False
+Are there AI policies in Singapore promoting human-centred values?,True,True,relevant (original),32,True
+Does Singapore have AI policies that promote human-centred values?,True,True,relevant (variant),32,False
+Are human-centred values promoted by AI policies in Singapore?,True,True,relevant (variant),32,False
+"In Singapore, are there AI policies that advocate for human-centred values?",True,True,relevant (variant),32,False
+Is there a promotion of human-centred values in Singapore's AI policies?,True,True,relevant (variant),32,False
+Are there AI policies in the US related to transparency?,True,True,relevant (original),33,True
+Does the US have AI policies related to transparency?,True,True,relevant (variant),33,False
+Are transparency-related AI policies present in the US?,True,True,relevant (variant),33,False
+"In the US, are there any AI policies that deal with transparency?",True,True,relevant (variant),33,False
+Is there any transparency-related AI policy in the US?,True,True,relevant (variant),33,False
+Are there any AI policies in Germany focusing on healthcare?,True,True,relevant (original),34,True
+Does Germany have any AI policies that focus on healthcare?,True,True,relevant (variant),34,False
+Are there AI policies focusing on healthcare in Germany?,True,True,relevant (variant),34,False
+"In Germany, are there any healthcare-focused AI policies?",True,True,relevant (variant),34,False
+Is there any focus on healthcare in Germany's AI policies?,True,True,relevant (variant),34,False
+Are there any AI policies in Germany focusing on mobility?,True,True,relevant (original),35,True
+Does Germany have any AI policies that focus on mobility?,True,True,relevant (variant),35,False
+Are there AI policies focusing on mobility in Germany?,True,True,relevant (variant),35,False
+"In Germany, are there any AI policies related to mobility?",True,True,relevant (variant),35,False
+Is there a focus on mobility in any of Germany's AI policies?,True,True,relevant (variant),35,False
+Are there any AI policies related to AI adoption in the public sector in the UK?,True,True,relevant (original),36,True
+Does the UK have any AI policies for AI adoption in the public sector?,True,True,relevant (variant),36,False
+Are there any policies in the UK for the adoption of AI in the public sector?,True,True,relevant (variant),36,False
+"In the public sector of the UK, are there any policies related to AI adoption?",True,True,relevant (variant),36,False
+Is there any AI adoption policy in the public sector in the UK?,True,True,relevant (variant),36,False
+Are there any AI policies related to AI adoption in the public sector in France?,True,True,relevant (original),37,True
+Does France have any AI policies regarding AI adoption in the public sector?,True,True,relevant (variant),37,False
+Are there any policies in France that govern the adoption of AI in the public sector?,True,True,relevant (variant),37,False
+"In France, is there any legislation related to the adoption of AI in the public sector?",True,True,relevant (variant),37,False
+Does the public sector in France have any AI adoption policies?,True,True,relevant (variant),37,False
+Are there any policies targeted to attracting and retaining private investments in AI in Canada?,True,True,relevant (original),38,True
+Does Canada have any policies aimed at attracting and retaining private AI investments?,True,True,relevant (variant),38,False
+Are there specific policies in Canada for attracting and retaining private investments in AI?,True,True,relevant (variant),38,False
+"In Canada, are there any policies that focus on attracting and retaining private AI investments?",True,True,relevant (variant),38,False
+Does Canada implement any policies to attract and retain private investments in AI?,True,True,relevant (variant),38,False
+Are there any policies targeted to attracting and retaining private investments in AI in Germany?,True,True,relevant (original),39,True
+Does Germany have any policies aimed at attracting and retaining private AI investments?,True,True,relevant (variant),39,False
+Are there specific policies in Germany for attracting and retaining private investments in AI?,True,True,relevant (variant),39,False
+"In Germany, are there any policies that aim to attract and retain private investments in AI?",True,True,relevant (variant),39,False
+Is there a policy in Germany that targets the attraction and retention of private investments in AI?,True,True,relevant (variant),39,False
+"Are there any policies targeted to increasing diversity in AI in the Netherlands (e.g. by supporting the inclusion of women, minorities, vulnerable groups, etc. in AI development and use)?",True,True,relevant (original),40,True
+"Does the Netherlands have any policies aimed at promoting diversity in AI, such as including women, minorities, and vulnerable groups in AI development and use?",True,True,relevant (variant),40,False
+"Are there any initiatives in the Netherlands that support the inclusion of women, minorities, and vulnerable groups in AI to increase diversity?",True,True,relevant (variant),40,False
+"Does the Netherlands implement any policies to enhance diversity in AI, for instance, by encouraging the participation of women, minorities, and vulnerable groups in AI development and use?",True,True,relevant (variant),40,False
+"Are there any strategies in the Netherlands that aim to boost diversity in AI by supporting the involvement of women, minorities, and vulnerable groups in AI development and use?",True,True,relevant (variant),40,False
+Are there any policies targeted to attracting and retaining AI talent in the United Kingdom?,True,True,relevant (original),41,True
+Does the United Kingdom have any policies aimed at attracting and retaining AI talent?,True,True,relevant (variant),41,False
+Are there specific policies in the United Kingdom for attracting and retaining AI professionals?,True,True,relevant (variant),41,False
+What policies does the United Kingdom have to attract and retain AI talent?,True,True,relevant (variant),41,False
+Is there a strategy in place in the United Kingdom to attract and keep AI talent?,True,True,relevant (variant),41,False
+Are there any incentives to foster the creation of AI start-ups in Serbia? Are there any barriers?,True,True,relevant (original),42,True
+Does Serbia offer any incentives to encourage the establishment of AI start-ups?,True,True,relevant (variant),42,False
+Are there any incentives in Serbia that promote the formation of AI start-ups?,True,True,relevant (variant),42,False
+Are there any obstacles in Serbia for the creation of AI start-ups?,True,True,relevant (variant),42,False
+Does Serbia have any barriers that could hinder the establishment of AI start-ups?,True,True,relevant (variant),42,False
+"Are there AI policies in UAE helping to build human capacity (e.g. reskill, upskill, etc.)?",True,True,relevant (original),43,True
+Does UAE have AI policies that aid in human capacity building such as reskilling and upskilling?,True,True,relevant (variant),43,False
+Are there any AI policies in UAE that contribute to human capacity development like reskilling or upskilling?,True,True,relevant (variant),43,False
+Is UAE implementing AI policies to enhance human capacity through reskilling and upskilling?,True,True,relevant (variant),43,False
+"In UAE, are there AI policies that are designed to help build human capacity, for instance, through reskilling and upskilling?",True,True,relevant (variant),43,False
+Are there AI policies in Serbia supporting research and development?,True,True,relevant (original),44,True
+Does Serbia have AI policies that support research and development?,True,True,relevant (variant),44,False
+Are research and development supported by AI policies in Serbia?,True,True,relevant (variant),44,False
+"In Serbia, are there AI policies that back research and development?",True,True,relevant (variant),44,False
+Is there support for research and development through AI policies in Serbia?,True,True,relevant (variant),44,False
+Has Canada set up AI research centres as part of its national AI strategy?,True,True,relevant (original),45,True
+Is setting up AI research centres part of Canada's national AI strategy?,True,True,relevant (variant),45,False
+Has Canada established AI research centres under its national AI strategy?,True,True,relevant (variant),45,False
+"Under its national AI strategy, has Canada created AI research centres?",True,True,relevant (variant),45,False
+"As part of its national AI strategy, has Canada set up AI research centres?",True,True,relevant (variant),45,False
+Are there any policies in Canada related to large language models?,True,True,relevant (original),46,True
+Do any policies exist in Canada concerning large language models?,True,True,relevant (variant),46,False
+Are there policies concerning large language models in Canada?,True,True,relevant (variant),46,False
+Does Canada have any policies related to large language models?,True,True,relevant (variant),46,False
+"In Canada, are there any policies that pertain to large language models?",True,True,relevant (variant),46,False
+Are there any policies in the United States related to data centres and compute capacity?,True,True,relevant (original),47,True
+Do any policies exist in the United States concerning data centres and compute capacity?,True,True,relevant (variant),47,False
+Are there policies in the US that pertain to data centres and compute capacity?,True,True,relevant (variant),47,False
+Does the United States have any policies regarding data centres and compute capacity?,True,True,relevant (variant),47,False
+"In the United States, are there any policies that relate to data centres and compute capacity?",True,True,relevant (variant),47,False
+What official bodies are responsible for AI strategy in the UK?,True,True,relevant (original),48,True
+Which official organizations in the UK are in charge of AI strategy?,True,True,relevant (variant),48,False
+Can you name the official bodies in the UK that handle AI strategy?,True,True,relevant (variant),48,False
+Who are the official authorities responsible for AI strategy in the UK?,True,True,relevant (variant),48,False
+What are the names of the official bodies in the UK that manage AI strategy?,True,True,relevant (variant),48,False
+Which part of the government is responsible for AI policies in Serbia?,True,True,relevant (original),49,True
+What section of the Serbian government handles AI policies?,True,True,relevant (variant),49,False
+Who in the Serbian government is in charge of AI policies?,True,True,relevant (variant),49,False
+Which department in the Serbian government oversees AI policies?,True,True,relevant (variant),49,False
+Who is responsible for AI policies within the Serbian government?,True,True,relevant (variant),49,False
+Which parts of the Finnish government are involved in AI policymaking?,True,True,relevant (original),50,True
+What sections of the Finnish government participate in AI policymaking?,True,True,relevant (variant),50,False
+Which divisions of the Finnish government have a role in AI policy formulation?,True,True,relevant (variant),50,False
+"In the Finnish government, who are involved in the making of AI policies?",True,True,relevant (variant),50,False
+Who in the Finnish government are part of AI policymaking?,True,True,relevant (variant),50,False
+Which countries have established ethics or oversight bodies for AI?,True,True,relevant (original),51,True
+What countries have set up ethics or oversight bodies for AI?,True,True,relevant (variant),51,False
+Can you list the countries that have ethics or oversight bodies for AI?,True,True,relevant (variant),51,False
+In which countries are there established ethics or oversight bodies for AI?,True,True,relevant (variant),51,False
+Which nations have formed ethics or oversight bodies for AI?,True,True,relevant (variant),51,False
+What is the timeline of Slovenia’s implementation of its national AI strategy?,True,True,relevant (original),52,True
+What is the schedule for the implementation of Slovenia's national AI strategy?,True,True,relevant (variant),52,False
+When is Slovenia planning to implement its national AI strategy?,True,True,relevant (variant),52,False
+What is the planned timeline for Slovenia's national AI strategy implementation?,True,True,relevant (variant),52,False
+When will Slovenia's national AI strategy be implemented?,True,True,relevant (variant),52,False
+What is the timeline of Korea’s implementation of its national AI strategy?,True,True,relevant (original),53,True
+What is the schedule for the implementation of Korea's national AI strategy?,True,True,relevant (variant),53,False
+When is Korea planning to implement its national AI strategy?,True,True,relevant (variant),53,False
+What is the planned timeline for Korea's national AI strategy implementation?,True,True,relevant (variant),53,False
+Can you tell me the timeline for the implementation of the national AI strategy in Korea?,True,True,relevant (variant),53,False
+In which year has the second phase of France’s national AI strategy started?,True,True,relevant (original),54,True
+When did the second phase of France's national AI strategy begin?,True,True,relevant (variant),54,False
+What year marked the start of the second phase of France's national AI strategy?,True,True,relevant (variant),54,False
+In what year did the second phase of France's national AI strategy commence?,True,True,relevant (variant),54,False
+When was the commencement year of the second phase of France's national AI strategy?,True,True,relevant (variant),54,False
+How is Canada evaluating the success of its AI strategy?,True,True,relevant (original),55,True
+What methods is Canada using to assess the success of its AI strategy?,True,True,relevant (variant),55,False
+In what ways is Canada measuring the effectiveness of its AI strategy?,True,True,relevant (variant),55,False
+How does Canada determine the success of its AI strategy?,True,True,relevant (variant),55,False
+What are the evaluation techniques Canada is using for its AI strategy?,True,True,relevant (variant),55,False
+What are the indicators listed in the Egypt AI strategy to monitor progress of actions?,True,True,relevant (original),56,True
+What are the listed indicators in the Egypt AI strategy for monitoring progress of actions?,True,True,relevant (variant),56,False
+What indicators does the Egypt AI strategy use to track the progress of actions?,True,True,relevant (variant),56,False
+Which indicators are outlined in the Egypt AI strategy to keep track of action progress?,True,True,relevant (variant),56,False
+What are the progress monitoring indicators mentioned in the Egypt AI strategy?,True,True,relevant (variant),56,False
+How much is the United Kingdom’s AI strategy investing in AI?,True,True,relevant (original),57,True
+What is the amount of investment in AI by the United Kingdom's AI strategy?,True,True,relevant (variant),57,False
+How much money is the UK's AI strategy putting into AI?,True,True,relevant (variant),57,False
+What's the investment of the UK's AI strategy in AI?,True,True,relevant (variant),57,False
+What is the financial commitment of the UK's AI strategy towards AI?,True,True,relevant (variant),57,False
+What is the budget of the French national AI strategy?,True,True,relevant (original),58,True
+What's the amount allocated for the French national AI strategy?,True,True,relevant (variant),58,False
+How much is the French national AI strategy budget?,True,True,relevant (variant),58,False
+What's the financial plan for the French national AI strategy?,True,True,relevant (variant),58,False
+What is the funding for the French national AI strategy?,True,True,relevant (variant),58,False
+Has the EU proposed specific legislation on AI?,True,True,relevant (original),59,True
+Has specific AI legislation been proposed by the EU?,True,True,relevant (variant),59,False
+Did the EU propose any specific laws on AI?,True,True,relevant (variant),59,False
+Is there any specific AI legislation proposed by the EU?,True,True,relevant (variant),59,False
+Has the EU put forward any specific AI legislation?,True,True,relevant (variant),59,False
+Has Canada proposed specific legislation on AI?,True,True,relevant (original),60,True
+Has specific AI legislation been proposed by Canada?,True,True,relevant (variant),60,False
+Did Canada propose any specific laws on AI?,True,True,relevant (variant),60,False
+Is there any specific AI legislation proposed by Canada?,True,True,relevant (variant),60,False
+Has Canada put forward any specific AI legislation?,True,True,relevant (variant),60,False
+Which legislation in Japan applies to AI?,True,True,relevant (original),61,True
+What is the applicable legislation for AI in Japan?,True,True,relevant (variant),61,False
+Can you tell me the legislation that applies to AI in Japan?,True,True,relevant (variant),61,False
+What are the Japanese laws regarding AI?,True,True,relevant (variant),61,False
+Which Japanese laws are relevant to AI?,True,True,relevant (variant),61,False
+What are the most effective ways to promote a healthy work-life balance in modern society?,False,False,irrelevant,62,True
+How can urban planning and design contribute to the creation of more sustainable and livable cities?,False,False,irrelevant,63,True
+"What role do bees play in the ecosystem, and what can be done to protect their populations from decline?",False,False,irrelevant,64,True
+"What are the most promising emerging technologies for addressing the global water crisis, and how can they be scaled up?",False,False,irrelevant,65,True
+How has the introduction of cryptocurrencies and blockchain technology influenced the global financial landscape?,False,False,irrelevant,66,True
+"What are the key factors contributing to the rise in global obesity rates, and how can policymakers address this public health issue?",False,False,irrelevant,67,True
+How can we promote sustainable tourism practices that benefit both local communities and the environment?,False,False,irrelevant,68,True
+"What are some effective strategies for reducing food waste at the individual, household, and institutional levels?",False,False,irrelevant,69,True
+"How has the evolution of social media impacted political discourse and the spread of information, both accurate and inaccurate?",False,False,irrelevant,70,True
+What are some of the most significant challenges and opportunities associated with space exploration in the 21st century?,False,False,irrelevant,71,True
+How can we encourage the use of renewable energy sources and reduce dependence on fossil fuels?,False,False,irrelevant,72,True
+What are the key factors that contribute to the development and preservation of cultural heritage in a rapidly globalizing world?,False,False,irrelevant,73,True
+"How can we promote greater gender equality and empower women in various aspects of society, including education, employment, and political representation?",False,False,irrelevant,74,True
+What are some innovative methods for addressing the growing issue of plastic pollution in oceans and waterways?,False,False,irrelevant,75,True
+How can the global community work together to prevent the spread of infectious diseases and prepare for potential pandemics?,False,False,irrelevant,76,True
+"What are the key factors that influence the taste and quality of different types of wine, and how can this knowledge be used to make better wine selections?",False,False,irrelevant,77,True
+How have advances in virtual reality and augmented reality technologies impacted the gaming industry and the way we interact with digital content?,False,False,irrelevant,78,True
+"What role do pets play in human well-being and mental health, and what are the benefits and challenges of pet ownership?",False,False,irrelevant,79,True
+"What are the primary causes of traffic congestion in urban areas, and what solutions can be implemented to alleviate this problem?",False,False,irrelevant,80,True
+"How can the arts, such as music, theater, and visual arts, contribute to the overall well-being and personal development of individuals and communities?",False,False,irrelevant,81,True
+"What are the most effective methods for learning a new language and achieving fluency, and how do these methods vary among different age groups?",False,False,irrelevant,82,True
+What are some strategies for maintaining personal motivation and productivity while working remotely or in a flexible work environment?,False,False,irrelevant,83,True
+"How has the increasing popularity of plant-based diets influenced the food industry, and what are the potential health and environmental benefits of adopting such a diet?",False,False,irrelevant,84,True
+"What are the primary factors that contribute to the formation of natural disasters, such as earthquakes, hurricanes, and volcanic eruptions, and how can communities better prepare for these events?",False,False,irrelevant,85,True
+How can urban agriculture and community gardens contribute to local food security and overall community well-being?,False,False,irrelevant,86,True
+What are some innovative approaches to waste management and recycling that can help reduce the environmental impact of human activities?,False,False,irrelevant,87,True
+How can we foster greater understanding and empathy between individuals of diverse cultural backgrounds to promote social cohesion and reduce prejudice?,False,False,irrelevant,88,True
+What are the most effective ways to teach children about the importance of financial literacy and responsible money management?,False,False,irrelevant,89,True
+"How has the growth of e-commerce and online shopping impacted traditional brick-and-mortar retail businesses, and what strategies can they employ to stay competitive?",False,False,irrelevant,90,True
+"What are some of the most interesting and unusual hobbies or pastimes that people engage in around the world, and what can we learn from them?",False,False,irrelevant,91,True
+How does the United States' AI in Government Act ensure the responsible and ethical use of AI technologies in public services?,True,False,trick,92,True
+"In Germany's AI Liability Act, how is liability determined when multiple AI systems or a combination of AI and human decisions lead to harm or incorrect decisions?",True,False,trick,93,True
+How does France's AI Transparency and Accountability Act ensure that AI developers comply with the requirement to provide explanations for their algorithms' decision-making processes?,True,False,trick,94,True
+How does Canada's Algorithmic Impact Assessment Framework balance the benefits of AI systems in the public sector with the potential risks to individuals' rights and freedoms?,True,False,trick,95,True
+To what extent do Japan's Guidelines for AI and Data Utilization provide clear and actionable recommendations for AI developers and users?,True,False,trick,96,True
+What measures are included in China's New Generation Artificial Intelligence Development Plan to encourage international collaboration and knowledge-sharing in the field of AI?,True,False,trick,97,True
+In what ways does France's High Council for AI (CPAI) contribute to the global discourse on AI governance and ethics?,True,False,trick,98,True
+How does Nigeria's National AI Strategy for Nigeria (NAISN) plan to attract foreign investment and expertise to boost the country's AI capabilities?,True,False,trick,99,True
+What measures does the AI Empowerment and Inclusion Act in Nigeria propose to ensure that underserved communities have equal access to AI resources and opportunities?,True,False,trick,100,True
+How does South Africa's AI for Social Good Initiative incentivize the development of AI solutions to address the country's most pressing socio-economic challenges?,True,False,trick,101,True
+"To what extent does the Data Privacy and AI Regulation Act in South Africa align with international data protection standards, such as the EU's General Data Protection Regulation (GDPR)?",True,False,trick,102,True
+How does Kenya's AI Vision 2030 plan to promote collaboration between the public and private sectors to drive AI innovation and adoption?,True,False,trick,103,True
+What specific provisions are included in Kenya's AI for Sustainable Development Act to encourage the use of AI in environmental conservation and renewable energy sectors?,True,False,trick,104,True
+In what ways does the AI for Smart Cities Act in Egypt support the development and implementation of AI technologies in urban planning to improve public services and infrastructure?,True,False,trick,105,True
+How does Ghana's AI Development Initiative (GAIDI) plan to leverage partnerships with regional and international AI organizations to strengthen the country's AI ecosystem?,True,False,trick,106,True
+What strategies are proposed in Ghana's AI for Healthcare Act to ensure the successful development and deployment of AI applications in healthcare services across the country?,True,False,trick,107,True
+How does Rwanda's AI Roadmap 2030 envision fostering a skilled workforce capable of driving AI innovation and adoption within the country?,True,False,trick,108,True
+How does Sweden's AI for Education and Skills Development Act plan to integrate AI technologies into educational curricula and promote training opportunities in STEM fields?,True,False,trick,109,True
+What specific measures does Brazil's AI for Economic Growth and Social Inclusion Act propose to ensure that AI technologies benefit all segments of society?,True,False,trick,110,True
+How does Argentina's AI for Sustainable Agriculture Initiative support the adoption of AI technologies to enhance agricultural productivity and promote sustainable farming practices?,True,False,trick,111,True
+"To what extent does the Data Privacy and AI Regulation Act in Argentina align with international data protection standards, such as the EU's General Data Protection Regulation (GDPR)?",True,False,trick,112,True
+"How does Chile's AI Vision 2030 plan to promote collaboration between various stakeholders, including the government, industry, and academia, to drive AI innovation and adoption?",True,False,trick,113,True
+What specific provisions are included in Chile's AI for Renewable Energy and Environmental Conservation Act to encourage the use of AI in clean energy and environmental protection efforts?,True,False,trick,114,True
+"In what ways does the AI for Public Health and Safety Act in Colombia support the development and implementation of AI technologies in healthcare, disaster response, and crime prevention?",True,False,trick,115,True
+How does Peru's AI Development Initiative (PADI) plan to leverage partnerships with regional and international AI organizations to strengthen the country's AI ecosystem?,True,False,trick,116,True
+What strategies are proposed in Peru's AI for Cultural Heritage Preservation Act to ensure the successful integration of AI applications in cultural preservation and documentation efforts?,True,False,trick,117,True
+How does Uruguay's AI Roadmap 2030 envision fostering a skilled workforce capable of driving AI innovation and adoption within the country?,True,False,trick,118,True
+How does India's AI for Education and Workforce Development Act plan to integrate AI technologies into educational curricula and promote training opportunities in technology and innovation fields?,True,False,trick,119,True
+"What are the main points of the Artificial Intelligence Regulation Act of 2023, ratified by the United Nations?",True,False,trick,120,True
+"Can you detail the steps involved in the ""Neural Networks Transparency Protocol"" enacted by the European Union in 2022?",True,False,trick,121,True
+What are the primary clauses of the 2021 United Nations AI Morality Act?,True,False,trick,122,True
+How did the 'AI First' policy adopted by New Zealand in 2020 impact their economy?,True,False,trick,123,True
+How has Canada's AI and Robotics Taxation Act of 2022 affected employment?,True,False,trick,124,True
+How did the OECD react to Brazil's decision to withdraw from the 2024 AI Climate Accord?,True,False,trick,125,True
+What are the implications of Russia's proposed restrictions on AI in defense sectors in 2025?,True,False,trick,126,True
+How are Australian companies adapting to the 2023 Melbourne AI fairness rules?,True,False,trick,127,True
+What are the key elements of Japan's AI and Robotics for Elderly Care Act?,True,False,trick,128,True
+What is the impact of South Africa's 2025 AI for Wildlife Conservation policy?,True,False,trick,129,True
+How have the Middle East's AI for Renewable Energy regulations affected the global energy market since their implementation in 2019?,True,False,trick,130,True
+"What are the key takeaways from the Beijing Accord on AI Transparency, adopted in 2026?",True,False,trick,131,True
+How has the AI in Agriculture Act of 2021 changed farming practices in Mexico?,True,False,trick,132,True
+What is the least relevant key pillar of AI policy in Canada?,True,False,trick,133,True

@@ -87,6 +87,6 @@ def create_all_variants(questions: pd.DataFrame, n_variant: int = 4) -> pd.DataF
 
 
 if __name__ == "__main__":
-    questions = pd.read_csv("src/sample_questions.csv")
+    questions = pd.read_csv("data/sample_questions.csv")
     questions = create_all_variants(questions, n_variant=4)
-    questions.to_csv("src/sample_questions_variants.csv", index=False)
+    questions.to_csv("data/sample_questions_variants.csv", index=False)
