@@ -10,11 +10,6 @@ from pymongo import MongoClient
 
 from buster.tokenizers import Tokenizer
 
-# auth information
-USERNAME = os.environ["AI4H_APP_USERNAME"]
-PASSWORD = os.environ["AI4H_APP_PASSWORD"]
-
-
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
@@ -89,6 +84,11 @@ def check_auth(username: str, password: str) -> bool:
     It is temporary for developing the PoC. Proper authentication needs to be implemented in the future.
     We allow a valid username to be any username beginning with 'databank-', this will allow us to differentiate between users easily.
     """
+
+    # get auth information from env. vars, they need to be set
+    USERNAME = os.environ["AI4H_APP_USERNAME"]
+    PASSWORD = os.environ["AI4H_APP_PASSWORD"]
+
     valid_user = username.startswith(USERNAME)
     valid_password = password == PASSWORD
     is_auth = valid_user and valid_password
