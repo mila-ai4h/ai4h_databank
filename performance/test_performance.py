@@ -27,7 +27,7 @@ from buster.busterbot import Buster
 from buster.completers import ChatGPTCompleter, DocumentAnswerer
 from buster.formatters.documents import DocumentsFormatterJSON
 from buster.formatters.prompts import PromptFormatter
-from buster.retriever import Retriever, ServiceRetriever
+from buster.retriever import ServiceRetriever
 from buster.tokenizers import GPTTokenizer
 from buster.validators import QuestionAnswerValidator, Validator
 from src import cfg
@@ -75,24 +75,35 @@ def process_questions(busterbot, questions: pd.DataFrame) -> pd.DataFrame:
     @retry(wait=wait_exponential(multiplier=1, min=4, max=10), stop=stop_after_attempt(5))
     def answer_question(question):
         completion = busterbot.process_input(question.question)
+        if "title" in completion.matched_documents.columns:
+            sources_titles = completion.matched_documents.title.tolist()
+        else:
+            sources_titles = ["" for _ in range(3)]
+        sources_column = [f"source_{i}" for i in range(len(sources_titles))]
         return pd.Series(
             [
                 question.question,
                 question.question_type,
                 question.valid_question,
                 question.valid_answer,
+                question.group,
+                question.is_original,
                 completion.question_relevant,
                 completion.answer_relevant,
                 completion.answer_text,
+                *sources_titles,
             ],
             index=[
                 "question",
                 "question_type",
                 "valid_question",
                 "valid_answer",
+                "group",
+                "is_original",
                 "question_relevant",
                 "answer_relevant",
                 "answer_text",
+                *sources_column,
             ],
         )
 
@@ -103,7 +114,7 @@ def process_questions(busterbot, questions: pd.DataFrame) -> pd.DataFrame:
 
 
 def compute_summary(results: pd.DataFrame) -> pd.DataFrame:
-    results.drop(columns=["answer_text"], inplace=True)
+    summary = results[["question_type", "question_relevant", "answer_relevant"]]
 
     summary = (
         results.groupby("question_type")
@@ -142,7 +153,7 @@ def detect_according_to_the_documentation(results: pd.DataFrame) -> tuple[int, i
         "the provided documents",
     ]
 
-    def detect_forbidden_expression(answer):
+    def detect_forbidden_expression(answer: str) -> bool:
         return any([expr in answer.lower() for expr in forbidden_expressions])
 
     fail = sum(results.answer_text.apply(detect_forbidden_expression))
@@ -151,7 +162,28 @@ def detect_according_to_the_documentation(results: pd.DataFrame) -> tuple[int, i
     return fail, total
 
 
-def write_markdown_results(summary: pd.DataFrame, fail: int, total: int):
+def measure_robustness(results: pd.DataFrame) -> pd.DataFrame:
+    results = results[results.question_type.str.startswith("relevant")]
+    grouped = results.groupby("group")["question_relevant"].sum().reset_index()
+    question_counts = grouped["question_relevant"].value_counts().sort_index().rename("Relevant questions")
+
+    grouped = results.groupby("group")["answer_relevant"].sum().reset_index()
+    answer_counts = grouped["answer_relevant"].value_counts().sort_index().rename("Relevant answers")
+
+    counts = pd.concat([question_counts, answer_counts], axis=1).T
+    max_val = results.groupby("group").size().iloc[0]
+    for i in range(max_val + 1):
+        if i not in counts.columns:
+            counts[i] = 0
+    counts = counts.reindex(sorted(counts.columns), axis=1)
+
+    counts.rename(columns=lambda x: f"{x} / {max_val}", inplace=True)
+    counts.fillna(0, inplace=True)
+
+    return counts
+
+
+def write_markdown_results(summary: pd.DataFrame, fail: int, total: int, variants: pd.DataFrame):
     markdown_summary = "# Performance Results\n\n"
     markdown_summary += summary.to_markdown(tablefmt="github")
     markdown_summary += "\n\n"
@@ -162,18 +194,27 @@ def write_markdown_results(summary: pd.DataFrame, fail: int, total: int):
 
     markdown_summary += "# Expressions Detector\n\n"
     markdown_summary += f"- **According to the documentation**: {fail} / {total} ({fail / total * 100:04.2f} %)\n"
+    markdown_summary += "\n\n"
+
+    markdown_summary += "# Robustness\n\n"
+    markdown_summary += "Each relevant question has 4 variants. The model should behave similarly for all variants.\n"
+    markdown_summary += "## Relevance Robustness\n"
+    markdown_summary += "This is the distribution of relevance for both questions and answers. For example, question_relevant at 3 / 5 means how many groups had 3 / 5 questions judged relevant.\n"
+    markdown_summary += variants.to_markdown(tablefmt="github")
+    markdown_summary += "\n\n"
 
     with open("results_summary.md", "w") as f:
         f.write(markdown_summary)
 
 
 def evaluate_performance(busterbot):
-    questions = pd.read_csv("data/sample_questions.csv")
+    questions = pd.read_csv("data/sample_questions_variants.csv")
     results = process_questions(busterbot, questions)
 
     fail, total = detect_according_to_the_documentation(results)
     summary = compute_summary(results)
-    write_markdown_results(summary, fail, total)
+    variants = measure_robustness(results)
+    write_markdown_results(summary, fail, total, variants)
 
 
 def test_summary(busterbot):
