@@ -88,7 +88,7 @@ gradio gradio_app.py
 
 simply run
 
-```
+```sh
 cd src/
 python app.py
 ```
@@ -106,3 +106,11 @@ Currently, the CI/CD pipeline deploys the mounted app on heroku and the buster g
 ## Chunk Management
 
 TODO: Add details on how to update/manage chunks
+
+
+## How to backup a database
+
+```sh
+mongodump --archive="backup-ai4h-databank-prod-2023-09-29" --db="ai4h-databank-prod" --uri="mongodb+srv://ai4h-databank-dev.m0zt2w2.mongodb.net/" --username miladatabank
+mongorestore --archive="backup-ai4h-databank-prod-2023-09-29" --nsFrom='ai4h-databank-prod.*' --nsTo='backup-ai4h-databank-prod-2023-09-29.*' --uri="mongodb+srv://ai4h-databank-dev.m0zt2w2.mongodb.net/" --username miladatabank
+```
