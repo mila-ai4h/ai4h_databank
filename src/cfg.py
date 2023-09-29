@@ -24,32 +24,34 @@ openai.api_key = os.environ["OPENAI_API_KEY"]
 openai.organization = os.environ["OPENAI_ORGANIZATION"]
 
 # Pinecone Configurations
-PINECONE_API_KEY = os.environ["AI4H_PINECONE_API_KEY"]
+PINECONE_API_KEY = os.environ["PINECONE_API_KEY"]
 PINECONE_ENV = "asia-southeast1-gcp"
 PINECONE_INDEX = "oecd"
 PINECONE_NAMESPACE = "data-2023-05-16"
 
 # MongoDB Configurations
-MONGO_USERNAME = os.environ["AI4H_MONGODB_USERNAME"]
-MONGO_PASSWORD = os.environ["AI4H_MONGODB_PASSWORD"]
-MONGO_CLUSTER = os.environ["AI4H_MONGODB_CLUSTER"]
+MONGO_USERNAME = os.environ["MONGO_USERNAME"]
+MONGO_PASSWORD = os.environ["MONGO_PASSWORD"]
+MONGO_CLUSTER = os.environ["MONGO_CLUSTER"]
 
 # Instance Configurations
-INSTANCE_NAME = os.environ["AI4H_INSTANCE_NAME"]  # e.g., huggingface, heroku
-INSTANCE_TYPE = os.environ["AI4H_INSTANCE_TYPE"]
-assert INSTANCE_TYPE in ["dev", "prod"], "Invalid instance_type declared."
+INSTANCE_NAME = os.environ["INSTANCE_NAME"]  # e.g., huggingface, heroku
+INSTANCE_TYPE = os.environ["INSTANCE_TYPE"]
+assert INSTANCE_TYPE in ["dev", "prod", "local"], "Invalid instance_type declared."
 
-# MongoDB Database Setup
+# MongoDB Databases
 MONGO_DATABASE_LOGGING = f"ai4h-databank-{INSTANCE_TYPE}"  # Where all interactions will be stored
 MONGO_DATABASE_DATA = "data-2023-05-16"  # Where documents are stored
-mongo_db = init_db(MONGO_USERNAME, MONGO_PASSWORD, MONGO_CLUSTER, MONGO_DATABASE_LOGGING)
-mongo_uri = make_uri(MONGO_USERNAME, MONGO_PASSWORD, MONGO_CLUSTER)
 
 # MongoDB Collections
 # Naming convention: Collection name followed by purpose.
 MONGO_COLLECTION_FEEDBACK = "feedback"  # Feedback form
 MONGO_COLLECTION_INTERACTION = "interaction"  # User interaction
 MONGO_COLLECTION_FLAGGED = "flagged"  # Flagged interactions
+
+# Make the connections to the databases
+mongo_uri = make_uri(MONGO_USERNAME, MONGO_PASSWORD, MONGO_CLUSTER)
+mongo_db = init_db(MONGO_USERNAME, MONGO_PASSWORD, MONGO_CLUSTER, MONGO_DATABASE_LOGGING)
 
 
 # Set relative path to data dir

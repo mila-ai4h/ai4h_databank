@@ -11,8 +11,8 @@ from pymongo import MongoClient
 from buster.tokenizers import Tokenizer
 
 # auth information
-USERNAME = os.getenv("AI4H_USERNAME")
-PASSWORD = os.getenv("AI4H_PASSWORD")
+USERNAME = os.environ["AI4H_APP_USERNAME"]
+PASSWORD = os.environ["AI4H_APP_PASSWORD"]
 
 
 logger = logging.getLogger(__name__)
