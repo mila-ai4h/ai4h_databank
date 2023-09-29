@@ -271,7 +271,7 @@ def submit_feedback(
         time=get_utc_time(),
         username=request.username,
     )
-    feedback.send(mongo_db, collection=cfg.mongo_feedback_collection)
+    feedback.send(mongo_db, collection=cfg.MONGO_FEEDBACK_COLLECTION)
 
 
 def toggle_visibility(visible: bool):
