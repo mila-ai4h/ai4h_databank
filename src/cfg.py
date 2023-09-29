@@ -15,10 +15,7 @@ from src.app_utils import WordTokenizer, init_db, make_uri
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-import os
-
 # Note: The app will not launch if the environment variables aren't set. This is intentional.
-
 # Set OpenAI Configurations
 openai.api_key = os.environ["OPENAI_API_KEY"]
 openai.organization = os.environ["OPENAI_ORGANIZATION"]
