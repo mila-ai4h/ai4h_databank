@@ -8,6 +8,8 @@ import pandas as pd
 import pymongo
 from pymongo import MongoClient
 
+from buster.tokenizers import Tokenizer
+
 # auth information
 USERNAME = os.getenv("AI4H_USERNAME")
 PASSWORD = os.getenv("AI4H_PASSWORD")
@@ -15,6 +17,22 @@ PASSWORD = os.getenv("AI4H_PASSWORD")
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
+
+
+class WordTokenizer(Tokenizer):
+    """Naive word-level tokenizer
+
+    The original tokenizer from openAI eats way too much Ram.
+    This is a naive word count tokenizer to be used instead."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def encode(self, string):
+        return string.split()
+
+    def decode(self, encoded):
+        return " ".join(encoded)
 
 
 def get_session_id() -> str:

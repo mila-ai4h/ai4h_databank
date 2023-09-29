@@ -9,29 +9,11 @@ from buster.completers import ChatGPTCompleter, DocumentAnswerer
 from buster.formatters.documents import DocumentsFormatter, DocumentsFormatterJSON
 from buster.formatters.prompts import PromptFormatter
 from buster.retriever import Retriever, ServiceRetriever
-from buster.tokenizers import Tokenizer
 from buster.validators import QuestionAnswerValidator, Validator
-from src.app_utils import init_db, make_uri
+from src.app_utils import WordTokenizer, init_db, make_uri
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
-
-
-class WordTokenizer(Tokenizer):
-    """Naive word-level tokenizer
-
-    The original tokenizer from openAI eats way too much Ram.
-    This is a naive word count tokenizer to be used instead."""
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def encode(self, string):
-        return string.split()
-
-    def decode(self, encoded):
-        return " ".join(encoded)
-
 
 # set openAI creds
 openai.api_key = os.getenv("OPENAI_API_KEY")
