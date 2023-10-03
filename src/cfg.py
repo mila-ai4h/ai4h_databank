@@ -6,7 +6,7 @@ import openai
 
 from buster.busterbot import Buster, BusterConfig
 from buster.completers import ChatGPTCompleter, DocumentAnswerer
-from buster.formatters.documents import DocumentsFormatter, DocumentsFormatterJSON
+from buster.formatters.documents import DocumentsFormatterJSON
 from buster.formatters.prompts import PromptFormatter
 from buster.retriever import Retriever, ServiceRetriever
 from buster.validators import QuestionAnswerValidator, Validator
@@ -15,36 +15,45 @@ from src.app_utils import WordTokenizer, init_db, make_uri
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-# set openAI creds
-openai.api_key = os.getenv("OPENAI_API_KEY")
-openai.organization = os.getenv("OPENAI_ORGANIZATION")
+# Note: The app will not launch if the environment variables aren't set. This is intentional.
+# Set OpenAI Configurations
+openai.api_key = os.environ["OPENAI_API_KEY"]
+openai.organization = os.environ["OPENAI_ORGANIZATION"]
 
-# set pinecone creds
-pinecone_api_key = os.getenv("AI4H_PINECONE_API_KEY")
-pinecone_env = os.getenv("AI4H_PINECONE_ENV")
-pinecone_index = os.getenv("AI4H_PINECONE_INDEX")
-pinecone_namespace = os.getenv("AI4H_PINECONE_NAMESPACE")
+# Pinecone Configurations
+PINECONE_API_KEY = os.environ["PINECONE_API_KEY"]
+PINECONE_ENV = "asia-southeast1-gcp"
+PINECONE_INDEX = "oecd"
+PINECONE_NAMESPACE = "data-2023-05-16"
 
-# set mongo creds
-mongo_username = os.getenv("AI4H_MONGODB_USERNAME")
-mongo_password = os.getenv("AI4H_MONGODB_PASSWORD")
-mongo_cluster = os.getenv("AI4H_MONGODB_CLUSTER")
-mongo_uri = make_uri(mongo_username, mongo_password, mongo_cluster)
-mongo_db_data = os.getenv("AI4H_MONGODB_DB_DATA")
+# MongoDB Configurations
+MONGO_USERNAME = os.environ["MONGO_USERNAME"]
+MONGO_PASSWORD = os.environ["MONGO_PASSWORD"]
+MONGO_CLUSTER = os.environ["MONGO_CLUSTER"]
 
-mongo_db_logging = os.getenv("AI4H_MONGODB_DB_LOGGING")
-mongo_db = init_db(mongo_username, mongo_password, mongo_cluster, mongo_db_logging)
+# Instance Configurations
+INSTANCE_NAME = os.environ["INSTANCE_NAME"]  # e.g., huggingface, heroku
+INSTANCE_TYPE = os.environ["INSTANCE_TYPE"]
+assert INSTANCE_TYPE in ["dev", "prod", "local"], "Invalid instance_type declared."
 
-mongo_feedback_collection = os.getenv("AI4H_MONGODB_FEEDBACK_COLLECTION")
-mongo_arena_collection = os.getenv("AI4H_MONGODB_ARENA_COLLECTION")
-mongo_interaction_collection = os.getenv("AI4H_MONGODB_INTERACTION_COLLECTION")
-mongo_flagged_collection = os.getenv("AI4H_MONGODB_FLAGGED_COLLECTION")
+# MongoDB Databases
+MONGO_DATABASE_LOGGING = f"ai4h-databank-{INSTANCE_TYPE}"  # Where all interactions will be stored
+MONGO_DATABASE_DATA = "data-2023-05-16"  # Where documents are stored
+
+# MongoDB Collections
+# Naming convention: Collection name followed by purpose.
+MONGO_COLLECTION_FEEDBACK = "feedback"  # Feedback form
+MONGO_COLLECTION_INTERACTION = "interaction"  # User interaction
+MONGO_COLLECTION_FLAGGED = "flagged"  # Flagged interactions
+
+# Make the connections to the databases
+mongo_uri = make_uri(MONGO_USERNAME, MONGO_PASSWORD, MONGO_CLUSTER)
+mongo_db = init_db(MONGO_USERNAME, MONGO_PASSWORD, MONGO_CLUSTER, MONGO_DATABASE_LOGGING)
 
 
 # Set relative path to data dir
 current_dir = Path(__file__).resolve().parent
 data_dir = current_dir.parent / "data"  # ../data
-
 
 app_name = "AIS 👀"
 
@@ -95,12 +104,12 @@ Q:
         },
     },
     retriever_cfg={
-        "pinecone_api_key": pinecone_api_key,
-        "pinecone_env": pinecone_env,
-        "pinecone_index": pinecone_index,
-        "pinecone_namespace": pinecone_namespace,
+        "pinecone_api_key": PINECONE_API_KEY,
+        "pinecone_env": PINECONE_ENV,
+        "pinecone_index": PINECONE_INDEX,
+        "pinecone_namespace": PINECONE_NAMESPACE,
         "mongo_uri": mongo_uri,
-        "mongo_db_name": mongo_db_data,
+        "mongo_db_name": MONGO_DATABASE_DATA,
         "top_k": 3,
         "thresh": 0.7,
         "max_tokens": 3000,
@@ -163,12 +172,12 @@ Q:
 )
 
 
-def setup_buster(buster_cfg, doc_formatter_cls: DocumentsFormatter = DocumentsFormatterJSON):
+def setup_buster(buster_cfg):
     retriever: Retriever = ServiceRetriever(**buster_cfg.retriever_cfg)
     tokenizer = WordTokenizer(**buster_cfg.tokenizer_cfg)
     document_answerer: DocumentAnswerer = DocumentAnswerer(
         completer=ChatGPTCompleter(**buster_cfg.completion_cfg),
-        documents_formatter=doc_formatter_cls(tokenizer=tokenizer, **buster_cfg.documents_formatter_cfg),
+        documents_formatter=DocumentsFormatterJSON(tokenizer=tokenizer, **buster_cfg.documents_formatter_cfg),
         prompt_formatter=PromptFormatter(tokenizer=tokenizer, **buster_cfg.prompt_formatter_cfg),
         **buster_cfg.documents_answerer_cfg,
     )
