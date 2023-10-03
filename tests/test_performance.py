@@ -17,9 +17,13 @@ def test_detect_according_to_the_documentation():
             ]
         }
     )
-    fail, total = detect_according_to_the_documentation(answers)
-    assert fail == 2
-    assert total == 3
+    result = detect_according_to_the_documentation("", answers)
+    fail = 2
+    total = 3
+    assert (
+        result
+        == f"# Expressions Detector\n\nThis detector checks whether the system used expressions we want to discourage.\n- **According to the documentation**: {fail} / {total} ({fail / total * 100:04.2f} %)\n    - Include also the following variants: 'based on the documentation', 'the provided documents'\n\n\n"
+    )
 
 
 def test_evaluate_performance(monkeypatch, busterbot):
