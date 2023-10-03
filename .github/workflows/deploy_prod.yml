@@ -22,16 +22,14 @@ jobs:
       - name: unit tests
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_ORGANIZATION: ${{ secrets.OPENAI_ORGANIZATION }}
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-          AI4H_MONGODB_USERNAME: ${{ secrets.AI4H_MONGODB_USERNAME }}
-          AI4H_MONGODB_PASSWORD: ${{ secrets.AI4H_MONGODB_PASSWORD }}
-          AI4H_MONGODB_CLUSTER: ${{ secrets.AI4H_MONGODB_CLUSTER }}
-          AI4H_MONGODB_DB_DATA: ${{ vars.AI4H_MONGODB_DB_DATA }}
-          AI4H_MONGODB_DB_LOGGING: ${{ vars.AI4H_MONGODB_DB_LOGGING }}
-          AI4H_PINECONE_API_KEY: ${{ secrets.AI4H_PINECONE_API_KEY }}
-          AI4H_PINECONE_ENV: ${{ secrets.AI4H_PINECONE_ENV }}
-          AI4H_PINECONE_INDEX: ${{ vars.AI4H_PINECONE_INDEX }}
-          AI4H_PINECONE_NAMESPACE: ${{ vars.AI4H_PINECONE_NAMESPACE }}
+          MONGO_USERNAME: ${{ secrets.MONGO_USERNAME }}
+          MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
+          MONGO_CLUSTER: ${{ secrets.MONGO_CLUSTER }}
+          INSTANCE_TYPE: prod
+          INSTANCE_NAME: github-actions
+          PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
         run: |
           python3 -m pip install --upgrade pip
           pip install -e .[tests]

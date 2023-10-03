@@ -7,38 +7,12 @@ import pandas as pd
 
 import src.cfg as cfg
 from buster.completers import Completion
-from src.app_utils import (
-    add_sources,
-    get_session_id,
-    get_utc_time,
-    verify_required_env_vars,
-)
+from src.app_utils import add_sources, get_session_id, get_utc_time
 from src.cfg import setup_buster
 from src.feedback import FeedbackForm, Interaction
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
-
-required_env_vars = [
-    "AI4H_USERNAME",
-    "AI4H_PASSWORD",
-    "AI4H_MONGODB_USERNAME",
-    "AI4H_MONGODB_PASSWORD",
-    "AI4H_MONGODB_DB_LOGGING",
-    "AI4H_MONGODB_CLUSTER",
-    "AI4H_MONGODB_DB_DATA",
-    "AI4H_MONGODB_FEEDBACK_COLLECTION",
-    "AI4H_MONGODB_FLAGGED_COLLECTION",
-    "AI4H_MONGODB_INTERACTION_COLLECTION",
-    "AI4H_PINECONE_API_KEY",
-    "AI4H_PINECONE_ENV",
-    "AI4H_PINECONE_INDEX",
-    "AI4H_PINECONE_NAMESPACE",
-    "OPENAI_API_KEY",
-    "OPENAI_ORGANIZATION",
-]
-
-verify_required_env_vars(required_vars=required_env_vars)
 
 # Typehint for chatbot history
 ChatHistory = list[list[Optional[str], Optional[str]]]
@@ -297,7 +271,7 @@ def submit_feedback(
         time=get_utc_time(),
         username=request.username,
     )
-    feedback.send(mongo_db, collection=cfg.mongo_feedback_collection)
+    feedback.send(mongo_db, collection=cfg.MONGO_COLLECTION_FEEDBACK)
 
 
 def toggle_visibility(visible: bool):
@@ -593,7 +567,7 @@ with buster_app:
         outputs=[*sources_textboxes]
     ).then(
         log_completion,
-        inputs=[last_completion, gr.State(cfg.mongo_interaction_collection), session_id]
+        inputs=[last_completion, gr.State(cfg.MONGO_COLLECTION_INTERACTION), session_id]
     )
 
     message.submit(
@@ -633,12 +607,12 @@ with buster_app:
         outputs=[*sources_textboxes]
     ).then(
         log_completion,
-        inputs=[last_completion, gr.State(cfg.mongo_interaction_collection), session_id]
+        inputs=[last_completion, gr.State(cfg.MONGO_COLLECTION_INTERACTION), session_id]
     )
 
     flag_button.click(
         log_completion,
-        inputs=[last_completion, gr.State(cfg.mongo_flagged_collection), session_id]
+        inputs=[last_completion, gr.State(cfg.MONGO_COLLECTION_FLAGGED), session_id]
     ).then(
         raise_flagging_message,
     )
