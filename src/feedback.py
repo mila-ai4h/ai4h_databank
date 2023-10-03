@@ -58,9 +58,10 @@ class ComparisonForm(StandardForm):
 
 @dataclass
 class Interaction:
-    username: str
     user_completions: list[Completion]
     time: str
+    session_id: str  # A unique identifier for each gradio session, e.g. UUID
+    username: Optional[str] = None
     instance_type: Optional[str] = None  # Dev or prod
     instance_name: Optional[str] = None  #  Heroku, hf-space, etc.
     form: Optional[StandardForm] = None
@@ -114,6 +115,7 @@ class Interaction:
 
         to_encode = {
             "username": self.username,
+            "session_id": self.session_id,
             "user_completions": self.user_completions,
             "time": self.time,
             "instance_type": self.instance_type,

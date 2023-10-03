@@ -117,7 +117,7 @@ We look forward to sharing with you an updated version of the product once we fe
     ).then(
         submit_feedback,
         inputs=[
-            overall_experience, clear_answer, accurate_answer, relevant_sources, relevant_sources_order, relevant_sources_selection, extra_info, last_completion,
+            overall_experience, clear_answer, accurate_answer, relevant_sources, relevant_sources_order, relevant_sources_selection, extra_info, last_completion, session_id,
         ],
     ).success(
         toggle_visibility,
@@ -229,13 +229,11 @@ def log_completion(
     else:
         user_completions = completion
 
-    # If a login page was used, use the username otherwise use the session_id
-    username = request.username if request.username is not None else session_id
-
     interaction = Interaction(
         user_completions=user_completions,
         time=get_utc_time(),
-        username=username,
+        username=request.username,
+        session_id=session_id,
         instance_name=instance_name,
         instance_type=instance_type,
     )
@@ -251,6 +249,7 @@ def submit_feedback(
     relevant_sources_selection: str,
     extra_info: str,
     completion: Union[Completion, list[Completion]],
+    session_id: str,
     request: gr.Request,
     instance_type: Optional[str] = cfg.INSTANCE_TYPE,
     instance_name: Optional[str] = cfg.INSTANCE_NAME,
@@ -276,6 +275,7 @@ def submit_feedback(
         form=feedback_form,
         time=get_utc_time(),
         username=request.username,
+        session_id=session_id,
         instance_name=instance_name,
         instance_type=instance_type,
     )
