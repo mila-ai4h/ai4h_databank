@@ -1,10 +1,9 @@
 import gradio as gr
 
 import src.cfg as cfg
-from src.buster.buster_app import log_completion, submit_feedback
 from src.app_utils import get_session_id
+from src.buster.buster_app import log_completion, submit_feedback
 from src.feedback import read_collection
-
 
 buster = cfg.setup_buster(cfg.buster_cfg)
 

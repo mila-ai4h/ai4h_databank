@@ -218,7 +218,12 @@ def log_completion(
     completion (Union[Completion, list[Completion]]): A single completion or a list of completions
         to log. Completions can be instances of the Completion class.
     collection (str): The name of the MongoDB collection where the interactions will be stored.
-    request (gr.Request): The request object containing request metadata.
+    session_id (str): A unique identifier for the current session. In gradio this is reset every time a page is refreshed.
+    request (gr.Request): The gradio request object containing request metadata.
+    instance_type (str, optional): The type of instance where the completion took place.
+        Defaults to cfg.INSTANCE_TYPE.
+    instance_name (str, optional): The name of the instance where the completion took place.
+        Defaults to cfg.INSTANCE_NAME.
     """
 
     # TODO: add UID for each page visitor instead of username
