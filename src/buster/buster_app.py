@@ -208,6 +208,8 @@ def log_completion(
     collection: str,
     session_id: str,
     request: gr.Request,
+    instance_type: Optional[str] = cfg.INSTANCE_TYPE,
+    instance_name: Optional[str] = cfg.INSTANCE_NAME,
 ):
     """
     Log user completions in a specified collection for analytics.
@@ -234,6 +236,8 @@ def log_completion(
         user_completions=user_completions,
         time=get_utc_time(),
         username=username,
+        instance_name=instance_name,
+        instance_type=instance_type,
     )
     interaction.send(mongo_db, collection=collection)
 
@@ -248,6 +252,8 @@ def submit_feedback(
     extra_info: str,
     completion: Union[Completion, list[Completion]],
     request: gr.Request,
+    instance_type: Optional[str] = cfg.INSTANCE_TYPE,
+    instance_name: Optional[str] = cfg.INSTANCE_NAME,
 ):
     feedback_form = FeedbackForm(
         overall_experience=overall_experience,
@@ -270,6 +276,8 @@ def submit_feedback(
         form=feedback_form,
         time=get_utc_time(),
         username=request.username,
+        instance_name=instance_name,
+        instance_type=instance_type,
     )
     feedback.send(mongo_db, collection=cfg.MONGO_COLLECTION_FEEDBACK)
 
@@ -607,7 +615,11 @@ with buster_app:
         outputs=[*sources_textboxes]
     ).then(
         log_completion,
-        inputs=[last_completion, gr.State(cfg.MONGO_COLLECTION_INTERACTION), session_id]
+        inputs=[
+            last_completion,
+            gr.State(cfg.MONGO_COLLECTION_INTERACTION),
+            session_id,
+        ]
     )
 
     flag_button.click(
