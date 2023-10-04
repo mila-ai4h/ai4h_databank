@@ -10,7 +10,7 @@ from buster.formatters.documents import DocumentsFormatterJSON
 from buster.formatters.prompts import PromptFormatter
 from buster.retriever import Retriever, ServiceRetriever
 from buster.validators import QuestionAnswerValidator, Validator
-from src.app_utils import WordTokenizer, init_db, make_uri
+from src.app_utils import WordTokenizer, get_logging_db_name, init_db, make_uri
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -34,10 +34,10 @@ MONGO_CLUSTER = os.environ["MONGO_CLUSTER"]
 # Instance Configurations
 INSTANCE_NAME = os.environ["INSTANCE_NAME"]  # e.g., huggingface, heroku
 INSTANCE_TYPE = os.environ["INSTANCE_TYPE"]
-assert INSTANCE_TYPE in ["dev", "prod", "local"], "Invalid instance_type declared."
+assert INSTANCE_TYPE in ["dev", "prod", "local", "test"], "Invalid instance_type declared."
 
 # MongoDB Databases
-MONGO_DATABASE_LOGGING = f"ai4h-databank-{INSTANCE_TYPE}"  # Where all interactions will be stored
+MONGO_DATABASE_LOGGING = get_logging_db_name(INSTANCE_TYPE)  # Where all interactions will be stored
 MONGO_DATABASE_DATA = "data-2023-05-16"  # Where documents are stored
 
 # MongoDB Collections

@@ -27,7 +27,7 @@ jobs:
           MONGO_USERNAME: ${{ secrets.MONGO_USERNAME }}
           MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
           MONGO_CLUSTER: ${{ secrets.MONGO_CLUSTER }}
-          INSTANCE_TYPE: prod
+          INSTANCE_TYPE: test
           INSTANCE_NAME: github-actions
           PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
         run: |

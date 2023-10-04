@@ -1,11 +1,23 @@
+import os
+
 import gradio as gr
 
 import src.cfg as cfg
-from src.app_utils import get_session_id
+from src.app_utils import get_logging_db_name, get_session_id, init_db
 from src.buster.buster_app import log_completion, submit_feedback
 from src.feedback import read_collection
 
 buster = cfg.setup_buster(cfg.buster_cfg)
+
+INSTANCE_TYPE = os.environ["INSTANCE_TYPE"]
+
+# MongoDB Configurations
+MONGO_USERNAME = os.environ["MONGO_USERNAME"]
+MONGO_PASSWORD = os.environ["MONGO_PASSWORD"]
+MONGO_CLUSTER = os.environ["MONGO_CLUSTER"]
+MONGO_DATABASE = get_logging_db_name(INSTANCE_TYPE)  # Where all interactions will be stored
+
+db = init_db(username=MONGO_USERNAME, password=MONGO_PASSWORD, cluster=MONGO_CLUSTER, db_name=MONGO_DATABASE)
 
 
 def test_completion_with_logging():
@@ -28,15 +40,16 @@ def test_completion_with_logging():
     assert completion.question_relevant == True
     assert completion.answer_relevant == True
 
-    collection = "interactions-unit-tests"
+    collection = "interaction"
     log_completion(
         completion=[completion],
         collection=collection,
         request=gr.Request(username=test_username),
         session_id=test_session_id,
+        mongo_db=db,
     )
 
-    df = read_collection(cfg.mongo_db, collection=collection)
+    df = read_collection(mongo_db=db, collection=collection)
 
     sub_df = df[df.session_id == test_session_id]
 

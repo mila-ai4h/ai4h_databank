@@ -210,6 +210,7 @@ def log_completion(
     request: gr.Request,
     instance_type: Optional[str] = cfg.INSTANCE_TYPE,
     instance_name: Optional[str] = cfg.INSTANCE_NAME,
+    mongo_db=cfg.mongo_db,
 ):
     """
     Log user completions in a specified collection for analytics.
