@@ -505,6 +505,7 @@ with buster_app:
                     placeholder="Ask your question here...",
                     lines=1,
                 )
+                chatbot = gr.Chatbot(label="Demo")
                 submit = gr.Button(value="Ask", variant="primary")
                 sources_textboxes = display_sources()
 
