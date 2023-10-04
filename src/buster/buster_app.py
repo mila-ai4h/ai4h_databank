@@ -80,7 +80,7 @@ We look forward to sharing with you an updated version of the product once we fe
                             )
                             relevant_sources_selection = gr.CheckboxGroup(
                                 choices=[f"Source {i+1}" for i in range(max_sources)],
-                                label="Check all relevant sources",
+                                label="Check all relevant sources (if any)",
                             )
                             relevant_sources_order = gr.Radio(
                                 choices=["👍", "👎"],
