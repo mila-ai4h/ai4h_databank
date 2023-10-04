@@ -117,7 +117,7 @@ We look forward to sharing with you an updated version of the product once we fe
     ).then(
         submit_feedback,
         inputs=[
-            overall_experience, clear_answer, accurate_answer, relevant_sources, relevant_sources_order, relevant_sources_selection, extra_info, last_completion,
+            overall_experience, clear_answer, accurate_answer, relevant_sources, relevant_sources_order, relevant_sources_selection, extra_info, last_completion, session_id,
         ],
     ).success(
         toggle_visibility,
@@ -210,6 +210,7 @@ def log_completion(
     request: gr.Request,
     instance_type: Optional[str] = cfg.INSTANCE_TYPE,
     instance_name: Optional[str] = cfg.INSTANCE_NAME,
+    mongo_db=cfg.mongo_db,
 ):
     """
     Log user completions in a specified collection for analytics.
@@ -218,7 +219,12 @@ def log_completion(
     completion (Union[Completion, list[Completion]]): A single completion or a list of completions
         to log. Completions can be instances of the Completion class.
     collection (str): The name of the MongoDB collection where the interactions will be stored.
-    request (gr.Request): The request object containing request metadata.
+    session_id (str): A unique identifier for the current session. In gradio this is reset every time a page is refreshed.
+    request (gr.Request): The gradio request object containing request metadata.
+    instance_type (str, optional): The type of instance where the completion took place.
+        Defaults to cfg.INSTANCE_TYPE.
+    instance_name (str, optional): The name of the instance where the completion took place.
+        Defaults to cfg.INSTANCE_NAME.
     """
 
     # TODO: add UID for each page visitor instead of username
@@ -229,13 +235,11 @@ def log_completion(
     else:
         user_completions = completion
 
-    # If a login page was used, use the username otherwise use the session_id
-    username = request.username if request.username is not None else session_id
-
     interaction = Interaction(
         user_completions=user_completions,
         time=get_utc_time(),
-        username=username,
+        username=request.username,
+        session_id=session_id,
         instance_name=instance_name,
         instance_type=instance_type,
     )
@@ -251,6 +255,7 @@ def submit_feedback(
     relevant_sources_selection: str,
     extra_info: str,
     completion: Union[Completion, list[Completion]],
+    session_id: str,
     request: gr.Request,
     instance_type: Optional[str] = cfg.INSTANCE_TYPE,
     instance_name: Optional[str] = cfg.INSTANCE_NAME,
@@ -276,6 +281,7 @@ def submit_feedback(
         form=feedback_form,
         time=get_utc_time(),
         username=request.username,
+        session_id=session_id,
         instance_name=instance_name,
         instance_type=instance_type,
     )

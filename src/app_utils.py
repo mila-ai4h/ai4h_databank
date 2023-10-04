@@ -30,6 +30,11 @@ class WordTokenizer(Tokenizer):
         return " ".join(encoded)
 
 
+def get_logging_db_name(instance_type: str) -> str:
+    assert instance_type in ["dev", "prod", "local", "test"], "Invalid instance_type declared."
+    return f"ai4h-databank-{instance_type}"
+
+
 def get_session_id() -> str:
     """Generate a uuid for each user."""
     return str(uuid.uuid1())

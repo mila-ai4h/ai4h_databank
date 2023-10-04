@@ -56,6 +56,7 @@ def test_read_write_feedback():
 
     f = Interaction(
         username="test user",
+        session_id="test id",
         user_completions=[b],
         form=FeedbackForm(
             overall_experience="yes",
