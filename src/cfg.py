@@ -33,8 +33,7 @@ MONGO_CLUSTER = os.environ["MONGO_CLUSTER"]
 
 # Instance Configurations
 INSTANCE_NAME = os.environ["INSTANCE_NAME"]  # e.g., huggingface, heroku
-INSTANCE_TYPE = os.environ["INSTANCE_TYPE"]
-assert INSTANCE_TYPE in ["dev", "prod", "local", "test"], "Invalid instance_type declared."
+INSTANCE_TYPE = os.environ["INSTANCE_TYPE"]  # e.g. ["dev", "prod", "local"]
 
 # MongoDB Databases
 MONGO_DATABASE_LOGGING = get_logging_db_name(INSTANCE_TYPE)  # Where all interactions will be stored
