@@ -498,12 +498,14 @@ with buster_app:
                     """## Search
                 Ask your AI policy questions below. Keep in mind this tool is a demo and can sometimes provide inaccurate information. Always verify the integrity of the information using the provided sources."""
                 )
-                user_input = gr.Textbox(
-                    label=f"Chat with {cfg.app_name}",
-                    placeholder="Ask your question here...",
-                    lines=1,
-                )
-                submit = gr.Button(value="Ask", variant="primary")
+                with gr.Row():
+                    with gr.Column(scale=10):
+                        user_input = gr.Textbox(
+                            label=f"Chat with {cfg.app_name}",
+                            placeholder="Ask your question here...",
+                            lines=1,
+                        )
+                    submit = gr.Button(value="Ask", variant="primary", size="lg")
                 chatbot = gr.Chatbot(label="Demo")
                 sources_textboxes = display_sources()
 
