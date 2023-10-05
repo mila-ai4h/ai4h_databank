@@ -292,8 +292,8 @@ def toggle_interactivity(interactive: bool):
     return gr.update(interactive=interactive)
 
 
-def clear_message():
-    """Clears the contents of the message box."""
+def clear_user_input():
+    """Clears the contents of the user_input box."""
     return gr.update(value="")
 
 
@@ -498,22 +498,20 @@ with buster_app:
                     """## Search
                 Ask your AI policy questions below. Keep in mind this tool is a demo and can sometimes provide inaccurate information. Always verify the integrity of the information using the provided sources."""
                 )
-
-                chatbot = gr.Chatbot(label="Demo")
-                message = gr.Textbox(
+                user_input = gr.Textbox(
                     label=f"Chat with {cfg.app_name}",
                     placeholder="Ask your question here...",
                     lines=1,
                 )
-                chatbot = gr.Chatbot(label="Demo")
                 submit = gr.Button(value="Ask", variant="primary")
+                chatbot = gr.Chatbot(label="Demo")
                 sources_textboxes = display_sources()
 
             with gr.Column():
                 gr.Markdown("## Example questions")
                 gr.Examples(
                     examples=example_questions,
-                    inputs=message,
+                    inputs=user_input,
                     label="Questions users could ask.",
                 )
 
@@ -540,10 +538,10 @@ with buster_app:
 
     # fmt: off
     submit.click(
-        add_user_question, [message], [chatbot]
+        add_user_question, [user_input], [chatbot]
     ).then(
-        clear_message,
-        outputs=[message]
+        clear_user_input,
+        outputs=[user_input]
     ).then(
         clear_sources,
         outputs=[*sources_textboxes]
@@ -579,11 +577,11 @@ with buster_app:
         inputs=[last_completion, gr.State(cfg.MONGO_COLLECTION_INTERACTION), session_id]
     )
 
-    message.submit(
-        add_user_question, [message], [chatbot]
+    user_input.submit(
+        add_user_question, [user_input], [chatbot]
     ).then(
-        clear_message,
-        outputs=[message]
+        clear_user_input,
+        outputs=[user_input]
     ).then(
         clear_sources,
         outputs=[*sources_textboxes]
