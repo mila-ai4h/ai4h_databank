@@ -348,7 +348,7 @@ buster_app = gr.Blocks()
 
 
 def setup_about_panel():
-    with gr.Accordion(label=f"About {app_name}", open=True) as about_panel:
+    with gr.Accordion(label=f"About {app_name}", open=False) as about_panel:
         with gr.Row(variant="panel"):
             with gr.Box():
                 gr.Markdown(
