@@ -355,7 +355,6 @@ def setup_about_panel():
                     f"""
 
                 ## Welcome
-                [terms and conditions](assets/index.html)
                 Artificial intelligence is a field that's developing fast! In response, policy makers from around the world are creating guidelines, rules and regulations to keep up.
 
                 Finding accurate and up-to-date information about regulatory changes can be difficult but crucial to share best practices, ensure interoperability and promote adherence to local laws and regulations. That's why we've created {app_name}.
@@ -503,7 +502,10 @@ with buster_app:
             with gr.Column(scale=2, variant="panel"):
                 gr.Markdown(
                     """## Search
-                Ask your AI policy questions below. Keep in mind this tool is a demo and can sometimes provide inaccurate information. Always verify the integrity of the information using the provided sources."""
+                Ask your AI policy questions below. Keep in mind this tool is a demo and can sometimes provide inaccurate information. Always verify the integrity of the information using the provided sources.
+
+                By using this app, you agree to our [terms and conditions](file=src/buster/assets/index.html)
+                """
                 )
 
                 chatbot = gr.Chatbot(label="Demo")
