@@ -355,7 +355,7 @@ def setup_about_panel():
                     f"""
 
                 ## Welcome
-                [terms and conditions]("./assets/index.html")
+                [terms and conditions](assets/index.html)
                 Artificial intelligence is a field that's developing fast! In response, policy makers from around the world are creating guidelines, rules and regulations to keep up.
 
                 Finding accurate and up-to-date information about regulatory changes can be difficult but crucial to share best practices, ensure interoperability and promote adherence to local laws and regulations. That's why we've created {app_name}.
