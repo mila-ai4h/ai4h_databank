@@ -55,7 +55,7 @@ mongo_db = init_db(MONGO_USERNAME, MONGO_PASSWORD, MONGO_CLUSTER, MONGO_DATABASE
 current_dir = Path(__file__).resolve().parent
 data_dir = current_dir.parent / "data"  # ../data
 
-app_name = "AIS 👀"
+app_name = "AIPS 🐒"
 
 # sample questions
 example_questions = [
@@ -80,7 +80,7 @@ buster_cfg = BusterConfig(
         "unknown_threshold": 0.84,
         "embedding_model": "text-embedding-ada-002",
         "use_reranking": True,
-        "invalid_question_response": "I cannot answer this question as it does not seem relevant to AI policies. If you believe this is a mistake, please provide feedback through the panel on the right side.",
+        "invalid_question_response": "I cannot answer this question as it does not seem relevant to AI policies. Try reformulating your question for better results. If you believe this is a mistake, please provide feedback through the panel on the right side.",
         "check_question_prompt": """You are a chatbot answering questions on behalf of the OECD specifically on AI policies.
 Your first job is to determine whether or not a question is valid, and should be answered.
 For a question to be considered valid, it must be related to AI and policies.
