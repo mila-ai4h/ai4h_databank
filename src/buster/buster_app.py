@@ -30,7 +30,7 @@ data_dir = cfg.data_dir
 documents_metadata_file = str(data_dir / "documents_metadata.csv")
 documents_metadata = pd.read_csv(documents_metadata_file)
 
-enable_terms_and_conditions = True
+enable_terms_and_conditions = False
 
 
 def add_disclaimer(completion: Completion, chat_history: ChatHistory, disclaimer: str = disclaimer):
@@ -355,6 +355,7 @@ def setup_about_panel():
                     f"""
 
                 ## Welcome
+                [terms and conditions]("./assets/index.html")
                 Artificial intelligence is a field that's developing fast! In response, policy makers from around the world are creating guidelines, rules and regulations to keep up.
 
                 Finding accurate and up-to-date information about regulatory changes can be difficult but crucial to share best practices, ensure interoperability and promote adherence to local laws and regulations. That's why we've created {app_name}.
