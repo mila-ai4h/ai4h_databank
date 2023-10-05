@@ -53,14 +53,13 @@ prepare_deploy_dir() {
   rm -rf $TMP_DEPLOY_DIR
   mkdir -p $TMP_DEPLOY_DIR/src
   mkdir -p $TMP_DEPLOY_DIR/data
-  mkdir -p $TMP_DEPLOY_DIR/assets
 
   # Copy over required files
   cp requirements.txt $TMP_DEPLOY_DIR/
   cp -r src/buster/  $TMP_DEPLOY_DIR/src/buster/
   cp src/feedback.py src/cfg.py src/app_utils.py $TMP_DEPLOY_DIR/src/
   cp data/documents_metadata.csv $TMP_DEPLOY_DIR/data
-  cp src/buster/assets/index.html $TMP_DEPLOY_DIR/assets/index.html
+  cp -r src/buster/assets $TMP_DEPLOY_DIR/src/buster/assets
 
   # make folder cwd
   cd $TMP_DEPLOY_DIR
