@@ -391,29 +391,29 @@ def setup_about_panel():
 
 
 def setup_terms_and_conditions():
-    terms_and_conditions = """App Terms and Conditions
+    terms_and_conditions = f"""App Terms and Conditions
 
--	Usage Agreement: By using the AIS, you agree to its terms and conditions. Terms may change; continued use means acceptance of changes.
+-	Usage Agreement: By using the {app_name}, you agree to its terms and conditions. Terms may change; continued use means acceptance of changes.
 
--	Background: Your use of the AIS is subject to the terms and conditions found at www.oecd.org/termsandconditions. The following disclosures do not modify or supersede those terms. Instead, these disclosures aim to provide greater transparency surrounding information included in the AIS.
+-	Background: Your use of the {app_name} is subject to the terms and conditions found at www.oecd.org/termsandconditions. The following disclosures do not modify or supersede those terms. Instead, these disclosures aim to provide greater transparency surrounding information included in the {app_name}.
 
--	Third-Party Information: The AIS serves as an accessible starting point for comprehending the AI policy landscape. As a result, please be aware that the AIS may retrieve information from documents, articles and data from various third-parties with which the OECD may not have an affiliation.
+-	Third-Party Information: The {app_name} serves as an accessible starting point for comprehending the AI policy landscape. As a result, please be aware that the {app_name} may retrieve information from documents, articles and data from various third-parties with which the OECD may not have an affiliation.
 
--	Data collection: The AIS may record and store user interactions with the purpose of improving the model and its outputs. It does not collect personal data. Please do not include personally identifiable information (PII) in your queries.
+-	Data collection: The {app_name} may record and store user interactions with the purpose of improving the model and its outputs. It does not collect personal data. Please do not include personally identifiable information (PII) in your queries.
 
--	Views Expressed: Please understand that any views or opinions expressed on the AIS are solely those of the third-parties that developed or collected the training data and do not represent the views or opinions of the OECD. Further, the inclusion of any document or dataset does not constitute an endorsement or recommendation by the OECD.
+-	Views Expressed: Please understand that any views or opinions expressed on the {app_name} are solely those of the third-parties that developed or collected the training data and do not represent the views or opinions of the OECD. Further, the inclusion of any document or dataset does not constitute an endorsement or recommendation by the OECD.
 
--	Use of generative AI: The AIS uses generative AI technologies to process and analyse data and information and to respond to user queries.
+-	Use of generative AI: The {app_name} uses generative AI technologies to process and analyse data and information and to respond to user queries.
 
--	Errors and Omissions: The OECD cannot guarantee and does not independently verify the accuracy, completeness, or validity information provided in the AIS. You should be aware that information included in the AIS may contain various errors and omissions and should be treated accordingly. Ensuring the veracity and accuracy of the information provided by the AIS is the User’s responsibility.
+-	Errors and Omissions: The OECD cannot guarantee and does not independently verify the accuracy, completeness, or validity information provided in the {app_name}. You should be aware that information included in the {app_name} may contain various errors and omissions and should be treated accordingly. Ensuring the veracity and accuracy of the information provided by the {app_name} is the User’s responsibility.
 
--	Scope: The AIS is not designed to write its own research by combining information across policy documents, analysing them and extracting insights. The AIS is not designed to answer questions for which no relevant information can be found in the training data.
+-	Scope: The {app_name} is not designed to write its own research by combining information across policy documents, analysing them and extracting insights. The {app_name} is not designed to answer questions for which no relevant information can be found in the training data.
 
--	Intellectual Property: Any of the copyrights, trademarks, service marks, collective marks, design rights, or other intellectual property or proprietary rights that are mentioned, cited, or otherwise included in the AIS are the property of their respective owners. Their use or inclusion in the AIS does not imply that you may use them for any other purpose. The OECD is not endorsed by, does not endorse, and may not affiliated with any of the holders of such rights, and as such, the OECD cannot and do not grant any rights to use or otherwise exploit the protected materials included herein.
+-	Intellectual Property: Any of the copyrights, trademarks, service marks, collective marks, design rights, or other intellectual property or proprietary rights that are mentioned, cited, or otherwise included in the {app_name} are the property of their respective owners. Their use or inclusion in the {app_name} does not imply that you may use them for any other purpose. The OECD is not endorsed by, does not endorse, and may not affiliated with any of the holders of such rights, and as such, the OECD cannot and do not grant any rights to use or otherwise exploit the protected materials included herein.
 
--	Limitation of Liability: Under no circumstances shall OECD be liable to any user on account of that user’s use or misuse or reliance on the AIS.
+-	Limitation of Liability: Under no circumstances shall OECD be liable to any user on account of that user’s use or misuse or reliance on the {app_name}.
 
--	Termination: OECD reserves the right to limit or suspend access by the users to AIS at any time and without notice for use deemed to be a breach to the terms and conditions.
+-	Termination: OECD reserves the right to limit or suspend access by the users to {app_name} at any time and without notice for use deemed to be a breach to the terms and conditions.
 
 -	Timeliness: The AI policy landscape is rapidly evolving. As such, while we regularly update our database, some of the information might become outdated or may not reflect the most recent changes or additions to policies and regulations.
 
