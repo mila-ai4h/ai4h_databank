@@ -59,7 +59,6 @@ prepare_deploy_dir() {
   cp -r src/buster/  $TMP_DEPLOY_DIR/src/buster/
   cp src/feedback.py src/cfg.py src/app_utils.py $TMP_DEPLOY_DIR/src/
   cp data/documents_metadata.csv $TMP_DEPLOY_DIR/data
-  cp -r src/buster/assets $TMP_DEPLOY_DIR/src/buster/assets
 
   # make folder cwd
   cd $TMP_DEPLOY_DIR
