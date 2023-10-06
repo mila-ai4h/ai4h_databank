@@ -80,7 +80,7 @@ We look forward to sharing with you an updated version of the product once we fe
                             )
                             relevant_sources_selection = gr.CheckboxGroup(
                                 choices=[f"Source {i+1}" for i in range(max_sources)],
-                                label="Check all relevant sources",
+                                label="Check all relevant sources (if any)",
                             )
                             relevant_sources_order = gr.Radio(
                                 choices=["👍", "👎"],
@@ -298,8 +298,8 @@ def toggle_interactivity(interactive: bool):
     return gr.update(interactive=interactive)
 
 
-def clear_message():
-    """Clears the contents of the message box."""
+def clear_user_input():
+    """Clears the contents of the user_input box."""
     return gr.update(value="")
 
 
@@ -507,21 +507,22 @@ with buster_app:
                 By using this app, you agree to our [terms and conditions](file=src/buster/assets/index.html)
                 """
                 )
-
+                with gr.Row():
+                    with gr.Column(scale=10):
+                        user_input = gr.Textbox(
+                            label=f"Chat with {cfg.app_name}",
+                            placeholder="Ask your question here...",
+                            lines=1,
+                        )
+                    submit = gr.Button(value="Ask", variant="primary", size="lg")
                 chatbot = gr.Chatbot(label="Demo")
-                message = gr.Textbox(
-                    label=f"Chat with {cfg.app_name}",
-                    placeholder="Ask your question here...",
-                    lines=1,
-                )
-                submit = gr.Button(value="Send ", variant="primary")
                 sources_textboxes = display_sources()
 
             with gr.Column():
                 gr.Markdown("## Example questions")
                 gr.Examples(
                     examples=example_questions,
-                    inputs=message,
+                    inputs=user_input,
                     label="Questions users could ask.",
                 )
 
@@ -548,10 +549,10 @@ with buster_app:
 
     # fmt: off
     submit.click(
-        add_user_question, [message], [chatbot]
+        add_user_question, [user_input], [chatbot]
     ).then(
-        clear_message,
-        outputs=[message]
+        clear_user_input,
+        outputs=[user_input]
     ).then(
         clear_sources,
         outputs=[*sources_textboxes]
@@ -587,11 +588,11 @@ with buster_app:
         inputs=[last_completion, gr.State(cfg.MONGO_COLLECTION_INTERACTION), session_id]
     )
 
-    message.submit(
-        add_user_question, [message], [chatbot]
+    user_input.submit(
+        add_user_question, [user_input], [chatbot]
     ).then(
-        clear_message,
-        outputs=[message]
+        clear_user_input,
+        outputs=[user_input]
     ).then(
         clear_sources,
         outputs=[*sources_textboxes]
