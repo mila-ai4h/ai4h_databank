@@ -55,11 +55,9 @@ def setup_feedback_form():
                 with gr.Column():
                     gr.Markdown(
                         f""" ## We Would Love Your Feedback
-
-Thank you for being here and providing feedback on {app_name}.
-Your feedback is anonymous and will help us make the tool as useful as possible for the community!
-
 Please submit feedback for each question asked. Each submission is directly linked to the submitted question.
+
+Your feedback is anonymous and will help us make the tool as useful as possible for the community!
 """
                     )
                     with gr.Row():
