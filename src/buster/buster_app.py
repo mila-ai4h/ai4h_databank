@@ -501,20 +501,25 @@ with buster_app:
         with gr.Row():
             with gr.Column(scale=2, variant="panel"):
                 gr.Markdown(
-                    """## Search
-                Ask your AI policy questions below. Keep in mind this tool is a demo and can sometimes provide inaccurate information. Always verify the integrity of the information using the provided sources.
-
-                By using this app, you agree to our [terms and conditions](file=src/buster/assets/index.html)
+                f"""
+                Ask {app_name} your AI policy questions! Keep in mind this tool is a demo and can sometimes provide inaccurate information. Always verify the integrity of the information using the provided sources.
                 """
                 )
                 with gr.Row():
                     with gr.Column(scale=10):
                         user_input = gr.Textbox(
-                            label=f"Chat with {cfg.app_name}",
+                            # label=f"Chat with {cfg.app_name}",
+                            label="",
                             placeholder="Ask your question here...",
                             lines=1,
                         )
                     submit = gr.Button(value="Ask", variant="primary", size="lg")
+
+                gr.Markdown(
+                """
+                By using this tool you agree to our [terms and conditions](file=src/buster/assets/index.html)
+                """
+                )
                 chatbot = gr.Chatbot(label="Demo")
                 sources_textboxes = display_sources()
 
