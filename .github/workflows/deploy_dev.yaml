@@ -24,9 +24,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_ORGANIZATION: ${{ secrets.OPENAI_ORGANIZATION }}
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-          MONGO_USERNAME: ${{ secrets.MONGO_USERNAME }}
-          MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
-          MONGO_CLUSTER: ${{ secrets.MONGO_CLUSTER }}
+          MONGO_URI: ${{ secrets.MONGO_URI }}
           INSTANCE_TYPE: test
           INSTANCE_NAME: github-actions
           PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
