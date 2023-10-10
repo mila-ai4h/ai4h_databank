@@ -10,7 +10,7 @@ from buster.formatters.documents import DocumentsFormatterJSON
 from buster.formatters.prompts import PromptFormatter
 from buster.retriever import Retriever, ServiceRetriever
 from buster.validators import QuestionAnswerValidator, Validator
-from src.app_utils import WordTokenizer, get_logging_db_name, init_db, make_uri
+from src.app_utils import WordTokenizer, get_logging_db_name, init_db
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
