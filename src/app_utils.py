@@ -63,7 +63,20 @@ def make_uri(username: str, password: str, cluster: str) -> str:
 
 
 def init_db(mongo_uri: str, db_name: str) -> pymongo.database.Database:
-    """Initialize mongodb database."""
+    """
+    Initialize and return a connection to the specified MongoDB database.
+
+    Parameters:
+    - mongo_uri (str): The connection string for the MongoDB. This can be formed using `make_uri` function.
+    - db_name (str): The name of the MongoDB database to connect to.
+
+    Returns:
+    pymongo.database.Database: The connected database object.
+
+    Note:
+    If there's a problem with the connection, an exception will be logged and the program will terminate.
+    """
+
     try:
         mongodb_client = MongoClient(mongo_uri)
         # Ping the database to make sure authentication is good
@@ -73,7 +86,6 @@ def init_db(mongo_uri: str, db_name: str) -> pymongo.database.Database:
         return database
     except Exception as e:
         logger.exception("Something went wrong connecting to mongodb")
-        return None
 
 
 def get_utc_time() -> str:
