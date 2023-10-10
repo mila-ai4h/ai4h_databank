@@ -68,7 +68,7 @@ prepare_deploy_dir() {
 create_readme() {
   echo '---
 title: SAI 💬
-emoji: 💻
+emoji: 🌎
 colorFrom: pink
 colorTo: green
 sdk: gradio
