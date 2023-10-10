@@ -9,15 +9,12 @@ from src.feedback import read_collection
 
 buster = cfg.setup_buster(cfg.buster_cfg)
 
-INSTANCE_TYPE = os.environ["INSTANCE_TYPE"]
-
 # MongoDB Configurations
-MONGO_USERNAME = os.environ["MONGO_USERNAME"]
-MONGO_PASSWORD = os.environ["MONGO_PASSWORD"]
-MONGO_CLUSTER = os.environ["MONGO_CLUSTER"]
+MONGO_URI = os.environ["MONGO_URI"]
+INSTANCE_TYPE = os.environ["INSTANCE_TYPE"]
 MONGO_DATABASE = get_logging_db_name(INSTANCE_TYPE)  # Where all interactions will be stored
 
-db = init_db(username=MONGO_USERNAME, password=MONGO_PASSWORD, cluster=MONGO_CLUSTER, db_name=MONGO_DATABASE)
+db = init_db(mongo_uri=MONGO_URI, db_name=MONGO_DATABASE)
 
 
 def test_completion_with_logging():
