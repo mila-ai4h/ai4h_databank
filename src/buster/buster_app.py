@@ -515,7 +515,7 @@ with buster_app:
                     submit = gr.Button(value="Ask", variant="primary", size="lg")
 
                 gr.Markdown(
-                """
+                    """
                 By using this tool you agree to our [terms and conditions](file=src/buster/assets/index.html)
                 """
                 )
@@ -523,12 +523,12 @@ with buster_app:
                 sources_textboxes = display_sources()
 
             with gr.Column():
-                gr.Markdown("## Example questions")
-                gr.Examples(
-                    examples=example_questions,
-                    inputs=user_input,
-                    label="Questions users could ask.",
-                )
+                # gr.Markdown("## Example questions")
+                # gr.Examples(
+                #     examples=example_questions,
+                #     inputs=user_input,
+                #     label="Questions users could ask.",
+                # )
 
                 feedback_elems = setup_feedback_form()
 
