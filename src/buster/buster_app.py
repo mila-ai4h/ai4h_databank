@@ -382,6 +382,9 @@ def setup_about_panel():
                 * Questions for which the answer can be found in the text (i.e. the thinking has already been done by the author) these AI models are not able to write their own research report combining information across policy documents and analyzing them itself).
 
                 If your question is outside the scope of the recommended use, the model has been instructed not to answer.
+
+                We are looking to create a tool that is as inclusive as possible.
+                While currently the tool only works with English language questions and documents we will continue assessing {app_name}'s capacity to perform as intended for users with different levels of fluency in English and plan to expand the functionality to ensure accessibility and impact across countries and user groups.
                 """
                 )
 
