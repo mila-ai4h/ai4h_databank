@@ -549,7 +549,7 @@ with buster_app:
 
     # fmt: off
     submit.click(
-        add_user_question, [user_input], [chatbot]
+        add_user_question, [user_input], [chatbot], api_name="ask_question"
     ).then(
         clear_user_input,
         outputs=[user_input]
