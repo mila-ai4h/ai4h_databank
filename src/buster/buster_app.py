@@ -586,6 +586,10 @@ with buster_app:
         inputs=[chatbot],
         outputs=[chatbot, last_completion],
     ).then(
+        add_disclaimer,
+        inputs=[last_completion, chatbot, gr.State(cfg.disclaimer)],
+        outputs=[chatbot]
+    ).then(
         add_sources,
         inputs=[last_completion, gr.State(max_sources)],
         outputs=[*sources_textboxes]
@@ -625,6 +629,10 @@ with buster_app:
         chat,
         inputs=[chatbot],
         outputs=[chatbot, last_completion],
+    ).then(
+        add_disclaimer,
+        inputs=[last_completion, chatbot, gr.State(cfg.disclaimer)],
+        outputs=[chatbot]
     ).then(
         add_sources,
         inputs=[last_completion, gr.State(max_sources)],

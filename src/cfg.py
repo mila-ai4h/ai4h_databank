@@ -51,7 +51,7 @@ mongo_db = init_db(mongo_uri=MONGO_URI, db_name=MONGO_DATABASE_LOGGING)
 current_dir = Path(__file__).resolve().parent
 data_dir = current_dir.parent / "data"  # ../data
 
-app_name = "SAI 🗣️"
+app_name = "SAI ️💬"
 
 # sample questions
 example_questions = [
@@ -61,10 +61,10 @@ example_questions = [
 ]
 
 
-disclaimer = """I'm a bot 🤖 and can sometimes give inaccurate information.
-Always verify the integrity of my statements using the sources provided below 📝
+disclaimer = f"""
+Use the feedback form on the right to help us improve 👉
 
-If something doesn't look right, you can use the feedback form to help me improve 😇
+Always verify the integrity of {app_name} responses using the sources provided below 👇
 """
 
 buster_cfg = BusterConfig(
