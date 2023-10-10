@@ -187,6 +187,15 @@ def add_user_question(user_question: str, chat_history: Optional[ChatHistory] = 
     return chat_history
 
 
+def ghost_chat(ghost_input: str):
+    completion = buster.process_input(ghost_input)
+
+    # call the text, generate it in the process
+    print(completion.answer_text)
+
+    return completion.answer_text
+
+
 def chat(chat_history: ChatHistory):
     """Answer a user's question using retrieval augmented generation."""
 
@@ -518,6 +527,10 @@ with buster_app:
                 chatbot = gr.Chatbot(label="Demo")
                 sources_textboxes = display_sources()
 
+                ghost_button = gr.Button(visible=False)
+                ghost_input = gr.Textbox(visible=False)
+                ghost_response = gr.Textbox(visible=False)
+
             with gr.Column():
                 gr.Markdown("## Example questions")
                 gr.Examples(
@@ -547,9 +560,13 @@ with buster_app:
     )
     # fmt: on
 
+    ghost_button.click(ghost_chat, inputs=[ghost_input], outputs=[ghost_response], api_name="ask_question")
+
     # fmt: off
     submit.click(
-        add_user_question, [user_input], [chatbot], api_name="ask_question"
+        add_user_question,
+        [user_input],
+        [chatbot],
     ).then(
         clear_user_input,
         outputs=[user_input]
