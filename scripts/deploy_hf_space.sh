@@ -67,7 +67,7 @@ prepare_deploy_dir() {
 # Create README for Hugging Face space
 create_readme() {
   echo '---
-title: Buster
+title: SAI 💬
 emoji: 💻
 colorFrom: pink
 colorTo: green
