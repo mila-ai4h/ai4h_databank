@@ -54,11 +54,11 @@ def setup_feedback_form():
             with gr.Box():
                 with gr.Column():
                     gr.Markdown(
-                        f""" ## Thank You For Being Here!
+                        f""" ## Feedback
 
 Thank you for being here and providing feedback on the model's outputs! Your feedback will help us make the tool as useful as possible for the community!
 
-Since this tool is still in its early stages of development, please only engage with it as a demo and not for use in a proper research context.
+The feedback you provide is anonymous and directly tied to the questions you asked.
 
 We look forward to sharing with you an updated version of the product once we feel it's ready!
 """
@@ -68,7 +68,8 @@ We look forward to sharing with you an updated version of the product once we fe
                             choices=["👍", "👎"], label="Did you find what you were looking for?"
                         )
 
-                    show_additional_feedback = gr.Group(visible=False)
+                    # Currently, we show all feedback, but also support having a small portion of it display at first
+                    show_additional_feedback = gr.Group(visible=True)
                     with show_additional_feedback:
                         with gr.Column():
                             clear_answer = gr.Radio(
@@ -88,9 +89,9 @@ We look forward to sharing with you an updated version of the product once we fe
                             )
 
                             extra_info = gr.Textbox(
-                                label="Enter any additional information",
+                                label="Any other comments?",
                                 lines=3,
-                                placeholder="Enter more helpful information for us here...",
+                                placeholder="Please enter other feedback for improvement here...",
                             )
 
                     submit_feedback_btn = gr.Button("Submit Feedback!", variant="primary", interactive=False)
@@ -503,6 +504,7 @@ with buster_app:
                 gr.Markdown(
                     f"""
                 Ask {app_name} your AI policy questions! Keep in mind this tool is a demo and can sometimes provide inaccurate information. Always verify the integrity of the information using the provided sources.
+                Since this tool is still in its early stages of development, please only engage with it as a demo and not for use in a proper research context.
                 """
                 )
                 with gr.Row():
@@ -564,10 +566,10 @@ with buster_app:
         toggle_visibility,
         inputs=gr.State(False),
         outputs=feedback_elems["submitted_message"],
-    ).then(
-        toggle_visibility,
-        inputs=gr.State(False),
-        outputs=feedback_elems["show_additional_feedback"],
+    # ).then(
+    #     toggle_visibility,
+    #     inputs=gr.State(False),
+    #     outputs=feedback_elems["show_additional_feedback"],
     ).then(
       clear_feedback_form,
         outputs=[
@@ -604,10 +606,10 @@ with buster_app:
         toggle_visibility,
         inputs=gr.State(False),
         outputs=feedback_elems["submitted_message"],
-    ).then(
-        toggle_visibility,
-        inputs=gr.State(False),
-        outputs=feedback_elems["show_additional_feedback"],
+    # ).then(
+    #     toggle_visibility,
+    #     inputs=gr.State(False),
+    #     outputs=feedback_elems["show_additional_feedback"],
     ).then(
       clear_feedback_form,
         outputs=[
