@@ -12,9 +12,7 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_ORGANIZATION: ${{ secrets.OPENAI_ORGANIZATION }}
-          MONGO_USERNAME: ${{ secrets.MONGO_USERNAME }}
-          MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
-          MONGO_CLUSTER: ${{ secrets.MONGO_CLUSTER }}
+          MONGO_URI: ${{ secrets.MONGO_URI }}
           PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
           INSTANCE_TYPE: dev
           INSTANCE_NAME: github-actions
