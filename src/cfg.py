@@ -54,7 +54,7 @@ mongo_db = init_db(MONGO_USERNAME, MONGO_PASSWORD, MONGO_CLUSTER, MONGO_DATABASE
 current_dir = Path(__file__).resolve().parent
 data_dir = current_dir.parent / "data"  # ../data
 
-app_name = "AIPS 🐒"
+app_name = "SAI 🗣️"
 
 # sample questions
 example_questions = [
