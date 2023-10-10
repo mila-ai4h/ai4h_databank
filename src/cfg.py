@@ -27,9 +27,7 @@ PINECONE_INDEX = "oecd"
 PINECONE_NAMESPACE = "data-2023-05-16"
 
 # MongoDB Configurations
-MONGO_USERNAME = os.environ["MONGO_USERNAME"]
-MONGO_PASSWORD = os.environ["MONGO_PASSWORD"]
-MONGO_CLUSTER = os.environ["MONGO_CLUSTER"]
+MONGO_URI = os.environ["MONGO_URI"]
 
 # Instance Configurations
 INSTANCE_NAME = os.environ["INSTANCE_NAME"]  # e.g., huggingface, heroku
@@ -46,8 +44,7 @@ MONGO_COLLECTION_INTERACTION = "interaction"  # User interaction
 MONGO_COLLECTION_FLAGGED = "flagged"  # Flagged interactions
 
 # Make the connections to the databases
-mongo_uri = make_uri(MONGO_USERNAME, MONGO_PASSWORD, MONGO_CLUSTER)
-mongo_db = init_db(MONGO_USERNAME, MONGO_PASSWORD, MONGO_CLUSTER, MONGO_DATABASE_LOGGING)
+mongo_db = init_db(mongo_uri=MONGO_URI, db_name=MONGO_DATABASE_LOGGING)
 
 
 # Set relative path to data dir
@@ -107,7 +104,7 @@ Q:
         "pinecone_env": PINECONE_ENV,
         "pinecone_index": PINECONE_INDEX,
         "pinecone_namespace": PINECONE_NAMESPACE,
-        "mongo_uri": mongo_uri,
+        "mongo_uri": MONGO_URI,
         "mongo_db_name": MONGO_DATABASE_DATA,
         "top_k": 3,
         "thresh": 0.7,

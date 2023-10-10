@@ -62,20 +62,18 @@ def make_uri(username: str, password: str, cluster: str) -> str:
     return uri
 
 
-def init_db(username: str, password: str, cluster: str, db_name: str) -> pymongo.database.Database:
+def init_db(mongo_uri: str, db_name: str) -> pymongo.database.Database:
     """Initialize mongodb database."""
-
-    if all(v is not None for v in [username, password, cluster]):
-        try:
-            uri = make_uri(username, password, cluster)
-            mongodb_client = MongoClient(uri)
-            database = mongodb_client[db_name]
-            logger.info("Succesfully connected to the MongoDB database")
-            return database
-        except Exception as e:
-            logger.exception("Something went wrong connecting to mongodb")
-
-    logger.warning("Didn't connect to MongoDB database, check auth.")
+    try:
+        mongodb_client = MongoClient(mongo_uri)
+        # Ping the database to make sure authentication is good
+        mongodb_client.admin.command("ping")
+        database = mongodb_client[db_name]
+        logger.info("Succesfully connected to the MongoDB database")
+        return database
+    except Exception as e:
+        logger.exception("Something went wrong connecting to mongodb")
+        return None
 
 
 def get_utc_time() -> str:
