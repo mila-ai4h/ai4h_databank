@@ -54,18 +54,17 @@ def setup_feedback_form():
             with gr.Box():
                 with gr.Column():
                     gr.Markdown(
-                        f""" ## Feedback
+                        f""" ## We Would Love Your Feedback
 
-Thank you for being here and providing feedback on the model's outputs! Your feedback will help us make the tool as useful as possible for the community!
+Thank you for being here and providing feedback on {app_name}.
+Your feedback is anonymous and will help us make the tool as useful as possible for the community!
 
-The feedback you provide is anonymous and directly tied to the questions you asked.
-
-We look forward to sharing with you an updated version of the product once we feel it's ready!
+Please submit feedback for each question asked. Each submission is directly linked to the submitted question.
 """
                     )
                     with gr.Row():
                         overall_experience = gr.Radio(
-                            choices=["👍", "👎"], label="Did you find what you were looking for?"
+                            choices=["👍", "👎"], label=f"Did {app_name} help answer your question?"
                         )
 
                     # Currently, we show all feedback, but also support having a small portion of it display at first
