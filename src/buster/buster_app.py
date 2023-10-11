@@ -94,6 +94,7 @@ Your feedback is anonymous and will help us make the tool as useful as possible 
                             expertise = gr.Radio(
                                 choices=["Beginner", "Intermediate", "Expert"],
                                 label="How would you rate your knowledge of AI policy",
+                                interactive=True,
                             )
 
                     submit_feedback_btn = gr.Button("Submit Feedback!", variant="primary", interactive=True)
@@ -333,6 +334,7 @@ def clear_feedback_form():
         feedback_elems["relevant_sources"]: gr.update(value=None),
         feedback_elems["relevant_sources_selection"]: gr.update(value=None),
         feedback_elems["relevant_sources_order"]: gr.update(value=None),
+        feedback_elems["expertise"]: gr.update(value=None),
         feedback_elems["extra_info"]: gr.update(value=None),
     }
 
@@ -597,6 +599,7 @@ with buster_app:
             feedback_elems["relevant_sources"],
             feedback_elems["relevant_sources_selection"],
             feedback_elems["relevant_sources_order"],
+            feedback_elems["expertise"],
             feedback_elems["extra_info"],
         ]
     ).then(
@@ -641,6 +644,7 @@ with buster_app:
             feedback_elems["relevant_sources"],
             feedback_elems["relevant_sources_selection"],
             feedback_elems["relevant_sources_order"],
+            feedback_elems["expertise"],
             feedback_elems["extra_info"],
         ]
     ).then(
