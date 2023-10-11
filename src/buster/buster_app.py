@@ -478,7 +478,7 @@ def setup_flag_button():
                 """# Report bugs and harmful content
     While we took many steps to ensure the tool is safe, we still rely on third parties for some of the model's capabilities. Please let us know if any harmful content shows up by clicking the button below and sending screenshots/concerns to mila.databank@gmail.com"""
             )
-            flag_button = gr.Button(value="Flag Content 🚩")
+            flag_button = gr.Button(value="Flag content 🚩")
     return flag_button
 
 
