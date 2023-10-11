@@ -490,7 +490,7 @@ with buster_app:
     # A unique identifier that resets every time a page is refreshed
     session_id = gr.State(get_session_id)
 
-    gr.Markdown(f"<h1><center>{app_name}: A Question-Answering Bot on AI Policies </center></h1>")
+    gr.Markdown(f"<h1><center>SAI: Search engine for AI policy</center></h1>")
 
     about_panel = setup_about_panel()
 
@@ -504,7 +504,7 @@ with buster_app:
                 gr.Markdown(
                     f"""
                 Ask {app_name} your AI policy questions! Keep in mind this tool is a demo and can sometimes provide inaccurate information. Always verify the integrity of the information using the provided sources.
-                Since this tool is still in its early stages of development, please only engage with it as a demo and not for use in a proper research context.
+                Since this tool is still in its early stages of development, please only engage with it as a demo.
                 """
                 )
                 with gr.Row():
