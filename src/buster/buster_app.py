@@ -101,18 +101,6 @@ Your feedback is anonymous and will help us make the tool as useful as possible 
                     with gr.Column(visible=False) as submitted_message:
                         gr.Markdown("Feedback recorded, thank you 📝! You can now ask a new question in the search bar.")
 
-    # # fmt: off
-    # overall_experience.input(
-    #     toggle_visibility,
-    #     inputs=gr.State("True"),
-    #     outputs=show_additional_feedback
-    # ).then(
-    #     toggle_interactivity,
-    #     inputs=gr.State(True),
-    #     outputs=submit_feedback_btn,
-    # )
-    # fmt: on
-
     # fmt: off
     submit_feedback_btn.click(
         toggle_visibility,
@@ -136,12 +124,11 @@ Your feedback is anonymous and will help us make the tool as useful as possible 
         toggle_visibility,
         inputs=gr.State(True),
         outputs=submitted_message,
+    ).success(
+        toggle_interactivity,
+        inputs=gr.State(False),
+        outputs=submit_feedback_btn,
     )
-    # ).success(
-    #     toggle_interactivity,
-    #     inputs=gr.State(False),
-    #     outputs=submit_feedback_btn,
-    # )
 
     # fmt: on
     feedback_elems = {
@@ -586,10 +573,10 @@ with buster_app:
         toggle_visibility,
         inputs=gr.State(False),
         outputs=feedback_elems["submitted_message"],
-    # ).then(
-    #     toggle_visibility,
-    #     inputs=gr.State(False),
-    #     outputs=feedback_elems["show_additional_feedback"],
+    ).then(
+        toggle_interactivity,
+        inputs=gr.State(True),
+        outputs=feedback_elems["submit_feedback_btn"],
     ).then(
       clear_feedback_form,
         outputs=[
@@ -631,10 +618,10 @@ with buster_app:
         toggle_visibility,
         inputs=gr.State(False),
         outputs=feedback_elems["submitted_message"],
-    # ).then(
-    #     toggle_visibility,
-    #     inputs=gr.State(False),
-    #     outputs=feedback_elems["show_additional_feedback"],
+    ).then(
+        toggle_interactivity,
+        inputs=gr.State(True),
+        outputs=feedback_elems["submit_feedback_btn"],
     ).then(
       clear_feedback_form,
         outputs=[
