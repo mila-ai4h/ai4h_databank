@@ -97,7 +97,7 @@ Your feedback is anonymous and will help us make the tool as useful as possible 
                                 interactive=True,
                             )
 
-                    submit_feedback_btn = gr.Button("Submit Feedback!", variant="primary", interactive=True)
+                    submit_feedback_btn = gr.Button("Submit feedback", variant="primary", interactive=True)
                     with gr.Column(visible=False) as submitted_message:
                         gr.Markdown("Feedback recorded, thank you 📝! You can now ask a new question in the search bar.")
 
@@ -127,7 +127,7 @@ Your feedback is anonymous and will help us make the tool as useful as possible 
             relevant_sources,
             relevant_sources_order,
             relevant_sources_selection,
-            # expertise,
+            expertise,
             extra_info,
             last_completion,
             session_id,
@@ -268,7 +268,7 @@ def submit_feedback(
     relevant_sources: str,
     relevant_sources_order: list[str],
     relevant_sources_selection: str,
-    # expertise: list[str],
+    expertise: list[str],
     extra_info: str,
     completion: Union[Completion, list[Completion]],
     session_id: str,
@@ -283,7 +283,7 @@ def submit_feedback(
         relevant_sources=relevant_sources,
         relevant_sources_order=relevant_sources_order,
         relevant_sources_selection=relevant_sources_selection,
-        # expertise=expertise,
+        expertise=expertise,
         extra_info=extra_info,
     )
 
