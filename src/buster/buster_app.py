@@ -54,8 +54,8 @@ def setup_feedback_form():
             with gr.Box():
                 with gr.Column():
                     gr.Markdown(
-                        f""" ## We Would Love Your Feedback
-Please submit feedback for each question asked. Each submission is directly linked to the submitted question.
+                        f""" ## We would love your feedback!
+Please submit feedback for each question asked.
 
 Your feedback is anonymous and will help us make the tool as useful as possible for the community!
 """
@@ -93,7 +93,7 @@ Your feedback is anonymous and will help us make the tool as useful as possible 
 
                     submit_feedback_btn = gr.Button("Submit Feedback!", variant="primary", interactive=False)
                     with gr.Column(visible=False) as submitted_message:
-                        gr.Markdown("Feedback recorded, thank you! 📝")
+                        gr.Markdown("Feedback recorded, thank you 📝! You can now ask a new question in the search bar.")
 
     # fmt: off
     overall_experience.input(
@@ -330,7 +330,7 @@ def reveal_app(checkbox: bool):
 def display_sources():
     with gr.Column(variant="panel"):
         gr.Markdown(
-            """## Relevant Documents
+            """## Relevant sources
         All retrieved documents will be listed here in order of importance. If no answer was found, documents will not be displayed.
         """
         )
@@ -443,7 +443,7 @@ def setup_additional_sources():
         gr.Markdown(f"")
 
         gr.Markdown(
-            f"""## 📚 Sources
+            f"""## 📚 Availble sources
         {app_name} has access to dozens of AI policy documents from various sources.
         Below we list all of the sources that {app_name} has access to.
         """
@@ -475,8 +475,8 @@ def setup_flag_button():
     with gr.Column(variant="compact"):
         with gr.Box():
             gr.Markdown(
-                """# Report Misuse
-    While we took many steps to ensure the tool is safe, we still rely on third parties for our LLM capabilities. Please let us know if any harmful content shows up by clicking the button below. You can also send us screenshots/concerns to mila.databank@gmail.com"""
+                """# Report bugs and harmful content
+    While we took many steps to ensure the tool is safe, we still rely on third parties for some of the model's capabilities. Please let us know if any harmful content shows up by clicking the button below and sending screenshots/concerns to mila.databank@gmail.com"""
             )
             flag_button = gr.Button(value="Flag Content 🚩")
     return flag_button
@@ -511,7 +511,7 @@ with buster_app:
                     with gr.Column(scale=10):
                         user_input = gr.Textbox(
                             label="",
-                            placeholder=f"Ask {app_name}",
+                            placeholder="Ask your AI policy question here…",
                             lines=1,
                         )
                     submit = gr.Button(value="Ask", variant="primary", size="lg")
@@ -521,7 +521,7 @@ with buster_app:
                 By using this tool you agree to our [terms and conditions](file=src/buster/assets/index.html)
                 """
                 )
-                chatbot = gr.Chatbot(label="Demo")
+                chatbot = gr.Chatbot(label="Generated Answer")
                 sources_textboxes = display_sources()
 
             with gr.Column():
