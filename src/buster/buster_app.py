@@ -443,7 +443,7 @@ def setup_additional_sources():
         gr.Markdown(f"")
 
         gr.Markdown(
-            f"""## 📚 Availble sources
+            f"""## 📚 Available sources
         {app_name} has access to dozens of AI policy documents from various sources.
         Below we list all of the sources that {app_name} has access to.
         """
