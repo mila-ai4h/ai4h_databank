@@ -448,7 +448,7 @@ def setup_additional_sources():
         Below we list all of the sources that {app_name} has access to.
         """
         )
-        with gr.Accordion(open=True, label="Click to list all available sources 📚"):
+        with gr.Accordion(open=False, label="Click to list all available sources 📚"):
             with gr.Column():
                 # Display the sources using a dataframe table
                 documents_metadata["Report"] = documents_metadata.apply(
