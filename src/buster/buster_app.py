@@ -91,20 +91,25 @@ Your feedback is anonymous and will help us make the tool as useful as possible 
                                 placeholder="Please enter other feedback for improvement here...",
                             )
 
-                    submit_feedback_btn = gr.Button("Submit Feedback!", variant="primary", interactive=False)
+                            expertise = gr.Radio(
+                                choices=["Beginner", "Intermediate", "Expert"],
+                                label="How would you rate your knowledge of AI policy",
+                            )
+
+                    submit_feedback_btn = gr.Button("Submit Feedback!", variant="primary", interactive=True)
                     with gr.Column(visible=False) as submitted_message:
                         gr.Markdown("Feedback recorded, thank you 📝! You can now ask a new question in the search bar.")
 
-    # fmt: off
-    overall_experience.input(
-        toggle_visibility,
-        inputs=gr.State("True"),
-        outputs=show_additional_feedback
-    ).then(
-        toggle_interactivity,
-        inputs=gr.State(True),
-        outputs=submit_feedback_btn,
-    )
+    # # fmt: off
+    # overall_experience.input(
+    #     toggle_visibility,
+    #     inputs=gr.State("True"),
+    #     outputs=show_additional_feedback
+    # ).then(
+    #     toggle_interactivity,
+    #     inputs=gr.State(True),
+    #     outputs=submit_feedback_btn,
+    # )
     # fmt: on
 
     # fmt: off
@@ -115,17 +120,27 @@ Your feedback is anonymous and will help us make the tool as useful as possible 
     ).then(
         submit_feedback,
         inputs=[
-            overall_experience, clear_answer, accurate_answer, relevant_sources, relevant_sources_order, relevant_sources_selection, extra_info, last_completion, session_id,
+            overall_experience,
+            clear_answer,
+            accurate_answer,
+            relevant_sources,
+            relevant_sources_order,
+            relevant_sources_selection,
+            # expertise,
+            extra_info,
+            last_completion,
+            session_id,
         ],
     ).success(
         toggle_visibility,
         inputs=gr.State(True),
         outputs=submitted_message,
-    ).success(
-        toggle_interactivity,
-        inputs=gr.State(False),
-        outputs=submit_feedback_btn,
     )
+    # ).success(
+    #     toggle_interactivity,
+    #     inputs=gr.State(False),
+    #     outputs=submit_feedback_btn,
+    # )
 
     # fmt: on
     feedback_elems = {
@@ -138,6 +153,7 @@ Your feedback is anonymous and will help us make the tool as useful as possible 
         "submit_feedback_btn": submit_feedback_btn,
         "submitted_message": submitted_message,
         "show_additional_feedback": show_additional_feedback,
+        "expertise": expertise,
         "extra_info": extra_info,
     }
 
@@ -251,6 +267,7 @@ def submit_feedback(
     relevant_sources: str,
     relevant_sources_order: list[str],
     relevant_sources_selection: str,
+    # expertise: list[str],
     extra_info: str,
     completion: Union[Completion, list[Completion]],
     session_id: str,
@@ -265,6 +282,7 @@ def submit_feedback(
         relevant_sources=relevant_sources,
         relevant_sources_order=relevant_sources_order,
         relevant_sources_selection=relevant_sources_selection,
+        # expertise=expertise,
         extra_info=extra_info,
     )
 
