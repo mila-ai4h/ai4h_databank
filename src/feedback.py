@@ -41,6 +41,9 @@ class FeedbackForm(StandardForm):
     relevant_sources_order: str
     relevant_sources_selection: list
 
+    # beginner, intermediate, expert at AI policy?
+    expertise: list[str]
+
     # Additional Feedback
     extra_info: str
 

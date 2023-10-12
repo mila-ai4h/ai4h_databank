@@ -54,21 +54,19 @@ def setup_feedback_form():
             with gr.Box():
                 with gr.Column():
                     gr.Markdown(
-                        f""" ## Thank You For Being Here!
+                        f""" ## We would love your feedback!
+Please submit feedback for each question asked.
 
-Thank you for being here and providing feedback on the model's outputs! Your feedback will help us make the tool as useful as possible for the community!
-
-Since this tool is still in its early stages of development, please only engage with it as a demo and not for use in a proper research context.
-
-We look forward to sharing with you an updated version of the product once we feel it's ready!
+Your feedback is anonymous and will help us make the tool as useful as possible for the community!
 """
                     )
                     with gr.Row():
                         overall_experience = gr.Radio(
-                            choices=["👍", "👎"], label="Did you find what you were looking for?"
+                            choices=["👍", "👎"], label=f"Did {app_name} help answer your question?"
                         )
 
-                    show_additional_feedback = gr.Group(visible=False)
+                    # Currently, we show all feedback, but also support having a small portion of it display at first
+                    show_additional_feedback = gr.Group(visible=True)
                     with show_additional_feedback:
                         with gr.Column():
                             clear_answer = gr.Radio(
@@ -88,26 +86,20 @@ We look forward to sharing with you an updated version of the product once we fe
                             )
 
                             extra_info = gr.Textbox(
-                                label="Enter any additional information",
+                                label="Any other comments?",
                                 lines=3,
-                                placeholder="Enter more helpful information for us here...",
+                                placeholder="Please enter other feedback for improvement here...",
                             )
 
-                    submit_feedback_btn = gr.Button("Submit Feedback!", variant="primary", interactive=False)
-                    with gr.Column(visible=False) as submitted_message:
-                        gr.Markdown("Feedback recorded, thank you! 📝")
+                            expertise = gr.Radio(
+                                choices=["Beginner", "Intermediate", "Expert"],
+                                label="How would you rate your knowledge of AI policy",
+                                interactive=True,
+                            )
 
-    # fmt: off
-    overall_experience.input(
-        toggle_visibility,
-        inputs=gr.State("True"),
-        outputs=show_additional_feedback
-    ).then(
-        toggle_interactivity,
-        inputs=gr.State(True),
-        outputs=submit_feedback_btn,
-    )
-    # fmt: on
+                    submit_feedback_btn = gr.Button("Submit feedback", variant="primary", interactive=True)
+                    with gr.Column(visible=False) as submitted_message:
+                        gr.Markdown("Feedback recorded, thank you 📝! You can now ask a new question in the search bar.")
 
     # fmt: off
     submit_feedback_btn.click(
@@ -117,7 +109,16 @@ We look forward to sharing with you an updated version of the product once we fe
     ).then(
         submit_feedback,
         inputs=[
-            overall_experience, clear_answer, accurate_answer, relevant_sources, relevant_sources_order, relevant_sources_selection, extra_info, last_completion, session_id,
+            overall_experience,
+            clear_answer,
+            accurate_answer,
+            relevant_sources,
+            relevant_sources_order,
+            relevant_sources_selection,
+            expertise,
+            extra_info,
+            last_completion,
+            session_id,
         ],
     ).success(
         toggle_visibility,
@@ -140,6 +141,7 @@ We look forward to sharing with you an updated version of the product once we fe
         "submit_feedback_btn": submit_feedback_btn,
         "submitted_message": submitted_message,
         "show_additional_feedback": show_additional_feedback,
+        "expertise": expertise,
         "extra_info": extra_info,
     }
 
@@ -253,6 +255,7 @@ def submit_feedback(
     relevant_sources: str,
     relevant_sources_order: list[str],
     relevant_sources_selection: str,
+    expertise: list[str],
     extra_info: str,
     completion: Union[Completion, list[Completion]],
     session_id: str,
@@ -267,6 +270,7 @@ def submit_feedback(
         relevant_sources=relevant_sources,
         relevant_sources_order=relevant_sources_order,
         relevant_sources_selection=relevant_sources_selection,
+        expertise=expertise,
         extra_info=extra_info,
     )
 
@@ -317,6 +321,7 @@ def clear_feedback_form():
         feedback_elems["relevant_sources"]: gr.update(value=None),
         feedback_elems["relevant_sources_selection"]: gr.update(value=None),
         feedback_elems["relevant_sources_order"]: gr.update(value=None),
+        feedback_elems["expertise"]: gr.update(value=None),
         feedback_elems["extra_info"]: gr.update(value=None),
     }
 
@@ -332,7 +337,7 @@ def reveal_app(checkbox: bool):
 def display_sources():
     with gr.Column(variant="panel"):
         gr.Markdown(
-            """## Relevant Documents
+            """## Relevant sources
         All retrieved documents will be listed here in order of importance. If no answer was found, documents will not be displayed.
         """
         )
@@ -384,6 +389,9 @@ def setup_about_panel():
                 * Questions for which the answer can be found in the text (i.e. the thinking has already been done by the author) these AI models are not able to write their own research report combining information across policy documents and analyzing them itself).
 
                 If your question is outside the scope of the recommended use, the model has been instructed not to answer.
+
+                We are looking to create a tool that is as inclusive as possible.
+                While currently the tool only works with English language questions and documents we will continue assessing {app_name}'s capacity to perform as intended for users with different levels of fluency in English and plan to expand the functionality to ensure accessibility and impact across countries and user groups.
                 """
                 )
 
@@ -442,12 +450,12 @@ def setup_additional_sources():
         gr.Markdown(f"")
 
         gr.Markdown(
-            f"""## 📚 Sources
+            f"""## 📚 Available sources
         {app_name} has access to dozens of AI policy documents from various sources.
         Below we list all of the sources that {app_name} has access to.
         """
         )
-        with gr.Accordion(open=True, label="Click to list all available sources 📚"):
+        with gr.Accordion(open=False, label="Click to list all available sources 📚"):
             with gr.Column():
                 # Display the sources using a dataframe table
                 documents_metadata["Report"] = documents_metadata.apply(
@@ -464,7 +472,7 @@ def setup_additional_sources():
 
 def raise_flagging_message():
     """Raises a red banner indicating that the content has been flagged."""
-    raise gr.Error(
+    gr.Info(
         "Thank you for flagging the content. Our moderation team will look closely at these samples. We appologize for any harm this might have caused you."
     )
 
@@ -474,10 +482,10 @@ def setup_flag_button():
     with gr.Column(variant="compact"):
         with gr.Box():
             gr.Markdown(
-                """# Report Misuse
-    While we took many steps to ensure the tool is safe, we still rely on third parties for our LLM capabilities. Please let us know if any harmful content shows up by clicking the button below. You can also send us screenshots/concerns to mila.databank@gmail.com"""
+                """# Report bugs and harmful content
+    While we took many steps to ensure the tool is safe, we still rely on third parties for some of the model's capabilities. Please let us know if any harmful content shows up by clicking the button below and sending screenshots/concerns to mila.databank@gmail.com"""
             )
-            flag_button = gr.Button(value="Flag Content 🚩")
+            flag_button = gr.Button(value="Flag content 🚩")
     return flag_button
 
 
@@ -489,7 +497,7 @@ with buster_app:
     # A unique identifier that resets every time a page is refreshed
     session_id = gr.State(get_session_id)
 
-    gr.Markdown(f"<h1><center>{app_name}: A Question-Answering Bot on AI Policies </center></h1>")
+    gr.Markdown(f"<h1><center>SAI: Search engine for AI policy</center></h1>")
 
     about_panel = setup_about_panel()
 
@@ -501,33 +509,36 @@ with buster_app:
         with gr.Row():
             with gr.Column(scale=2, variant="panel"):
                 gr.Markdown(
-                    """## Search
-                Ask your AI policy questions below. Keep in mind this tool is a demo and can sometimes provide inaccurate information. Always verify the integrity of the information using the provided sources.
-
-                By using this app, you agree to our [terms and conditions](file=src/buster/assets/index.html)
+                    f"""
+                Ask {app_name} your AI policy questions! Keep in mind this tool is a demo and can sometimes provide inaccurate information. Always verify the integrity of the information using the provided sources.
+                Since this tool is still in its early stages of development, please only engage with it as a demo.
                 """
                 )
                 with gr.Row():
                     with gr.Column(scale=10):
                         user_input = gr.Textbox(
-                            label=f"Chat with {cfg.app_name}",
-                            placeholder="Ask your question here...",
+                            label="",
+                            placeholder="Ask your AI policy question here…",
                             lines=1,
                         )
                     submit = gr.Button(value="Ask", variant="primary", size="lg")
-                chatbot = gr.Chatbot(label="Demo")
+
+                gr.Markdown(
+                    """
+                By using this tool you agree to our [terms and conditions](file=src/buster/assets/index.html)
+                """
+                )
+                # gr.Examples(
+                #     examples=[random.choice(example_questions)],
+                #     inputs=user_input,
+                #     label="Questions users could ask.",
+                # )
+
+                chatbot = gr.Chatbot(label="Generated Answer")
                 sources_textboxes = display_sources()
 
             with gr.Column():
-                gr.Markdown("## Example questions")
-                gr.Examples(
-                    examples=example_questions,
-                    inputs=user_input,
-                    label="Questions users could ask.",
-                )
-
                 feedback_elems = setup_feedback_form()
-
                 flag_button = setup_flag_button()
 
         setup_additional_sources()
@@ -561,9 +572,9 @@ with buster_app:
         inputs=gr.State(False),
         outputs=feedback_elems["submitted_message"],
     ).then(
-        toggle_visibility,
-        inputs=gr.State(False),
-        outputs=feedback_elems["show_additional_feedback"],
+        toggle_interactivity,
+        inputs=gr.State(True),
+        outputs=feedback_elems["submit_feedback_btn"],
     ).then(
       clear_feedback_form,
         outputs=[
@@ -573,12 +584,17 @@ with buster_app:
             feedback_elems["relevant_sources"],
             feedback_elems["relevant_sources_selection"],
             feedback_elems["relevant_sources_order"],
+            feedback_elems["expertise"],
             feedback_elems["extra_info"],
         ]
     ).then(
         chat,
         inputs=[chatbot],
         outputs=[chatbot, last_completion],
+    ).then(
+        add_disclaimer,
+        inputs=[last_completion, chatbot, gr.State(cfg.disclaimer)],
+        outputs=[chatbot]
     ).then(
         add_sources,
         inputs=[last_completion, gr.State(max_sources)],
@@ -601,9 +617,9 @@ with buster_app:
         inputs=gr.State(False),
         outputs=feedback_elems["submitted_message"],
     ).then(
-        toggle_visibility,
-        inputs=gr.State(False),
-        outputs=feedback_elems["show_additional_feedback"],
+        toggle_interactivity,
+        inputs=gr.State(True),
+        outputs=feedback_elems["submit_feedback_btn"],
     ).then(
       clear_feedback_form,
         outputs=[
@@ -613,12 +629,17 @@ with buster_app:
             feedback_elems["relevant_sources"],
             feedback_elems["relevant_sources_selection"],
             feedback_elems["relevant_sources_order"],
+            feedback_elems["expertise"],
             feedback_elems["extra_info"],
         ]
     ).then(
         chat,
         inputs=[chatbot],
         outputs=[chatbot, last_completion],
+    ).then(
+        add_disclaimer,
+        inputs=[last_completion, chatbot, gr.State(cfg.disclaimer)],
+        outputs=[chatbot]
     ).then(
         add_sources,
         inputs=[last_completion, gr.State(max_sources)],
