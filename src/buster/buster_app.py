@@ -399,7 +399,6 @@ def setup_terms_and_conditions():
                 """
             By using this tool you agree to our [terms and conditions](file=src/buster/assets/index.html)
             """,
-                scale=1,
             )
             accept_checkbox = gr.Checkbox(value=0, label="I accept", interactive=True, container=False, scale=1)
     return accept_terms_group, accept_checkbox
