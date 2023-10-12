@@ -20,6 +20,7 @@ def test_read_write_feedbackform():
         relevant_sources="yes",
         relevant_sources_selection=["source 1", "source 2"],
         relevant_sources_order="yes",
+        expertise="Beginner",
         extra_info="Helpful",
     )
 
@@ -32,6 +33,7 @@ def test_read_write_feedbackform():
     assert ff.relevant_sources == ff_back.relevant_sources
     assert ff.relevant_sources_order == ff_back.relevant_sources_order
     assert ff.relevant_sources_selection == ff_back.relevant_sources_selection
+    assert ff.expertise == ff_back.expertise
     assert ff.extra_info == ff_back.extra_info
 
 
@@ -65,6 +67,7 @@ def test_read_write_feedback():
             relevant_sources="yes",
             relevant_sources_selection=["source 1", "source 2"],
             relevant_sources_order="yes",
+            expertise="Beginner",
             extra_info="Helpful",
         ),
         time="time",
