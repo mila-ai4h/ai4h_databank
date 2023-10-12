@@ -472,7 +472,7 @@ def setup_additional_sources():
 
 def raise_flagging_message():
     """Raises a red banner indicating that the content has been flagged."""
-    raise gr.Error(
+    gr.Info(
         "Thank you for flagging the content. Our moderation team will look closely at these samples. We appologize for any harm this might have caused you."
     )
 
@@ -528,19 +528,17 @@ with buster_app:
                 By using this tool you agree to our [terms and conditions](file=src/buster/assets/index.html)
                 """
                 )
-                chatbot = gr.Chatbot(label="Generated Answer")
-                sources_textboxes = display_sources()
-
-            with gr.Column():
-                # gr.Markdown("## Example questions")
                 # gr.Examples(
-                #     examples=example_questions,
+                #     examples=[random.choice(example_questions)],
                 #     inputs=user_input,
                 #     label="Questions users could ask.",
                 # )
 
-                feedback_elems = setup_feedback_form()
+                chatbot = gr.Chatbot(label="Generated Answer")
+                sources_textboxes = display_sources()
 
+            with gr.Column():
+                feedback_elems = setup_feedback_form()
                 flag_button = setup_flag_button()
 
         setup_additional_sources()
