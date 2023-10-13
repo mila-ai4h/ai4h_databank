@@ -26,6 +26,11 @@ buster = setup_buster(buster_cfg=buster_cfg)
 max_sources = cfg.buster_cfg.retriever_cfg["top_k"]
 data_dir = cfg.data_dir
 
+
+# link to the terms and conditions to be rendered in markdown blocks
+path_to_tncs = "src/buster/assets/index.html"
+md_link_to_tncs = f"[terms and conditions](file={path_to_tncs})"
+
 # get documents metadata
 documents_metadata_file = str(data_dir / "documents_metadata.csv")
 documents_metadata = pd.read_csv(documents_metadata_file)
@@ -396,8 +401,8 @@ def setup_terms_and_conditions():
     with gr.Group(visible=True) as accept_terms_group:
         with gr.Column(scale=1):
             gr.Markdown(
-                """
-            By using this tool you agree to our [terms and conditions](file=src/buster/assets/index.html)
+                f"""
+            By using this tool you agree to our {md_link_to_tncs}
             """,
             )
             accept_checkbox = gr.Checkbox(value=0, label="I accept", interactive=True, container=False, scale=1)
@@ -495,7 +500,18 @@ with buster_app:
 
     setup_additional_sources()
 
-    gr.HTML("<center> Powered by <a href='https://github.com/jerpint/buster'>Buster</a> 🤖</center>")
+    gr.HTML(f"""
+    <center>
+        <div style='margin-bottom: 20px;'>  <!-- Add margin to the bottom of this div -->
+            Powered by <a href='https://github.com/jerpint/buster'>Buster</a> 🤖
+        </div>
+
+        <div>
+            <a href='.{path_to_tncs}'> Terms And Conditions </a>
+        </div>
+    </center>
+    """)
+
 
     # fmt: off
     # Allow use of submit button and hide checkbox when accepted
