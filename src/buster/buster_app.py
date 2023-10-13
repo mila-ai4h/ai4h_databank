@@ -28,8 +28,8 @@ data_dir = cfg.data_dir
 
 
 # link to the terms and conditions to be rendered in markdown blocks
-path_to_tncs = "src/buster/assets/index.html"
-md_link_to_tncs = f"[terms and conditions](file={path_to_tncs})"
+path_to_tncs = "file=src/buster/assets/index.html"
+md_link_to_tncs = f"[terms and conditions]({path_to_tncs})"
 
 # get documents metadata
 documents_metadata_file = str(data_dir / "documents_metadata.csv")
@@ -508,7 +508,7 @@ with buster_app:
         </div>
 
         <div>
-            <a href='.{path_to_tncs}'> Terms And Conditions </a>
+            <a href='{path_to_tncs}'> Terms And Conditions </a>
         </div>
     </center>
     """
