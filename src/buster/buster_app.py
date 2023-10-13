@@ -500,7 +500,8 @@ with buster_app:
 
     setup_additional_sources()
 
-    gr.HTML(f"""
+    gr.HTML(
+        f"""
     <center>
         <div style='margin-bottom: 20px;'>  <!-- Add margin to the bottom of this div -->
             Powered by <a href='https://github.com/jerpint/buster'>Buster</a> 🤖
@@ -510,8 +511,8 @@ with buster_app:
             <a href='.{path_to_tncs}'> Terms And Conditions </a>
         </div>
     </center>
-    """)
-
+    """
+    )
 
     # fmt: off
     # Allow use of submit button and hide checkbox when accepted
