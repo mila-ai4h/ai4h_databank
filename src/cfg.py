@@ -62,11 +62,9 @@ example_questions = [
 
 
 disclaimer = f"""
-```
 **Use the feedback form on the right to help us improve** 👉
 
 **Always verify the integrity of {app_name} responses using the sources provided below** 👇
-```
 """
 
 buster_cfg = BusterConfig(
