@@ -1,4 +1,5 @@
 import os
+
 from src.buster.buster_app import buster_app
 
 concurrency_count = int(os.getenv("CONCURRENCY_COUNT", 32))
