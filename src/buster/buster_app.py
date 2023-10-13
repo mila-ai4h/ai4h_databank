@@ -26,11 +26,14 @@ buster = setup_buster(buster_cfg=buster_cfg)
 max_sources = cfg.buster_cfg.retriever_cfg["top_k"]
 data_dir = cfg.data_dir
 
+
+# link to the terms and conditions to be rendered in markdown blocks
+path_to_tncs = "src/buster/assets/index.html"
+md_link_to_tncs = f"[terms and conditions](file={path_to_tncs})"
+
 # get documents metadata
 documents_metadata_file = str(data_dir / "documents_metadata.csv")
 documents_metadata = pd.read_csv(documents_metadata_file)
-
-enable_terms_and_conditions = False
 
 
 def add_disclaimer(completion: Completion, chat_history: ChatHistory, disclaimer: str = disclaimer):
@@ -326,12 +329,8 @@ def clear_feedback_form():
     }
 
 
-def reveal_app(checkbox: bool):
-    if checkbox:
-        return gr.Group.update(visible=True), gr.Group.update(visible=False)
-    else:
-        gr.Warning("You must accept terms and conditions to continue...")
-        return gr.Group.update(visible=False), gr.Group.update(visible=True)
+def reveal_app(choice: gr.SelectData):
+    return gr.Group.update(visible=False), gr.update(interactive=True)
 
 
 def display_sources():
@@ -399,49 +398,15 @@ def setup_about_panel():
 
 
 def setup_terms_and_conditions():
-    terms_and_conditions = f"""App Terms and Conditions
-
--	Usage Agreement: By using the {app_name}, you agree to its terms and conditions. Terms may change; continued use means acceptance of changes.
-
--	Background: Your use of the {app_name} is subject to the terms and conditions found at www.oecd.org/termsandconditions. The following disclosures do not modify or supersede those terms. Instead, these disclosures aim to provide greater transparency surrounding information included in the {app_name}.
-
--	Third-Party Information: The {app_name} serves as an accessible starting point for comprehending the AI policy landscape. As a result, please be aware that the {app_name} may retrieve information from documents, articles and data from various third-parties with which the OECD may not have an affiliation.
-
--	Data collection: The {app_name} may record and store user interactions with the purpose of improving the model and its outputs. It does not collect personal data. Please do not include personally identifiable information (PII) in your queries.
-
--	Views Expressed: Please understand that any views or opinions expressed on the {app_name} are solely those of the third-parties that developed or collected the training data and do not represent the views or opinions of the OECD. Further, the inclusion of any document or dataset does not constitute an endorsement or recommendation by the OECD.
-
--	Use of generative AI: The {app_name} uses generative AI technologies to process and analyse data and information and to respond to user queries.
-
--	Errors and Omissions: The OECD cannot guarantee and does not independently verify the accuracy, completeness, or validity information provided in the {app_name}. You should be aware that information included in the {app_name} may contain various errors and omissions and should be treated accordingly. Ensuring the veracity and accuracy of the information provided by the {app_name} is the User’s responsibility.
-
--	Scope: The {app_name} is not designed to write its own research by combining information across policy documents, analysing them and extracting insights. The {app_name} is not designed to answer questions for which no relevant information can be found in the training data.
-
--	Intellectual Property: Any of the copyrights, trademarks, service marks, collective marks, design rights, or other intellectual property or proprietary rights that are mentioned, cited, or otherwise included in the {app_name} are the property of their respective owners. Their use or inclusion in the {app_name} does not imply that you may use them for any other purpose. The OECD is not endorsed by, does not endorse, and may not affiliated with any of the holders of such rights, and as such, the OECD cannot and do not grant any rights to use or otherwise exploit the protected materials included herein.
-
--	Limitation of Liability: Under no circumstances shall OECD be liable to any user on account of that user’s use or misuse or reliance on the {app_name}.
-
--	Termination: OECD reserves the right to limit or suspend access by the users to {app_name} at any time and without notice for use deemed to be a breach to the terms and conditions.
-
--	Timeliness: The AI policy landscape is rapidly evolving. As such, while we regularly update our database, some of the information might become outdated or may not reflect the most recent changes or additions to policies and regulations.
-
--	Contact: Questions? Reach us at ai@oecd.org.
-
-
-    """
-
-    accept_terms_group = gr.Group(visible=enable_terms_and_conditions)
-    with accept_terms_group:
-        with gr.Column(variant="compact"):
-            with gr.Box():
-                gr.Markdown(
-                    f"## Terms and Conditions \n Welcome to {app_name} Before continuing, you must read and accept the terms and conditions."
-                )
-                gr.Textbox(terms_and_conditions, interactive=False, max_lines=10, label="Terms & Conditions")
-                with gr.Column():
-                    accept_checkbox = gr.Checkbox(label="I accept the terms.", interactive=True)
-                    accept_terms = gr.Button("Enter", variant="primary")
-    return accept_terms_group, accept_checkbox, accept_terms
+    with gr.Group(visible=True) as accept_terms_group:
+        with gr.Column(scale=1):
+            gr.Markdown(
+                f"""
+            By using this tool you agree to our {md_link_to_tncs}
+            """,
+            )
+            accept_checkbox = gr.Checkbox(value=0, label="I accept", interactive=True, container=False, scale=1)
+    return accept_terms_group, accept_checkbox
 
 
 def setup_additional_sources():
@@ -501,60 +466,59 @@ with buster_app:
 
     about_panel = setup_about_panel()
 
-    accept_terms_group, accept_checkbox, accept_terms = setup_terms_and_conditions()
+    with gr.Row():
+        with gr.Column(scale=2, variant="panel"):
+            gr.Markdown(
+                f"""
+            Ask {app_name} your AI policy questions! Keep in mind this tool is a demo and can sometimes provide inaccurate information. Always verify the integrity of the information using the provided sources.
+            Since this tool is still in its early stages of development, please only engage with it as a demo.
+            """
+            )
+            with gr.Row():
+                with gr.Column(scale=20):
+                    user_input = gr.Textbox(
+                        label="",
+                        placeholder="Ask your AI policy question here…",
+                        lines=1,
+                    )
+                submit = gr.Button(value="Ask", variant="primary", size="lg", interactive=False)
 
-    app_group_visible = False if enable_terms_and_conditions else True
-    app_group = gr.Box(visible=app_group_visible)
-    with app_group:
-        with gr.Row():
-            with gr.Column(scale=2, variant="panel"):
-                gr.Markdown(
-                    f"""
-                Ask {app_name} your AI policy questions! Keep in mind this tool is a demo and can sometimes provide inaccurate information. Always verify the integrity of the information using the provided sources.
-                Since this tool is still in its early stages of development, please only engage with it as a demo.
-                """
-                )
-                with gr.Row():
-                    with gr.Column(scale=10):
-                        user_input = gr.Textbox(
-                            label="",
-                            placeholder="Ask your AI policy question here…",
-                            lines=1,
-                        )
-                    submit = gr.Button(value="Ask", variant="primary", size="lg")
+                accept_terms_group, accept_terms_checkbox = setup_terms_and_conditions()
 
-                gr.Markdown(
-                    """
-                By using this tool you agree to our [terms and conditions](file=src/buster/assets/index.html)
-                """
-                )
-                # gr.Examples(
-                #     examples=[random.choice(example_questions)],
-                #     inputs=user_input,
-                #     label="Questions users could ask.",
-                # )
+            gr.Examples(
+                examples=example_questions,
+                inputs=user_input,
+                label=f"Sample questions to ask {app_name}",
+            )
 
-                chatbot = gr.Chatbot(label="Generated Answer")
-                sources_textboxes = display_sources()
+            chatbot = gr.Chatbot(label="Generated Answer")
+            sources_textboxes = display_sources()
 
-            with gr.Column():
-                feedback_elems = setup_feedback_form()
-                flag_button = setup_flag_button()
+        with gr.Column():
+            feedback_elems = setup_feedback_form()
+            flag_button = setup_flag_button()
 
-        setup_additional_sources()
+    setup_additional_sources()
 
-    gr.HTML("<center> Powered by <a href='https://github.com/jerpint/buster'>Buster</a> 🤖</center>")
+    gr.HTML(
+        f"""
+    <center>
+        <div style='margin-bottom: 20px;'>  <!-- Add margin to the bottom of this div -->
+            Powered by <a href='https://github.com/jerpint/buster'>Buster</a> 🤖
+        </div>
+
+        <div>
+            <a href='.{path_to_tncs}'> Terms And Conditions </a>
+        </div>
+    </center>
+    """
+    )
 
     # fmt: off
-    # Reval app if terms are accepted, once accepted
-    accept_terms.click(
+    # Allow use of submit button and hide checkbox when accepted
+    accept_terms_checkbox.select(
         reveal_app,
-        inputs=accept_checkbox,
-        outputs=[app_group, accept_terms_group]
-    ).then(
-        hide_about_panel,
-        inputs=accept_checkbox,
-        outputs=about_panel,
+        outputs=[accept_terms_group, submit]
     )
     # fmt: on
 
