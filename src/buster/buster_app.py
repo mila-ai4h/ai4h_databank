@@ -485,11 +485,11 @@ with buster_app:
 
                 accept_terms_group, accept_terms_checkbox = setup_terms_and_conditions()
 
-            # gr.Examples(
-            #     examples=[random.choice(example_questions)],
-            #     inputs=user_input,
-            #     label="Questions users could ask.",
-            # )
+            gr.Examples(
+                examples=example_questions,
+                inputs=user_input,
+                label=f"Sample questions to ask {app_name}",
+            )
 
             chatbot = gr.Chatbot(label="Generated Answer")
             sources_textboxes = display_sources()
