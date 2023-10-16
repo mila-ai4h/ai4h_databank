@@ -478,7 +478,7 @@ with buster_app:
                 with gr.Column(scale=20):
                     user_input = gr.Textbox(
                         label="",
-                        placeholder="Accept the terms and conditions to use the app",
+                        placeholder="⚠️ Accept the terms and conditions to use the app",
                         lines=1,
                         interactive=False,
                     )
