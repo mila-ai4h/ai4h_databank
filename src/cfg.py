@@ -24,7 +24,7 @@ openai.organization = os.environ["OPENAI_ORGANIZATION"]
 PINECONE_API_KEY = os.environ["PINECONE_API_KEY"]
 PINECONE_ENV = "asia-southeast1-gcp"
 PINECONE_INDEX = "oecd"
-PINECONE_NAMESPACE = "data-2023-05-16"
+PINECONE_NAMESPACE = "data-2023-10-13"
 
 # MongoDB Configurations
 MONGO_URI = os.environ["MONGO_URI"]
@@ -35,7 +35,7 @@ INSTANCE_TYPE = os.environ["INSTANCE_TYPE"]  # e.g. ["dev", "prod", "local"]
 
 # MongoDB Databases
 MONGO_DATABASE_LOGGING = get_logging_db_name(INSTANCE_TYPE)  # Where all interactions will be stored
-MONGO_DATABASE_DATA = "data-2023-05-16"  # Where documents are stored
+MONGO_DATABASE_DATA = "data-2023-10-13"  # Where documents are stored
 
 # MongoDB Collections
 # Naming convention: Collection name followed by purpose.
