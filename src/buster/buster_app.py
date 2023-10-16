@@ -491,7 +491,7 @@ with buster_app:
                 label=f"Sample questions to ask {app_name}",
             )
 
-            chatbot = gr.Chatbot(label="Generated Answer")
+            chatbot = gr.Chatbot(label="Generated Answer", show_share_button=False)
             sources_textboxes = display_sources()
 
         with gr.Column():
