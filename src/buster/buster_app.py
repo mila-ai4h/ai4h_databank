@@ -331,7 +331,11 @@ def clear_feedback_form():
 
 
 def reveal_app(choice: gr.SelectData):
-    return gr.Group.update(visible=False), gr.update(interactive=True)
+    return (
+        gr.Group.update(visible=False),
+        gr.update(interactive=True, placeholder="Ask your AI policy question here…"),
+        gr.update(interactive=True),
+    )
 
 
 def display_sources():
@@ -479,8 +483,9 @@ with buster_app:
                 with gr.Column(scale=20):
                     user_input = gr.Textbox(
                         label="",
-                        placeholder="Ask your AI policy question here…",
+                        placeholder="⚠️ Accept the terms and conditions to use the app",
                         lines=1,
+                        interactive=False,
                     )
                 submit = gr.Button(value="Ask", variant="primary", size="lg", interactive=False)
 
@@ -519,7 +524,7 @@ with buster_app:
     # Allow use of submit button and hide checkbox when accepted
     accept_terms_checkbox.select(
         reveal_app,
-        outputs=[accept_terms_group, submit]
+        outputs=[accept_terms_group, user_input, submit]
     )
     # fmt: on
 
