@@ -247,6 +247,7 @@ def log_completion(
         session_id=session_id,
         instance_name=instance_name,
         instance_type=instance_type,
+        data_version=cfg.MONGO_DATABASE_DATA,
     )
     interaction.send(mongo_db, collection=collection)
 
@@ -491,7 +492,7 @@ with buster_app:
                 label=f"Sample questions to ask {app_name}",
             )
 
-            chatbot = gr.Chatbot(label="Generated Answer")
+            chatbot = gr.Chatbot(label="Generated Answer", show_share_button=False)
             sources_textboxes = display_sources()
 
         with gr.Column():
