@@ -1,5 +1,5 @@
-from src.cfg import buster_cfg
 from buster.retriever import Retriever, ServiceRetriever
+from src.cfg import buster_cfg
 
 retriever: Retriever = ServiceRetriever(**buster_cfg.retriever_cfg)
 
