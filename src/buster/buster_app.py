@@ -330,7 +330,11 @@ def clear_feedback_form():
 
 
 def reveal_app(choice: gr.SelectData):
-    return gr.Group.update(visible=False), gr.update(interactive=True, placeholder="Ask your AI policy question here…"), gr.update(interactive=True)
+    return (
+        gr.Group.update(visible=False),
+        gr.update(interactive=True, placeholder="Ask your AI policy question here…"),
+        gr.update(interactive=True),
+    )
 
 
 def display_sources():
