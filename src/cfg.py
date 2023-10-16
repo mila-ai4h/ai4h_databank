@@ -37,6 +37,16 @@ INSTANCE_TYPE = os.environ["INSTANCE_TYPE"]  # e.g. ["dev", "prod", "local"]
 MONGO_DATABASE_LOGGING = get_logging_db_name(INSTANCE_TYPE)  # Where all interactions will be stored
 MONGO_DATABASE_DATA = "data-2023-10-13"  # Where documents are stored
 
+# Check that data chunks are aligned on Mongo and Pinecone
+if MONGO_DATABASE_DATA != PINECONE_NAMESPACE:
+    logger.warning(
+        f"""The collection is different on pinecone and Mongo, is this expected?
+
+        {MONGO_DATABASE_DATA=}
+        {PINECONE_NAMESPACE=}
+        """
+    )
+
 # MongoDB Collections
 # Naming convention: Collection name followed by purpose.
 MONGO_COLLECTION_FEEDBACK = "feedback"  # Feedback form
