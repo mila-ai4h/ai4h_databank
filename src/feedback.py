@@ -67,6 +67,7 @@ class Interaction:
     username: Optional[str] = None
     instance_type: Optional[str] = None  # Dev or prod
     instance_name: Optional[str] = None  #  Heroku, hf-space, etc.
+    data_version: Optional[str] = None  # Which collection of the was used
     form: Optional[StandardForm] = None
 
     def send(self, mongo_db: pymongo.database.Database, collection: str):
@@ -123,6 +124,7 @@ class Interaction:
             "time": self.time,
             "instance_type": self.instance_type,
             "instance_name": self.instance_name,
+            "data_version": self.data_version,
         }
 
         if self.form is not None:
