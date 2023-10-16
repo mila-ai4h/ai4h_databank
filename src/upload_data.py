@@ -5,6 +5,7 @@ import pandas as pd
 
 from buster.documents_manager import DocumentsService
 from src.app_utils import make_uri
+from src.cfg import MONGO_URI, PINECONE_API_KEY, PINECONE_ENV, PINECONE_INDEX
 
 
 def split_text(text: str, max_words: int = 500) -> list[str]:
@@ -60,18 +61,7 @@ if __name__ == "__main__":
     pinecone_namespace = args.pinecone_namespace
     mongo_db_data = args.mongo_db_data
 
-    # Set pinecone creds
-    pinecone_api_key = os.getenv("AI4H_PINECONE_API_KEY")
-    pinecone_env = os.getenv("AI4H_PINECONE_ENV")
-    pinecone_index = os.getenv("AI4H_PINECONE_INDEX")
-
-    # Set mongo creds
-    mongo_username = os.getenv("AI4H_MONGODB_USERNAME")
-    mongo_password = os.getenv("AI4H_MONGODB_PASSWORD")
-    mongo_cluster = os.getenv("AI4H_MONGODB_CLUSTER")
-    mongo_uri = make_uri(mongo_username, mongo_password, mongo_cluster)
-
     # Read data
     df = pd.read_csv(args.filepath, delimiter="\t")
 
-    upload_data(pinecone_api_key, pinecone_env, pinecone_index, pinecone_namespace, mongo_uri, mongo_db_data, df)
+    upload_data(PINECONE_API_KEY, PINECONE_ENV, PINECONE_INDEX, pinecone_namespace, MONGO_URI, mongo_db_data, df)
