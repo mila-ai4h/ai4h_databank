@@ -490,7 +490,6 @@ with buster_app:
                     )
                 submit = gr.Button(value="Ask", variant="primary", size="lg", interactive=False)
 
-
             gr.Examples(
                 examples=example_questions,
                 inputs=user_input,
