@@ -479,6 +479,7 @@ with buster_app:
             Since this tool is still in its early stages of development, please only engage with it as a demo.
             """
             )
+            accept_terms_group, accept_terms_checkbox = setup_terms_and_conditions()
             with gr.Row():
                 with gr.Column(scale=20):
                     user_input = gr.Textbox(
@@ -488,8 +489,6 @@ with buster_app:
                         interactive=False,
                     )
                 submit = gr.Button(value="Ask", variant="primary", size="lg", interactive=False)
-
-                accept_terms_group, accept_terms_checkbox = setup_terms_and_conditions()
 
             gr.Examples(
                 examples=example_questions,
