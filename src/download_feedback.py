@@ -6,7 +6,7 @@ from src.cfg import MONGO_COLLECTION_FEEDBACK, MONGO_URI
 from src.feedback import FeedbackForm, read_collection
 
 
-def collect_feedback(time: str = None):
+def download_feedback(time: str = None):
     mongo_db = init_db(mongo_uri=MONGO_URI, db_name=get_logging_db_name("prod"))
 
     df = read_collection(
