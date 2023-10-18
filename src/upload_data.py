@@ -1,18 +1,26 @@
 import argparse
-import os
+from typing import Type
 
 import pandas as pd
 
 from buster.documents_manager import DocumentsService
-from src.app_utils import make_uri
-from src.cfg import MONGO_URI, PINECONE_API_KEY, PINECONE_ENV, PINECONE_INDEX
+from buster.tokenizers import GPTTokenizer, Tokenizer
+from src.cfg import (
+    MONGO_URI,
+    PINECONE_API_KEY,
+    PINECONE_ENV,
+    PINECONE_INDEX,
+    buster_cfg,
+)
 
 
-def split_text(text: str, max_words: int = 500) -> list[str]:
-    words = text.split()
+def chunk_text(text: str, tokenizer: Type[Tokenizer], token_limit: int) -> list[str]:
+    tokens = tokenizer.encode(text)
     chunks = []
-    for i in range(0, len(words), max_words):
-        chunks.append(" ".join(words[i : i + max_words]))
+
+    for i in range(0, len(tokens), token_limit):
+        chunks.append(tokenizer.decode(tokens[i : i + token_limit]))
+
     return chunks
 
 
@@ -26,7 +34,9 @@ def upload_data(
     dataframe: pd.DataFrame,
 ):
     # Make sure the chunks are not too big
-    dataframe["content"] = dataframe["content"].apply(split_text)
+    tokenizer = GPTTokenizer(buster_cfg.tokenizer_cfg["model_name"])
+    token_limit_per_chunk = 1000
+    dataframe["content"] = dataframe["content"].apply(lambda x: chunk_text(x, tokenizer, token_limit_per_chunk))
     dataframe = dataframe.explode("content", ignore_index=True)
 
     # Rename link to url
