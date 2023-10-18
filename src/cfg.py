@@ -9,8 +9,9 @@ from buster.completers import ChatGPTCompleter, DocumentAnswerer
 from buster.formatters.documents import DocumentsFormatterJSON
 from buster.formatters.prompts import PromptFormatter
 from buster.retriever import Retriever, ServiceRetriever
+from buster.tokenizers import GPTTokenizer
 from buster.validators import QuestionAnswerValidator, Validator
-from src.app_utils import WordTokenizer, get_logging_db_name, init_db
+from src.app_utils import get_logging_db_name, init_db
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -180,7 +181,7 @@ Q:
 
 def setup_buster(buster_cfg):
     retriever: Retriever = ServiceRetriever(**buster_cfg.retriever_cfg)
-    tokenizer = WordTokenizer(**buster_cfg.tokenizer_cfg)
+    tokenizer = GPTTokenizer(**buster_cfg.tokenizer_cfg)
     document_answerer: DocumentAnswerer = DocumentAnswerer(
         completer=ChatGPTCompleter(**buster_cfg.completion_cfg),
         documents_formatter=DocumentsFormatterJSON(tokenizer=tokenizer, **buster_cfg.documents_formatter_cfg),
