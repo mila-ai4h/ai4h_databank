@@ -373,6 +373,12 @@ def setup_about_panel():
                 ## How it works (and doesn't)
 
                 {app_name} uses Large Language Models (AI algorithms that work with text) to pinpoint sections of policy documents that are relevant to your question. Rather than presenting you with the specific policy section verbatim, {app_name} has been designed to summarize the information in a digestible format, so that the response you receive more naturally fits with the question you've posed.
+
+                It's helpful to keep in mind that {app_name} is entirely restricted to our database (see “Available Sources” below). These sources are from the [OECD.AI](http://oecd.ai/) Database (containing national AI policies) and AI-related reports from the OECD iLibrary. If the answer to your question is not contained in these policy documents, the model won't be able to respond.
+
+                Since we restrict the model to information found in the documentation, it has a hard time with questions that require more generalized knowledge. Therefore, if you ask the model for information about AI policies in Asia, the model won't necessarily show you Japanese policy documentation. To overcome this limitation, it's best to be as specific as possible in your question, referencing the particular country you're looking for information on.
+                
+                For more information about the tool's strengths and limitations, please see our website [here](https://mila.quebec/en/project/sai/).
                 """
                 )
 
@@ -381,7 +387,7 @@ def setup_about_panel():
                     f"""
                 ## Risks
 
-                We have done our best to make sure that the AI algorithms are __only__ taking information from what is available in the OECD AI Observatory’s Database; but, of course, Large Language Models (LLMs) are prone to fabrication. This means LLMs can make things up and present this made up information as if it were real, making it seem as if the information was found in a policy document. We therefore advise you to check the sources provided by the model to validate that the answer is in fact true. If you'd like to know exactly which documents the model can reference in its response, please see below.
+                We have done our best to make sure that the AI algorithms are __only__ taking information from what is available in the OECD AI Observatory's Database; but, of course, Large Language Models (LLMs) are prone to fabrication. This means LLMs can make things up and present this made up information as if it were real, making it seem as if the information was found in a policy document. We therefore advise you to check the sources provided by the model to validate that the answer is in fact true. If you'd like to know exactly which documents the model can reference in its response, please see below.
 
 
                 ## Recommended usage
