@@ -137,7 +137,7 @@ Q:
     },
     documents_formatter_cfg={
         "max_tokens": 3500,
-        "columns": ["content", "source", "title"],
+        "columns": ["content", "source", "title", "country", "year"],
     },
     prompt_formatter_cfg={
         "max_tokens": 3500,
