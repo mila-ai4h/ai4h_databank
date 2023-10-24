@@ -57,7 +57,7 @@ prepare_deploy_dir() {
   # Copy over required files
   cp requirements.txt $TMP_DEPLOY_DIR/
   cp -r src/buster/  $TMP_DEPLOY_DIR/src/buster/
-  cp src/feedback.py src/cfg.py src/app_utils.py $TMP_DEPLOY_DIR/src/
+  cp src/cfg.py src/feedback.py src/app_utils.py $TMP_DEPLOY_DIR/src/
   cp data/documents_metadata.csv $TMP_DEPLOY_DIR/data
 
   # make folder cwd
