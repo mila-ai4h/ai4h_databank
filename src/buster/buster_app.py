@@ -377,7 +377,7 @@ def setup_about_panel():
                 It's helpful to keep in mind that {app_name} is entirely restricted to our database (see “Available Sources” below). These sources are from the [OECD.AI](http://oecd.ai/) Database (containing national AI policies) and AI-related reports from the OECD iLibrary. If the answer to your question is not contained in these policy documents, the model won't be able to respond.
 
                 Since we restrict the model to information found in the documentation, it has a hard time with questions that require more generalized knowledge. Therefore, if you ask the model for information about AI policies in Asia, the model won't necessarily show you Japanese policy documentation. To overcome this limitation, it's best to be as specific as possible in your question, referencing the particular country you're looking for information on.
-                
+
                 For more information about the tool's strengths and limitations, please see our website [here](https://mila.quebec/en/project/sai/).
                 """
                 )

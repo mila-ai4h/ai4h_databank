@@ -1,4 +1,5 @@
 import logging
+import logging.config
 import os
 from pathlib import Path
 
@@ -13,8 +14,20 @@ from buster.tokenizers import GPTTokenizer
 from buster.validators import QuestionAnswerValidator, Validator
 from src.app_utils import get_logging_db_name, init_db
 
+# Set relative path to data dir
+current_dir = Path(__file__).resolve().parent
+
+# Path to logging configuration file
+# Set where logs get logged directly in that file
+logging.config.fileConfig(
+    os.path.join(current_dir.parent, "logging.ini"),
+    disable_existing_loggers=False,
+)
+
+
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
+
 
 # Note: The app will not launch if the environment variables aren't set. This is intentional.
 # Set OpenAI Configurations
@@ -58,8 +71,6 @@ MONGO_COLLECTION_FLAGGED = "flagged"  # Flagged interactions
 mongo_db = init_db(mongo_uri=MONGO_URI, db_name=MONGO_DATABASE_LOGGING)
 
 
-# Set relative path to data dir
-current_dir = Path(__file__).resolve().parent
 data_dir = current_dir.parent / "data"  # ../data
 
 app_name = "SAI ️💬"
