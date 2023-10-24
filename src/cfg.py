@@ -140,7 +140,7 @@ Q:
         "columns": ["content", "source", "title"],
     },
     prompt_formatter_cfg={
-        "max_tokens": 4500,
+        "max_tokens": 4000,
         "text_before_docs": (
             "You are a chatbot assistant answering questions about artificial intelligence (AI) policies and laws. "
             "You represent the OECD AI Policy Observatory. "
