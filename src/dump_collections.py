@@ -31,6 +31,7 @@ def dump_collection(collection_name: str, time: str = None) -> None:
     current_date = datetime.date.today().strftime("%Y-%m-%d")
     df_name = f"{collection_name}_{current_date}.csv"
     df.to_csv(df_name, index=False)
+    print(f"Succesfully dumped {collection_name=} to {df_name}")
 
 
 if __name__ == "__main__":
