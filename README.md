@@ -27,6 +27,14 @@ password: MilaDatabank!!123
 
 Where `$USERNAME` can be any username, ideally used to identify who is using the app (e.g. `databank-jeremy`)
 
+
+## Tech Stack
+
+Here is an overview of our tech stack:
+
+![image](assets/tech_stack.png)
+
+
 ## How to run locally
 
 ### Install the dependencies
