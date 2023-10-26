@@ -114,8 +114,36 @@ def check_auth(username: str, password: str) -> bool:
 def format_sources(matched_documents: pd.DataFrame) -> list[str]:
     formatted_sources = []
 
-    for _, doc in matched_documents.iterrows():
-        formatted_sources.append(f"### [{doc.title}]({doc.url})\n{doc.content}\n")
+    # We first group on Title of the document, so that 2 chunks from a same doc get lumped together
+    grouped_df = matched_documents.groupby("title")
+
+    # Here we just rank the titles by highest to lowest similarity score...
+    ranked_titles = (
+        grouped_df.apply(lambda x: x.similarity_to_answer.max()).sort_values(ascending=False).index.to_list()
+    )
+
+    for title in ranked_titles:
+        df = grouped_df.get_group(title)
+        # break
+        chunks = "\n\n[...] ".join(df.content.to_list())
+
+        url = df.url.to_list()[0]
+        source = df.source.to_list()[0]
+        year = df.year.to_list()[0]
+        country = df.country.to_list()[0]
+
+        formatted_sources.append(
+            f"""
+
+### Publication: [{title}]({url})
+**Year of publication:** {year}
+**Source:** {source}
+**Country:** {country}
+
+**Identified sections**:
+[...] {chunks}
+"""
+        )
 
     return formatted_sources
 
@@ -130,9 +158,8 @@ def add_sources(completion, max_sources: int):
     if any(arg is False for arg in [completion.question_relevant, completion.answer_relevant]):
         # Question was not relevant, don't bother doing anything else...
         formatted_sources = [""]
-        formatted_sources = pad_sources(formatted_sources, max_sources)
-        return formatted_sources
+    else:
+        formatted_sources = format_sources(completion.matched_documents)
 
-    formatted_sources = format_sources(completion.matched_documents)
-
+    formatted_sources = pad_sources(formatted_sources, max_sources)
     return formatted_sources
