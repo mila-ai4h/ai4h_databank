@@ -39,7 +39,8 @@ css = """
 .source {
     max-height: 250px; /* Set the maximum height for the textboxes */
     overflow: auto; /* Enable scrollbars when content exceeds dimensions */
-    background-color: #e5e7eb; # dark-ish gray
+    outline: 1px solid gray; /* Add a gray outline */
+    border-radius: 5px; /* Add rounded corners to the outline */
 }
 """
 
@@ -347,7 +348,7 @@ def reveal_app(choice: gr.SelectData):
 
 
 def display_sources():
-    with gr.Column(variant="panel"):
+    with gr.Column():
         gr.Markdown(
             """## Relevant sources
         All retrieved documents will be listed here in order of importance. If no answer was found, documents will not be displayed.
