@@ -125,8 +125,9 @@ def format_sources(matched_documents: pd.DataFrame) -> list[str]:
 
     for title in ranked_titles:
         df = grouped_df.get_group(title)
-        # break
-        chunks = "\n\n[...] ".join(df.content.to_list())
+
+        # Adds a link break between sources from a same chunk
+        chunks = "<br><br>".join(["🔗 " + chunk for chunk in df.content.to_list()])
 
         url = df.url.to_list()[0]
         source = df.source.to_list()[0]
@@ -142,7 +143,7 @@ def format_sources(matched_documents: pd.DataFrame) -> list[str]:
 **Country:** {country}
 
 **Identified sections**:
-[...] {chunks}
+{chunks}
 """
         )
 
