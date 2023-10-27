@@ -35,6 +35,14 @@ md_link_to_tncs = f"[terms and conditions]({path_to_tncs})"
 documents_metadata_file = str(data_dir / "documents_metadata.csv")
 documents_metadata = pd.read_csv(documents_metadata_file)
 
+css = """
+.source {
+    max-height: 250px; /* Set the maximum height for the textboxes */
+    overflow: auto; /* Enable scrollbars when content exceeds dimensions */
+    background-color: #e5e7eb; # dark-ish gray
+}
+"""
+
 
 def add_disclaimer(completion: Completion, chat_history: ChatHistory, disclaimer: str = disclaimer):
     """Add a disclaimer response if the answer was relevant."""
@@ -347,13 +355,9 @@ def display_sources():
         )
         sources_textboxes = []
         for i in range(max_sources):
-            with gr.Tab(f"Source {i + 1} 📝"):
-                t = gr.Markdown(latex_delimiters=[])
+            t = gr.Markdown(latex_delimiters=[], elem_classes="source", visible=False)
             sources_textboxes.append(t)
     return sources_textboxes
-
-
-buster_app = gr.Blocks()
 
 
 def setup_about_panel():
@@ -377,7 +381,7 @@ def setup_about_panel():
                 It's helpful to keep in mind that {app_name} is entirely restricted to our database (see “Available Sources” below). These sources are from the [OECD.AI](http://oecd.ai/) Database (containing national AI policies) and AI-related reports from the OECD iLibrary. If the answer to your question is not contained in these policy documents, the model won't be able to respond.
 
                 Since we restrict the model to information found in the documentation, it has a hard time with questions that require more generalized knowledge. Therefore, if you ask the model for information about AI policies in Asia, the model won't necessarily show you Japanese policy documentation. To overcome this limitation, it's best to be as specific as possible in your question, referencing the particular country you're looking for information on.
-                
+
                 For more information about the tool's strengths and limitations, please see our website [here](https://mila.quebec/en/project/sai/).
                 """
                 )
@@ -465,6 +469,7 @@ def setup_flag_button():
     return flag_button
 
 
+buster_app = gr.Blocks(css=css)
 with buster_app:
     # State variables are client-side and are reset every time a client refreshes the page
     # Store the users' last completion here
