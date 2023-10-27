@@ -35,6 +35,13 @@ md_link_to_tncs = f"[terms and conditions]({path_to_tncs})"
 documents_metadata_file = str(data_dir / "documents_metadata.csv")
 documents_metadata = pd.read_csv(documents_metadata_file)
 
+css = """
+.source {
+    max-height: 250px; /* Set the maximum height for the textboxes */
+    overflow: auto; /* Enable scrollbars when content exceeds dimensions */
+}
+"""
+
 
 def add_disclaimer(completion: Completion, chat_history: ChatHistory, disclaimer: str = disclaimer):
     """Add a disclaimer response if the answer was relevant."""
@@ -347,13 +354,10 @@ def display_sources():
         )
         sources_textboxes = []
         for i in range(max_sources):
-            with gr.Tab(f"Source {i + 1} 📝"):
-                t = gr.Markdown(latex_delimiters=[])
-            sources_textboxes.append(t)
+            with gr.Group(visible=True):
+                t = gr.Markdown(latex_delimiters=[], elem_classes="source")
+                sources_textboxes.append(t)
     return sources_textboxes
-
-
-buster_app = gr.Blocks()
 
 
 def setup_about_panel():
@@ -465,6 +469,7 @@ def setup_flag_button():
     return flag_button
 
 
+buster_app = gr.Blocks(css=css)
 with buster_app:
     # State variables are client-side and are reset every time a client refreshes the page
     # Store the users' last completion here
