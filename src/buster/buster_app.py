@@ -39,6 +39,7 @@ css = """
 .source {
     max-height: 250px; /* Set the maximum height for the textboxes */
     overflow: auto; /* Enable scrollbars when content exceeds dimensions */
+    background-color: #e5e7eb; # dark-ish gray
 }
 """
 
@@ -354,9 +355,8 @@ def display_sources():
         )
         sources_textboxes = []
         for i in range(max_sources):
-            with gr.Group(visible=True):
-                t = gr.Markdown(latex_delimiters=[], elem_classes="source")
-                sources_textboxes.append(t)
+            t = gr.Markdown(latex_delimiters=[], elem_classes="source", visible=False)
+            sources_textboxes.append(t)
     return sources_textboxes
 
 

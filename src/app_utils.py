@@ -4,6 +4,7 @@ import uuid
 from datetime import datetime, timezone
 from urllib.parse import quote_plus
 
+import gradio as gr
 import pandas as pd
 import pymongo
 from pymongo import MongoClient
@@ -162,4 +163,10 @@ def add_sources(completion, max_sources: int):
         formatted_sources = format_sources(completion.matched_documents)
 
     formatted_sources = pad_sources(formatted_sources, max_sources)
-    return formatted_sources
+
+    sources_textboxes = []
+    for source in formatted_sources:
+        visible = False if source == "" else True
+        t = gr.Markdown(source, latex_delimiters=[], elem_classes="source", visible=visible)
+        sources_textboxes.append(t)
+    return sources_textboxes
