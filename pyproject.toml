@@ -9,8 +9,7 @@ requires-python = ">=3.10"
 dependencies = [
     "buster-doctalk",
     "gradio",
-    "pymongo",
-    "jinja2>=3.1.2"
+    "pymongo"
 ]
 
 [project.optional-dependencies]
