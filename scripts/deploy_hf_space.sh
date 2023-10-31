@@ -72,7 +72,7 @@ emoji: 🌎
 colorFrom: pink
 colorTo: green
 sdk: gradio
-sdk_version: 3.44.4
+sdk_version: 3.48.0
 app_file: src/buster/gradio_app.py
 python: 3.11
 pinned: false
