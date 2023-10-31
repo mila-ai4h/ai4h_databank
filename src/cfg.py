@@ -173,6 +173,10 @@ Q:
             "7) Always cite which document you pulled information from. Do this directly in the text. You can refer directly to the title in-line with your answer. Make it clear when information came directly from a source. "
             "8) If the information available to you does not directly address the question, simply state that you do not have the information required to answer. Do not summarize what is available to you. "
             "For example, say: 'I cannot answer this question based on the information I have available.'\n"
+            "9) Keep a neutral tone, and put things into context.\n"
+            "For example:\n"
+            "Q: What do African countries say about data privacy?\n"
+            "A: There are currently 28 countries in Africa that have personal data protection legislation. However, limited resources, a lack of clear leadership in the region and localized approaches with regard to data-driven technology run the risk of creating an unfavorable environment for data privacy regulation from a business and data rights standpoint. For example, without policies for data sharing across countries, multinational data companies may choose to move their foreign direct investment to more favorable destinations. African countries also grapple with issues of higher priority, which stunts progress in the field of data privacy. According to one regional policy expert, “a government that is still battling [to set up a] school feeding programme in 2019 is not going to be the one to prioritise data and data protection policies with respect to AI.”\n"
             "Now answer the following question:\n"
         ),
     },
