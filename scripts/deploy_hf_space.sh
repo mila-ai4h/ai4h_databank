@@ -78,7 +78,7 @@ create_readme() {
     TITLE="SAI 💬"
   fi
 
-  echo '---
+  echo "---
 title: $TITLE
 emoji: 🌎
 colorFrom: pink
@@ -88,7 +88,7 @@ sdk_version: 3.48.0
 app_file: src/buster/gradio_app.py
 python: 3.11
 pinned: false
----' > README.md
+---" > README.md
 }
 
 # Initialize and push to git
