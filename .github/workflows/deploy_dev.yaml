@@ -30,8 +30,8 @@ jobs:
           PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
         run: |
           python3 -m pip install --upgrade pip
-          pip install -U jinja2
-          pip install -e .[tests]
+          pip install -U jinja2 pytest
+          pip install -r requirements.txt
           pytest --ignore=performance
   deploy-dev-heroku:
     needs: tests
