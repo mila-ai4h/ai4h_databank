@@ -1,4 +1,4 @@
-buster-doctalk==1.0.19
+git+https://github.com/jerpint/buster@add-top-k-option
 gradio==3.48.0
 pymongo==4.5.0
 gunicorn==21.2.0
