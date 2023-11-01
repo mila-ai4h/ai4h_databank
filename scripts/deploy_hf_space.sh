@@ -8,6 +8,7 @@ TMP_DEPLOY_DIR=${2:-"deploy"}
 
 
 # SPACE URLS
+STAGING_URL="https://$HF_USERNAME:$HF_TOKEN@huggingface.co/spaces/mila-quebec/SAI-staging"
 DEV_URL="https://$HF_USERNAME:$HF_TOKEN@huggingface.co/spaces/mila-quebec/SAI-dev"
 PROD_URL="https://$HF_USERNAME:$HF_TOKEN@huggingface.co/spaces/mila-quebec/SAI"
 
@@ -17,7 +18,7 @@ huggingface-cli login --token $HF_TOKEN
 # Check and set deployment URL
 set_deploy_url() {
   if [ -z "$DEPLOY_TYPE" ]; then
-    echo "Error: Please provide the deployment type argument ('dev' or 'prod')."
+    echo "Error: Please provide the deployment type argument, one of ['dev', 'prod', 'staging']"
     echo "Usage: $0 <deployment_type> [deploy_directory]"
     exit 1
   elif [ "$DEPLOY_TYPE" = "dev" ]; then
@@ -26,8 +27,11 @@ set_deploy_url() {
   elif [ "$DEPLOY_TYPE" = "prod" ]; then
     SPACE_URL=$PROD_URL
     echo "Deploying to **prod** space"
+  elif [ "$DEPLOY_TYPE" = "staging" ]; then
+    SPACE_URL=$STAGING_URL
+    echo "Deploying to **staging** space"
   else
-    echo "Error: Invalid DEPLOY_TYPE. Valid values are 'dev' or 'prod'."
+    echo "Error: Invalid DEPLOY_TYPE. Valid values are 'dev', 'prod', or 'staging'."
     exit 1
   fi
 }
@@ -66,8 +70,16 @@ prepare_deploy_dir() {
 
 # Create README for Hugging Face space
 create_readme() {
+  if [ "$DEPLOY_TYPE" = "dev" ]; then
+    TITLE="SAI 💬 (Dev)"
+  elif [ "$DEPLOY_TYPE" = "staging" ]; then
+    TITLE="SAI 💬 (Staging)"
+  else
+    TITLE="SAI 💬"
+  fi
+
   echo '---
-title: SAI 💬
+title: $TITLE
 emoji: 🌎
 colorFrom: pink
 colorTo: green
