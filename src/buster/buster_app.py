@@ -512,7 +512,9 @@ with buster_app:
                 inputs=user_input,
                 label=f"Sample questions to ask {app_name}",
             )
-            top_k_slider = gr.Slider(minimum=1, maximum=max_sources, interactive=True, value=3, step=1, label="Number of sources")
+            top_k_slider = gr.Slider(
+                minimum=1, maximum=max_sources, interactive=True, value=3, step=1, label="Number of sources"
+            )
 
             chatbot = gr.Chatbot(label="Generated Answer", show_share_button=False)
             sources_textboxes = display_sources()
