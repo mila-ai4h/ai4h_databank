@@ -29,6 +29,7 @@ jobs:
           python3 -m pip install --upgrade pip
           pip install -U jinja2
           pip install -e .[tests]
+          pip install -r requirements.txt
           pytest --ignore=performance
   deploy-staging-hf-space:
     needs: tests
