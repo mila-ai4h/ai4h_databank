@@ -23,7 +23,7 @@ disclaimer = cfg.disclaimer
 mongo_db = cfg.mongo_db
 buster_cfg = copy.deepcopy(cfg.buster_cfg)
 buster = setup_buster(buster_cfg=buster_cfg)
-max_sources = cfg.buster_cfg.retriever_cfg["top_k"]
+max_sources = cfg.max_sources
 data_dir = cfg.data_dir
 
 
@@ -203,6 +203,11 @@ def add_user_question(user_question: str, chat_history: Optional[ChatHistory] = 
 
 def chat(chat_history: ChatHistory, top_k: Optional[int] = None):
     """Answer a user's question using retrieval augmented generation."""
+
+    # Make sure top k is an int between 1 and 15
+    top_k = int(top_k)
+    top_k = max(top_k, 1)
+    top_k = min(top_k, max_sources)
 
     # We assume that the question is the user's last interaction
     user_input = chat_history[-1][0]
@@ -507,7 +512,7 @@ with buster_app:
                 inputs=user_input,
                 label=f"Sample questions to ask {app_name}",
             )
-            top_k_slider = gr.Slider(minimum=1, maximum=10, interactive=True, value=3, step=1, label="Number of sources")
+            top_k_slider = gr.Slider(minimum=1, maximum=max_sources, interactive=True, value=3, step=1, label="Number of sources")
 
             chatbot = gr.Chatbot(label="Generated Answer", show_share_button=False)
             sources_textboxes = display_sources()
@@ -538,7 +543,6 @@ with buster_app:
         reveal_app,
         outputs=[accept_terms_group, user_input, submit]
     )
-    # fmt: on
 
     gr.on(
         triggers=[submit.click, user_input.submit],
