@@ -201,13 +201,13 @@ def add_user_question(user_question: str, chat_history: Optional[ChatHistory] = 
     return chat_history
 
 
-def chat(chat_history: ChatHistory):
+def chat(chat_history: ChatHistory, top_k: Optional[int] = None):
     """Answer a user's question using retrieval augmented generation."""
 
     # We assume that the question is the user's last interaction
     user_input = chat_history[-1][0]
 
-    completion = buster.process_input(user_input)
+    completion = buster.process_input(user_input, top_k=top_k)
 
     # Stream tokens one at a time
     chat_history[-1][1] = ""
@@ -507,6 +507,7 @@ with buster_app:
                 inputs=user_input,
                 label=f"Sample questions to ask {app_name}",
             )
+            top_k_slider = gr.Slider(minimum=1, maximum=10, interactive=True, value=3, step=1, label="Number of sources")
 
             chatbot = gr.Chatbot(label="Generated Answer", show_share_button=False)
             sources_textboxes = display_sources()
@@ -539,9 +540,11 @@ with buster_app:
     )
     # fmt: on
 
-    # fmt: off
-    submit.click(
-        add_user_question, [user_input], [chatbot]
+    gr.on(
+        triggers=[submit.click, user_input.submit],
+        fn=add_user_question,
+        inputs=[user_input],
+        outputs=[chatbot]
     ).then(
         clear_user_input,
         outputs=[user_input]
@@ -570,7 +573,7 @@ with buster_app:
         ]
     ).then(
         chat,
-        inputs=[chatbot],
+        inputs=[chatbot, top_k_slider],
         outputs=[chatbot, last_completion],
     ).then(
         add_disclaimer,
@@ -585,54 +588,6 @@ with buster_app:
         inputs=[last_completion, gr.State(cfg.MONGO_COLLECTION_INTERACTION), session_id]
     )
 
-    user_input.submit(
-        add_user_question, [user_input], [chatbot]
-    ).then(
-        clear_user_input,
-        outputs=[user_input]
-    ).then(
-        clear_sources,
-        outputs=[*sources_textboxes]
-    ).then(
-        toggle_visibility,
-        inputs=gr.State(False),
-        outputs=feedback_elems["submitted_message"],
-    ).then(
-        toggle_interactivity,
-        inputs=gr.State(True),
-        outputs=feedback_elems["submit_feedback_btn"],
-    ).then(
-      clear_feedback_form,
-        outputs=[
-            feedback_elems["overall_experience"],
-            feedback_elems["clear_answer"],
-            feedback_elems["accurate_answer"],
-            feedback_elems["relevant_sources"],
-            feedback_elems["relevant_sources_selection"],
-            feedback_elems["relevant_sources_order"],
-            feedback_elems["expertise"],
-            feedback_elems["extra_info"],
-        ]
-    ).then(
-        chat,
-        inputs=[chatbot],
-        outputs=[chatbot, last_completion],
-    ).then(
-        add_disclaimer,
-        inputs=[last_completion, chatbot, gr.State(cfg.disclaimer)],
-        outputs=[chatbot]
-    ).then(
-        add_sources,
-        inputs=[last_completion, gr.State(max_sources)],
-        outputs=[*sources_textboxes]
-    ).then(
-        log_completion,
-        inputs=[
-            last_completion,
-            gr.State(cfg.MONGO_COLLECTION_INTERACTION),
-            session_id,
-        ]
-    )
 
     flag_button.click(
         log_completion,
