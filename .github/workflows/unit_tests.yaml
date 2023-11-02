@@ -1,17 +1,41 @@
+name: Unit Tests
+
+on:
+  workflow_call:
+    inputs:
+      black-options:
+        required: false
+        default: "--check --diff --line-length 120"
+        type: string
+    secrets:
+      OPENAI_API_KEY:
+        required: true
+      OPENAI_ORGANIZATION:
+        required: true
+      HF_TOKEN:
+        required: true
+      MONGO_URI:
+        required: true
+      PINECONE_API_KEY:
+        required: true
+
 jobs:
   unit_tests:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
+
       - name: black linter
         uses: psf/black@stable
         with:
-          options: "--check --diff --line-length 120"
+          options: ${{ inputs.black-options }}
+
       - name: isort
         run: |
           pip install isort
           isort --profile black --check-only .
+
       - name: unit tests
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
