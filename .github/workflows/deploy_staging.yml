@@ -5,17 +5,13 @@ on: workflow_dispatch
 jobs:
   tests:
     runs-on: ubuntu-latest
+  tests:
+    runs-on: ubuntu-latest
     steps:
-      - name: Check out repository code
-        uses: actions/checkout@v3
-      - name: black linter
-        uses: psf/black@stable
-        with:
-          options: "--check --diff --line-length 120"
-      - name: isort
-        run: |
-          pip install isort
-          isort --profile black --check-only .
+      # Other steps specific to the dev stage
+      - name: Run Unit Tests
+        uses: ./.github/workflows/unit_tests.yml
+
       - name: unit tests
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -28,6 +24,7 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           pip install -U jinja2
+          pip install -r requirements.txt
           pip install -e .[tests]
           pytest --ignore=performance
   deploy-staging-hf-space:

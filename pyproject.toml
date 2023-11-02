@@ -6,12 +6,7 @@ build-backend = "hatchling.build"
 name = "ai4h_databank"
 version = "0.0.1"
 requires-python = ">=3.10"
-dependencies = [
-  "buster-doctalk==1.0.19",
-  "gradio==3.48.0",
-  "pymongo==4.5.0",
-  "gunicorn==21.2.0",
-]
+dependencies = []
 
 [project.optional-dependencies]
 tests = [
