@@ -4,7 +4,7 @@ on: workflow_dispatch
 
 jobs:
   tests:
-    uses: ./.github/workflows/reusable-unit-tests-workflow.yml@main
+    uses: ./.github/workflows/unit_test.yaml@main
     secrets:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       OPENAI_ORGANIZATION: ${{ secrets.OPENAI_ORGANIZATION }}
