@@ -8,7 +8,7 @@ on:
 
 jobs:
   tests:
-    uses: ./.github/workflows/unit_tests.yaml@main
+    uses: ./.github/workflows/unit_tests.yaml@ci-dependencies
     secrets:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       OPENAI_ORGANIZATION: ${{ secrets.OPENAI_ORGANIZATION }}
