@@ -1,4 +1,4 @@
-git+https://github.com/jerpint/buster@add-top-k-option
-gradio==3.48.0
-pymongo==4.5.0
+buster-doctalk==1.0.20
+gradio==3.50.2
+pymongo==4.6.0
 gunicorn==21.2.0
