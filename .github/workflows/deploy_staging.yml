@@ -12,6 +12,19 @@ jobs:
       MONGO_URI: ${{ secrets.MONGO_URI }}
       PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
 
+  deploy-staging-heroku:
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Deploy to Heroku
+        uses: akhileshns/heroku-deploy@v3.12.13 # This is the action
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: ${{ vars.HEROKU_DEV_SERVER }}
+          heroku_email: ${{ vars.HEROKU_EMAIL }}
+
   deploy-staging-hf-space:
     needs: tests
     runs-on: ubuntu-latest
