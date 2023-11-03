@@ -6,6 +6,8 @@ set -e
 DEPLOY_TYPE=$1
 TMP_DEPLOY_DIR=${2:-"deploy"}
 
+# Extract Gradio SDK version from requirements.txt
+GRADIO_SDK_VERSION=$(awk -F'==' '/gradio/ {print $2}' requirements.txt)
 
 # SPACE URLS
 STAGING_URL="https://$HF_USERNAME:$HF_TOKEN@huggingface.co/spaces/mila-quebec/SAI-staging"
@@ -84,7 +86,7 @@ emoji: 🌎
 colorFrom: pink
 colorTo: green
 sdk: gradio
-sdk_version: 3.48.0
+sdk_version: $GRADIO_SDK_VERSION
 app_file: src/buster/gradio_app.py
 python: 3.11
 pinned: false
