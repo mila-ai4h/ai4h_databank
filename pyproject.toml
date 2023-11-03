@@ -6,10 +6,7 @@ build-backend = "hatchling.build"
 name = "ai4h_databank"
 version = "0.0.1"
 requires-python = ">=3.10"
-dependencies = [
-    "gradio==3.48.0",
-    "pymongo"
-]
+dependencies = []
 
 [project.optional-dependencies]
 tests = [
