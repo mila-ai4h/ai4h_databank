@@ -4,7 +4,7 @@ on: workflow_dispatch
 
 jobs:
   tests:
-    uses: Mila-AI4H/ai4h_databank/.github/workflows/unit_tests.yaml@ci-dependencies
+    uses: Mila-AI4H/ai4h_databank/.github/workflows/unit_tests.yaml@main
     secrets:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       OPENAI_ORGANIZATION: ${{ secrets.OPENAI_ORGANIZATION }}
