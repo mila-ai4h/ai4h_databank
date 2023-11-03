@@ -1,4 +1,4 @@
-buster-doctalk==1.0.20
+git+https://github.com/jerpint/buster.git@question-reformulator
 gradio==3.50.2
 pymongo==4.6.0
 gunicorn==21.2.0

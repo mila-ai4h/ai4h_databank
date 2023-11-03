@@ -207,7 +207,21 @@ def chat(chat_history: ChatHistory):
     # We assume that the question is the user's last interaction
     user_input = chat_history[-1][0]
 
-    completion = buster.process_input(user_input)
+    completion = buster.process_input(user_input, reformulate_question=True)
+
+    # ## FOR DEBUGGING ##
+    # from buster.utils import UserInputs
+    # completion = Completion(
+    #     user_inputs=UserInputs(original_input=user_input, reformulated_input="New question"),
+    #     error=False,
+    #     matched_documents=None,
+    #     answer_generator="Debugging some code right now..."
+    # )
+    # ##
+
+    if completion.user_inputs.reformulated_input is not None:
+        chat_history.append([None, f"I reformulated your question to: {completion.user_inputs.reformulated_input}"])
+        chat_history.append([None, None])
 
     # Stream tokens one at a time
     chat_history[-1][1] = ""

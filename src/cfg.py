@@ -8,6 +8,7 @@ from buster.busterbot import Buster, BusterConfig
 from buster.completers import ChatGPTCompleter, DocumentAnswerer
 from buster.formatters.documents import DocumentsFormatterJSON
 from buster.formatters.prompts import PromptFormatter
+from buster.formatters.questions import QuestionReformulator
 from buster.retriever import Retriever, ServiceRetriever
 from buster.tokenizers import GPTTokenizer
 from buster.validators import QuestionAnswerValidator, Validator
@@ -194,5 +195,12 @@ def setup_buster(buster_cfg):
     )
     validator: Validator = QuestionAnswerValidator(**buster_cfg.validator_cfg)
 
-    buster: Buster = Buster(retriever=retriever, document_answerer=document_answerer, validator=validator)
+    question_reformulator = QuestionReformulator()
+
+    buster: Buster = Buster(
+        retriever=retriever,
+        document_answerer=document_answerer,
+        validator=validator,
+        question_reformulator=question_reformulator,
+    )
     return buster
