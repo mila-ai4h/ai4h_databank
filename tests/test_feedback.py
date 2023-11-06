@@ -1,6 +1,7 @@
 import pandas as pd
 
 from buster.completers import Completion
+from buster.utils import UserInputs
 from src.feedback import FeedbackForm, Interaction
 
 
@@ -41,7 +42,7 @@ def test_read_write_feedback():
     n_samples = 3
     b = Completion(
         error=False,
-        user_input="This is my input",
+        user_inputs=UserInputs(original_input="This is my input"),
         answer_text="This is my completed answer",
         matched_documents=pd.DataFrame.from_dict(
             {
@@ -82,7 +83,7 @@ def test_read_write_feedback():
     assert f.form.extra_info == f_back.form.extra_info
     assert f.form.relevant_sources == f_back.form.relevant_sources
     assert len(f.user_completions) == len(f_back.user_completions)
-    assert f.user_completions[0].user_input == f_back.user_completions[0].user_input
+    assert f.user_completions[0].user_inputs == f_back.user_completions[0].user_inputs
     assert f.user_completions[0].error == f_back.user_completions[0].error
     assert f.user_completions[0].answer_text == f_back.user_completions[0].answer_text
     assert f.user_completions[0].answer_relevant == f_back.user_completions[0].answer_relevant
