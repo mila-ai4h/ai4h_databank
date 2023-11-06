@@ -210,7 +210,7 @@ def chat(chat_history: ChatHistory, reformulate_question: bool):
     completion = buster.process_input(user_input, reformulate_question=reformulate_question)
 
     # ## FOR DEBUGGING ##
-    # from buster.utils import UserInputs
+    # from buster.completers import UserInputs
     # completion = Completion(
     #     user_inputs=UserInputs(original_input=user_input, reformulated_input="New question"),
     #     error=False,
