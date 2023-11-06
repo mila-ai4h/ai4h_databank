@@ -8,7 +8,7 @@ from buster.busterbot import Buster, BusterConfig
 from buster.completers import ChatGPTCompleter, DocumentAnswerer
 from buster.formatters.documents import DocumentsFormatterJSON
 from buster.formatters.prompts import PromptFormatter
-from buster.formatters.questions import QuestionReformulator
+from buster.llm_utils import QuestionReformulator
 from buster.retriever import Retriever, ServiceRetriever
 from buster.tokenizers import GPTTokenizer
 from buster.validators import QuestionAnswerValidator, Validator
@@ -140,6 +140,16 @@ Q:
         "max_tokens": 3500,
         "columns": ["content", "source", "title"],
     },
+    question_reformulator_cfg={
+        "completion_kwargs": {
+            "model": "gpt-3.5-turbo",
+            "stream": False,
+            "temperature": 0,
+        },
+        "system_prompt": """
+        Your role is to reformat a user's input into a question that is useful in the context of a semantic retrieval system.
+        Reformulate the question in a way that captures the original essence of the question while also adding more relevant details that can be useful in the context of semantic retrieval.""",
+    },
     prompt_formatter_cfg={
         "max_tokens": 4000,
         "text_before_docs": (
@@ -195,7 +205,7 @@ def setup_buster(buster_cfg):
     )
     validator: Validator = QuestionAnswerValidator(**buster_cfg.validator_cfg)
 
-    question_reformulator = QuestionReformulator()
+    question_reformulator = QuestionReformulator(**buster_cfg.question_reformulator_cfg)
 
     buster: Buster = Buster(
         retriever=retriever,
