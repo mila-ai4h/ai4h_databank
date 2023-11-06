@@ -201,13 +201,13 @@ def add_user_question(user_question: str, chat_history: Optional[ChatHistory] = 
     return chat_history
 
 
-def chat(chat_history: ChatHistory):
+def chat(chat_history: ChatHistory, reformulate_question: bool):
     """Answer a user's question using retrieval augmented generation."""
 
     # We assume that the question is the user's last interaction
     user_input = chat_history[-1][0]
 
-    completion = buster.process_input(user_input, reformulate_question=True)
+    completion = buster.process_input(user_input, reformulate_question=reformulate_question)
 
     # ## FOR DEBUGGING ##
     # from buster.utils import UserInputs
@@ -219,7 +219,8 @@ def chat(chat_history: ChatHistory):
     # )
     # ##
 
-    if completion.user_inputs.reformulated_input is not None:
+    if reformulate_question and not completion.error:
+        assert completion.user_inputs.reformulated_input is not None
         chat_history.append([None, f"I reformulated your question to: {completion.user_inputs.reformulated_input}"])
         chat_history.append([None, None])
 
@@ -522,6 +523,7 @@ with buster_app:
                 label=f"Sample questions to ask {app_name}",
             )
 
+            reformulate_question_cbox = gr.Checkbox(value=True, label="Reformulate Question")
             chatbot = gr.Chatbot(label="Generated Answer", show_share_button=False)
             sources_textboxes = display_sources()
 
@@ -587,7 +589,7 @@ with buster_app:
         ]
     ).then(
         chat,
-        inputs=[chatbot],
+        inputs=[chatbot, reformulate_question_cbox],
         outputs=[chatbot, last_completion],
     ).then(
         add_disclaimer,
