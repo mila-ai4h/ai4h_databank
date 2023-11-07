@@ -21,7 +21,7 @@ import random
 
 import pandas as pd
 import pytest
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_result
 
 from buster.busterbot import Buster
 from buster.completers import ChatGPTCompleter, DocumentAnswerer
@@ -72,7 +72,14 @@ def busterbot(monkeypatch, run_expensive):
 
 
 def process_questions(busterbot, questions: pd.DataFrame) -> pd.DataFrame:
-    @retry(wait=wait_exponential(multiplier=1, min=4, max=10), stop=stop_after_attempt(5))
+    def is_unable_to_process(answer: pd.Series) -> bool:
+        return answer.answer_text.str.startswith("Unable to process your question at the moment, try again soon")
+
+    @retry(
+        wait=wait_exponential(multiplier=1, min=4, max=10),
+        stop=stop_after_attempt(5),
+        retry=retry_if_result(is_unable_to_process),
+    )
     def answer_question(question):
         completion = busterbot.process_input(question.question)
         if "title" in completion.matched_documents.columns:
