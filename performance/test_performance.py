@@ -21,7 +21,8 @@ import random
 
 import pandas as pd
 import pytest
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_result
+from pinecone.core.exceptions import PineconeProtocolError
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_result, retry_if_exception_type
 
 from buster.busterbot import Buster
 from buster.completers import ChatGPTCompleter, DocumentAnswerer
@@ -78,7 +79,7 @@ def process_questions(busterbot, questions: pd.DataFrame) -> pd.DataFrame:
     @retry(
         wait=wait_exponential(multiplier=1, min=4, max=10),
         stop=stop_after_attempt(5),
-        retry=retry_if_result(is_unable_to_process),
+        retry=(retry_if_result(is_unable_to_process) | retry_if_exception_type(PineconeProtocolError)),
     )
     def answer_question(question):
         completion = busterbot.process_input(question.question)
