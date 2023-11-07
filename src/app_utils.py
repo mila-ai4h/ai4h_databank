@@ -157,7 +157,7 @@ def pad_sources(sources: list[str], max_sources: int) -> list[str]:
 
 
 def add_sources(completion, max_sources: int):
-    if any(arg is False for arg in [completion.question_relevant, completion.answer_relevant]):
+    if not completion.question_relevant:
         # Question was not relevant, don't bother doing anything else...
         formatted_sources = [""]
     else:
