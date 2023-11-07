@@ -73,7 +73,7 @@ def busterbot(monkeypatch, run_expensive):
 
 def process_questions(busterbot, questions: pd.DataFrame) -> pd.DataFrame:
     def is_unable_to_process(answer: pd.Series) -> bool:
-        return answer.answer_text.str.startswith("Unable to process your question at the moment, try again soon")
+        return answer.answer_text.startswith("Unable to process your question at the moment, try again soon")
 
     @retry(
         wait=wait_exponential(multiplier=1, min=4, max=10),
