@@ -2,3 +2,4 @@ buster-doctalk==1.0.20
 gradio==3.50.2
 pymongo==4.6.0
 gunicorn==21.2.0
+pandas[output-formatting]==2.1.2
