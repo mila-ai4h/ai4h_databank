@@ -25,7 +25,7 @@ openai.organization = os.environ["OPENAI_ORGANIZATION"]
 PINECONE_API_KEY = os.environ["PINECONE_API_KEY"]
 PINECONE_ENV = "asia-southeast1-gcp"
 PINECONE_INDEX = "oecd"
-PINECONE_NAMESPACE = "data-2023-10-23"
+PINECONE_NAMESPACE = "data-2023-11-02"
 
 # MongoDB Configurations
 MONGO_URI = os.environ["MONGO_URI"]
@@ -36,7 +36,7 @@ INSTANCE_TYPE = os.environ["INSTANCE_TYPE"]  # e.g. ["dev", "prod", "local"]
 
 # MongoDB Databases
 MONGO_DATABASE_LOGGING = get_logging_db_name(INSTANCE_TYPE)  # Where all interactions will be stored
-MONGO_DATABASE_DATA = "data-2023-10-23"  # Where documents are stored
+MONGO_DATABASE_DATA = "data-2023-11-02"  # Where documents are stored
 
 # Check that data chunks are aligned on Mongo and Pinecone
 if MONGO_DATABASE_DATA != PINECONE_NAMESPACE:
