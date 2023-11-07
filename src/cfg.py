@@ -87,7 +87,16 @@ buster_cfg = BusterConfig(
         "unknown_threshold": 0.84,
         "embedding_model": "text-embedding-ada-002",
         "use_reranking": True,
-        "invalid_question_response": "I cannot answer this question as it does not seem relevant to AI policies. If you believe this is a mistake, please provide feedback through the panel on the right side. You can also try reformulating your question for better results.",
+        "invalid_question_response": """Thank you for your question! Unfortunately, I haven’t been able to find the information you’re looking for. Your question might be:
+
+        * Outside the scope of AI policy documents
+        * Too recent (i.e. draft policies) or about the future
+        * Building on my previous answer (I have no memory of previous conversations)
+        * Vague (i.e not affiliated with a specific country)
+        * Asking me to make a judgment call on what’s better, worse, stronger or weaker (I don’t have an opinion)
+
+        You can always try rewording your question and try again!
+        """,
         "check_question_prompt": """You are a chatbot answering questions on behalf of the OECD specifically on AI policies.
 Your first job is to determine whether or not a question is valid, and should be answered.
 For a question to be considered valid, it must be related to AI and policies.
