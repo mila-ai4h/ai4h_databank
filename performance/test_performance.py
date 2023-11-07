@@ -22,7 +22,13 @@ import random
 import pandas as pd
 import pytest
 from pinecone.core.exceptions import PineconeProtocolError
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_result, retry_if_exception_type
+from tenacity import (
+    retry,
+    retry_if_exception_type,
+    retry_if_result,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 from buster.busterbot import Buster
 from buster.completers import ChatGPTCompleter, DocumentAnswerer
