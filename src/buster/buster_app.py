@@ -47,7 +47,7 @@ css = """
 
 def add_disclaimer(completion: Completion, chat_history: ChatHistory, disclaimer: str = disclaimer):
     """Add a disclaimer response if the answer was relevant."""
-    if completion.answer_relevant:
+    if completion.question_relevant:
         chat_history.append([None, disclaimer])
     return chat_history
 
@@ -366,7 +366,7 @@ def display_sources():
     with gr.Column():
         gr.Markdown(
             """## Relevant sources
-        All retrieved documents will be listed here in order of importance. If no answer was found, documents will not be displayed.
+        All retrieved documents will be listed here in order of importance.
         """
         )
         sources_textboxes = []
