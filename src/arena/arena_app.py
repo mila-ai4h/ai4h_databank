@@ -154,7 +154,7 @@ async def bot_response_stream(
 
         completion_left = Completion(
             error=False,
-            user_input=question,
+            UserInputs(original_input=question),
             matched_documents=pd.DataFrame(),
             answer_generator=generator("What is Up left"),
             answer_relevant=True,
@@ -163,7 +163,7 @@ async def bot_response_stream(
         )
         completion_right = Completion(
             error=False,
-            user_input=question,
+            UserInputs(original_input=question),
             matched_documents=pd.DataFrame(),
             answer_generator=generator("What is Up right"),
             answer_relevant=True,

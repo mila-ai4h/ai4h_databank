@@ -57,4 +57,4 @@ def test_completion_with_logging():
     assert record["username"] == test_username
     assert record["session_id"] == test_session_id
     # we add a \n after a question so remove it to compare
-    assert record["completion_user_input"].strip("\n") == test_user_input
+    assert record["completion_user_inputs"]["original_input"].strip("\n") == test_user_input

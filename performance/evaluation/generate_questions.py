@@ -5,7 +5,8 @@ import re
 import openai
 import pandas as pd
 
-from buster.completers import ChatGPTCompleter
+from buster.completers import ChatGPTCompleter, UserInputs
+
 from src.cfg import retriever
 
 logger = logging.getLogger(__name__)
@@ -50,7 +51,7 @@ def generate_questions(document: str, completer):
     2) Don't refer directly to the document, for example, do not say 'According to the document'.
     3) Questions should be the kind of information you'd search for on a website, and generally broad in scope.
     """
-    outputs = completer.complete(prompt, user_input=document, **completer.completion_kwargs)
+    outputs = completer.complete(prompt, UserInputs(original_input=document), **completer.completion_kwargs)
 
     # at this point, chatGPT generated questions in form 1) ... 2) ... so we split them
     questions = split_questions(outputs)
@@ -63,7 +64,7 @@ def generate_questions_from_summary(document: str, completer):
 
     # summarize the document
     prompt = "Summarize the content of the following document. Keep it high level"
-    summary = completer.complete(prompt, user_input=document, **completer.completion_kwargs)
+    summary = completer.complete(prompt, UserInputs(original_input=document), **completer.completion_kwargs)
     print(f"{summary=}")
 
     # generate questions
@@ -71,9 +72,9 @@ def generate_questions_from_summary(document: str, completer):
     Questions should be in the style of a typical person interested in AI policies.
     They can be general, or specific, but should be answered by the information provided.
     Generate 3 questions, keep them short and on-topic."""
-    outputs = completer.complete(prompt, user_input=summary, **completer.completion_kwargs)
+    outputs = completer.complete(prompt, UserInputs(original_input=summary), **completer.completion_kwargs)
     print(f"{outputs=}")
-    outputs = completer.complete(prompt, user_input=document, **completer.completion_kwargs)
+    outputs = completer.complete(prompt, UserInputs(original_input=document), **completer.completion_kwargs)
 
     # at this point, chatGPT generated questions in form 1) ... 2) ... so we split them
     questions = split_questions(outputs)
