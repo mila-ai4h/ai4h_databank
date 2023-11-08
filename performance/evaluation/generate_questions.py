@@ -6,7 +6,6 @@ import openai
 import pandas as pd
 
 from buster.completers import ChatGPTCompleter, UserInputs
-
 from src.cfg import retriever
 
 logger = logging.getLogger(__name__)
