@@ -1,6 +1,6 @@
 from buster.tokenizers import GPTTokenizer
+from scripts.upload_data import chunk_text
 from src.cfg import buster_cfg
-from src.upload_data import chunk_text
 
 
 def test_chunk_text():
