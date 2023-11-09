@@ -92,7 +92,7 @@ buster_cfg = BusterConfig(
                 * Too recent (i.e. draft policies) or about the future
                 * Building on my previous answer (I have no memory of previous conversations)
                 * Vague (i.e not affiliated with a specific country)
-                * Asking me to make a judgment call on what's better, worse, stronger or weaker (I don't have an opinion)
+                * Asking the model to perform its own assessment of the policies (i.e. What is the best/worst AI policy)
                 You can always try rewording your question and ask again!
                 """,
         "check_question_prompt": """You are a chatbot answering questions on behalf of the OECD specifically on AI policies.
