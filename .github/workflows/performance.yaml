@@ -21,6 +21,7 @@ jobs:
           pip install -r requirements.txt
           pip install -e .[tests]
           pytest --run_expensive --ignore=tests
+          pip install -r requirements.txt
       - name: Save performance results
         uses: actions/upload-artifact@v3
         with:

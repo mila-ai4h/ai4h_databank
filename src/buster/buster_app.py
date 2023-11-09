@@ -23,7 +23,7 @@ disclaimer = cfg.disclaimer
 mongo_db = cfg.mongo_db
 buster_cfg = copy.deepcopy(cfg.buster_cfg)
 buster = setup_buster(buster_cfg=buster_cfg)
-max_sources = cfg.buster_cfg.retriever_cfg["top_k"]
+max_sources = cfg.max_sources
 data_dir = cfg.data_dir
 
 
@@ -201,13 +201,18 @@ def add_user_question(user_question: str, chat_history: Optional[ChatHistory] = 
     return chat_history
 
 
-def chat(chat_history: ChatHistory, reformulate_question: bool):
+def chat(chat_history: ChatHistory, reformulate_question: bool, top_k: Optional[int] = None):
     """Answer a user's question using retrieval augmented generation."""
+
+    # Make sure top k is an int between 1 and 15
+    top_k = int(top_k)
+    top_k = max(top_k, 1)
+    top_k = min(top_k, max_sources)
 
     # We assume that the question is the user's last interaction
     user_input = chat_history[-1][0]
 
-    completion = buster.process_input(user_input, reformulate_question=reformulate_question)
+    completion = buster.process_input(user_input, reformulate_question=reformulate_question, top_k=top_k)
 
     # ## FOR DEBUGGING ##
     # from buster.completers import UserInputs
@@ -522,6 +527,9 @@ with buster_app:
                 inputs=user_input,
                 label=f"Sample questions to ask {app_name}",
             )
+            top_k_slider = gr.Slider(
+                minimum=1, maximum=max_sources, interactive=True, value=3, step=1, label="Number of sources"
+            )
 
             reformulate_question_cbox = gr.Checkbox(value=True, label="Reformulate Question")
             chatbot = gr.Chatbot(label="Generated Answer", show_share_button=False)
@@ -553,9 +561,7 @@ with buster_app:
         reveal_app,
         outputs=[accept_terms_group, user_input, submit]
     )
-    # fmt: on
 
-    # fmt: off
     gr.on(
         triggers=[submit.click, user_input.submit],
         fn=add_user_question,
@@ -589,7 +595,7 @@ with buster_app:
         ]
     ).then(
         chat,
-        inputs=[chatbot, reformulate_question_cbox],
+        inputs=[chatbot, reformulate_question_cbox, top_k_slider],
         outputs=[chatbot, last_completion],
     ).then(
         add_disclaimer,

@@ -65,6 +65,8 @@ data_dir = current_dir.parent / "data"  # ../data
 
 app_name = "SAI ️💬"
 
+max_sources = 15
+
 # sample questions
 example_questions = [
     "Are there any AI policies related to AI adoption in the public sector in the UK?",
@@ -120,7 +122,6 @@ Q:
         "mongo_db_name": MONGO_DATABASE_DATA,
         "top_k": 3,
         "thresh": 0.7,
-        "max_tokens": 3000,
         "embedding_model": "text-embedding-ada-002",
     },
     documents_answerer_cfg={
@@ -128,7 +129,7 @@ Q:
     },
     completion_cfg={
         "completion_kwargs": {
-            "model": "gpt-3.5-turbo-0613",
+            "model": "gpt-3.5-turbo-16k-0613",
             "stream": True,
             "temperature": 0,
         },
@@ -137,7 +138,7 @@ Q:
         "model_name": "gpt-3.5-turbo-0613",
     },
     documents_formatter_cfg={
-        "max_tokens": 3500,
+        "max_tokens": 13000,
         "columns": ["content", "source", "title"],
     },
     question_reformulator_cfg={
@@ -151,7 +152,7 @@ Q:
         Reformulate the question in a way that captures the original essence of the question while also adding more relevant details that can be useful in the context of semantic retrieval.""",
     },
     prompt_formatter_cfg={
-        "max_tokens": 4000,
+        "max_tokens": 14000,
         "text_before_docs": (
             "You are a chatbot assistant answering questions about artificial intelligence (AI) policies and laws. "
             "You represent the OECD AI Policy Observatory. "
