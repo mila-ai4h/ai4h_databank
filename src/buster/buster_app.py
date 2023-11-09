@@ -58,7 +58,15 @@ def hide_about_panel(accept_checkbox):
     return {about_panel: gr.update(open=open)}
 
 
-def setup_feedback_form():
+def set_relevant_sources_selection(num_sources: int):
+    relevant_sources_selection = gr.CheckboxGroup(
+        choices=[f"Source {i+1}" for i in range(num_sources)],
+        label="Check all relevant sources (if any)",
+    )
+    return relevant_sources_selection
+
+
+def setup_feedback_form(num_sources: int):
     # Feedback
     feedback_elems = {}
     with gr.Box():
@@ -88,10 +96,7 @@ Your feedback is anonymous and will help us make the tool as useful as possible 
                             relevant_sources = gr.Radio(
                                 choices=["👍", "👎"], label="Were the retrieved sources generally relevant to your query?"
                             )
-                            relevant_sources_selection = gr.CheckboxGroup(
-                                choices=[f"Source {i+1}" for i in range(max_sources)],
-                                label="Check all relevant sources (if any)",
-                            )
+                            relevant_sources_selection = set_relevant_sources_selection(num_sources=num_sources)
                             relevant_sources_order = gr.Radio(
                                 choices=["👍", "👎"],
                                 label="Were the sources ranked appropriately, in order of relevance?",
@@ -490,6 +495,26 @@ def setup_flag_button():
     return flag_button
 
 
+def setup_user_settings():
+    with gr.Accordion(label=f"Settings ⚙️", open=False):
+        top_k_slider = gr.Slider(
+            minimum=1,
+            maximum=max_sources,
+            interactive=True,
+            value=3,
+            step=1,
+            label="Number of sources",
+            info="Number of documents to pass to the language model during its retrieval.",
+        )
+
+        reformulate_question_cbox = gr.Checkbox(
+            value=False,
+            label="Reformulate Question (Beta)",
+            info="Reformulates a user's question to enhance source retrieval.",
+        )
+    return reformulate_question_cbox, top_k_slider
+
+
 buster_app = gr.Blocks(css=css)
 with buster_app:
     # State variables are client-side and are reset every time a client refreshes the page
@@ -527,18 +552,18 @@ with buster_app:
                 inputs=user_input,
                 label=f"Sample questions to ask {app_name}",
             )
-            top_k_slider = gr.Slider(
-                minimum=1, maximum=max_sources, interactive=True, value=3, step=1, label="Number of sources"
-            )
 
-            reformulate_question_cbox = gr.Checkbox(value=True, label="Reformulate Question")
             chatbot = gr.Chatbot(label="Generated Answer", show_share_button=False)
             sources_textboxes = display_sources()
 
         with gr.Column():
-            feedback_elems = setup_feedback_form()
+            reformulate_question_cbox, top_k_slider = setup_user_settings()
+            feedback_elems = setup_feedback_form(top_k_slider.value)
             flag_button = setup_flag_button()
 
+    top_k_slider.change(
+        set_relevant_sources_selection, inputs=top_k_slider, outputs=feedback_elems["relevant_sources_selection"]
+    )
     setup_additional_sources()
 
     gr.HTML(
