@@ -9,8 +9,7 @@ import gradio as gr
 import pandas as pd
 
 import src.cfg as cfg
-from buster.completers import Completion
-from buster.formatters.documents import DocumentsFormatterHTML, DocumentsFormatterJSON
+from buster.completers import Completion, UserInputs
 from src.app_utils import add_sources, get_utc_time
 from src.cfg import buster_cfg, setup_buster
 from src.feedback import ComparisonForm, Interaction
@@ -96,6 +95,7 @@ def submit_feedback(completion_left, completion_right, current_question, vote, e
         vote=vote, model_left=model_left, model_right=model_right, question=current_question, extra_info=extra_info
     )
     feedback = Interaction(
+        session_id="",
         username=request.username,
         user_completions=[completion_left, completion_right],
         form=comparison_form,
@@ -154,7 +154,7 @@ async def bot_response_stream(
 
         completion_left = Completion(
             error=False,
-            UserInputs(original_input=question),
+            user_inputs=UserInputs(original_input=question),
             matched_documents=pd.DataFrame(),
             answer_generator=generator("What is Up left"),
             answer_relevant=True,
@@ -163,7 +163,7 @@ async def bot_response_stream(
         )
         completion_right = Completion(
             error=False,
-            UserInputs(original_input=question),
+            user_inputs=UserInputs(original_input=question),
             matched_documents=pd.DataFrame(),
             answer_generator=generator("What is Up right"),
             answer_relevant=True,
