@@ -95,7 +95,7 @@ def submit_feedback(completion_left, completion_right, current_question, vote, e
         vote=vote, model_left=model_left, model_right=model_right, question=current_question, extra_info=extra_info
     )
     feedback = Interaction(
-        session_id=None,
+        session_id="",
         username=request.username,
         user_completions=[completion_left, completion_right],
         form=comparison_form,
