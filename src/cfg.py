@@ -35,6 +35,14 @@ MONGO_URI = os.environ["MONGO_URI"]
 INSTANCE_NAME = os.environ["INSTANCE_NAME"]  # e.g., huggingface, heroku
 INSTANCE_TYPE = os.environ["INSTANCE_TYPE"]  # e.g. ["dev", "prod", "local"]
 
+# ONLY SET TO TRUE FOR DEBUGGING
+DEBUG = False
+
+# Just in case...
+if DEBUG:
+    assert INSTANCE_TYPE != "prod", "Cannot enter DEBUG mode on prod."
+    logger.warning("You are currently in DEBUG mode.")
+
 # MongoDB Databases
 MONGO_DATABASE_LOGGING = get_logging_db_name(INSTANCE_TYPE)  # Where all interactions will be stored
 MONGO_DATABASE_DATA = "data-2023-11-02"  # Where documents are stored
@@ -80,6 +88,11 @@ disclaimer = f"""
 
 **Always verify the integrity of {app_name} responses using the sources provided below** 👇
 """
+
+message_before_reformulation = "I reformulated your answer to: '"
+message_after_reformulation = (
+    "'\n\nThis is done automatically to increase performance of the tool. You can disable this in the Settings ⚙️ tab."
+)
 
 buster_cfg = BusterConfig(
     validator_cfg={
