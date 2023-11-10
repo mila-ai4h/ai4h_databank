@@ -501,18 +501,23 @@ def setup_user_settings():
             minimum=1,
             maximum=max_sources,
             interactive=True,
-            value=3,
+            value=5,
             step=1,
             label="Number of sources",
             info="Number of documents to pass to the language model during its retrieval.",
         )
 
         reformulate_question_cbox = gr.Checkbox(
-            value=False,
+            value=True,
             label="Reformulate Question (Beta)",
             info="Reformulates a user's question to enhance source retrieval.",
         )
-    return reformulate_question_cbox, top_k_slider
+
+    settings_elems = {
+        "reformulate_question_cbox": reformulate_question_cbox,
+        "top_k_slider": top_k_slider,
+    }
+    return settings_elems
 
 
 buster_app = gr.Blocks(css=css)
@@ -557,13 +562,15 @@ with buster_app:
             sources_textboxes = display_sources()
 
         with gr.Column():
-            reformulate_question_cbox, top_k_slider = setup_user_settings()
+            settings_elems = setup_user_settings()
+            top_k_slider = settings_elems["top_k_slider"]
             feedback_elems = setup_feedback_form(top_k_slider.value)
             flag_button = setup_flag_button()
 
     top_k_slider.change(
         set_relevant_sources_selection, inputs=top_k_slider, outputs=feedback_elems["relevant_sources_selection"]
     )
+
     setup_additional_sources()
 
     gr.HTML(
@@ -620,7 +627,7 @@ with buster_app:
         ]
     ).then(
         chat,
-        inputs=[chatbot, reformulate_question_cbox, top_k_slider],
+        inputs=[chatbot, settings_elems["reformulate_question_cbox"], settings_elems["top_k_slider"]],
         outputs=[chatbot, last_completion],
     ).then(
         add_disclaimer,
