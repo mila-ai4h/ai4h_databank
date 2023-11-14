@@ -9,8 +9,8 @@ import pandas as pd
 import pymongo
 from pymongo import MongoClient
 
-from buster.tokenizers import Tokenizer
 from buster.completers import Completion
+from buster.tokenizers import Tokenizer
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
