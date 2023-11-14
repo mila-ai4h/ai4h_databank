@@ -10,6 +10,7 @@ import pymongo
 from pymongo import MongoClient
 
 from buster.tokenizers import Tokenizer
+from buster.completers import Completion
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -156,12 +157,13 @@ def pad_sources(sources: list[str], max_sources: int) -> list[str]:
     return sources + [""] * (max_sources - k)
 
 
-def add_sources(completion, max_sources: int):
+def add_sources(completion: Completion, max_sources: int):
     if not completion.question_relevant:
         # Question was not relevant, don't bother doing anything else...
         formatted_sources = [""]
     else:
-        formatted_sources = format_sources(completion.matched_documents)
+        matched_documents = completion.matched_documents
+        formatted_sources = format_sources(matched_documents[matched_documents.relevance == True])
 
     formatted_sources = pad_sources(formatted_sources, max_sources)
 
