@@ -63,7 +63,7 @@ def busterbot(monkeypatch, run_expensive):
 
     retriever = ServiceRetriever(**buster_cfg.retriever_cfg)
 
-    buster_cfg.validator_cfg["completion_kwargs"]["stream"] = False
+    buster_cfg.completion_cfg["completion_kwargs"]["stream"] = False
     tokenizer = GPTTokenizer(**buster_cfg.tokenizer_cfg)
     document_answerer: DocumentAnswerer = DocumentAnswerer(
         completer=ChatGPTCompleter(**buster_cfg.completion_cfg),
