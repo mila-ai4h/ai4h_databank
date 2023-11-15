@@ -36,7 +36,7 @@ from buster.formatters.documents import DocumentsFormatterJSON
 from buster.formatters.prompts import PromptFormatter
 from buster.retriever import ServiceRetriever
 from buster.tokenizers import GPTTokenizer
-from buster.validators import QuestionAnswerValidator, Validator
+from buster.validators import Validator
 from src import cfg
 
 logger = logging.getLogger(__name__)
@@ -53,7 +53,7 @@ def busterbot(monkeypatch, run_expensive):
         random.seed(42)
 
         # Patch question relevance call
-        monkeypatch.setattr(QuestionAnswerValidator, "check_question_relevance", lambda s, q: (True, "mocked response"))
+        monkeypatch.setattr(Validator, "check_question_relevance", lambda s, q: (True, "mocked response"))
         # Patch embedding call to avoid computing embeddings
         monkeypatch.setattr(
             ServiceRetriever, "get_embedding", lambda s, x, model: [random.random() for _ in range(EMBEDDING_LENGTH)]
@@ -71,7 +71,7 @@ def busterbot(monkeypatch, run_expensive):
         prompt_formatter=PromptFormatter(tokenizer=tokenizer, **buster_cfg.prompt_formatter_cfg),
         **buster_cfg.documents_answerer_cfg,
     )
-    validator: Validator = QuestionAnswerValidator(**buster_cfg.validator_cfg)
+    validator: Validator = Validator(**buster_cfg.validator_cfg)
 
     buster: Buster = Buster(retriever=retriever, document_answerer=document_answerer, validator=validator)
 
