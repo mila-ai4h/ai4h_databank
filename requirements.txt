@@ -1,4 +1,4 @@
-git+https://github.com/jerpint/buster.git@main#egg=buster-docktalk
+git+https://github.com/jerpint/buster.git@main#egg=buster-doctalk
 gradio==3.50.2
 pymongo==4.6.0
 gunicorn==21.2.0
