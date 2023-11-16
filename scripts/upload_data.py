@@ -5,6 +5,7 @@ import pandas as pd
 
 from buster.documents_manager import DocumentsService
 from buster.tokenizers import GPTTokenizer, Tokenizer
+from buster.llm_utils import get_openai_embedding, BM25
 from src.cfg import (
     MONGO_URI,
     PINECONE_API_KEY,
@@ -42,6 +43,14 @@ def upload_data(
     # Rename link to url
     dataframe.rename(columns={"link": "url"}, inplace=True)
 
+    # Initialize BM25
+    bm25 = BM25()
+    bm25.fit(dataframe)
+    bm25.dump_params("bm25_params.json")
+
+    sparse_embedding_fn = bm25.get_sparse_embedding_fn()
+
+    # Add the embeddings
     manager = DocumentsService(
         pinecone_api_key,
         pinecone_env,
@@ -51,7 +60,7 @@ def upload_data(
         mongo_db_data,
         required_columns=["content", "url", "title", "source", "country", "year"],
     )
-    manager.batch_add(dataframe)
+    manager.batch_add(dataframe, embedding_fn=get_openai_embedding, sparse_embedding_fn=sparse_embedding_fn)
 
 
 if __name__ == "__main__":
