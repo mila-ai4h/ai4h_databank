@@ -10,7 +10,7 @@ from buster.formatters.documents import DocumentsFormatterJSON
 from buster.formatters.prompts import PromptFormatter
 from buster.retriever import Retriever, ServiceRetriever
 from buster.tokenizers import GPTTokenizer
-from buster.validators import QuestionAnswerValidator, Validator
+from buster.validators import Validator
 from src.app_utils import get_logging_db_name, init_db
 
 logger = logging.getLogger(__name__)
@@ -80,41 +80,45 @@ disclaimer = f"""
 
 buster_cfg = BusterConfig(
     validator_cfg={
-        "unknown_response_templates": [
-            "I cannot answer this question based on the information I have available",
-            "The information I have access to does not address the question",
-        ],
-        "unknown_threshold": 0.84,
-        "embedding_model": "text-embedding-ada-002",
-        "use_reranking": True,
-        "invalid_question_response": """Thank you for your question! Unfortunately, I haven't been able to find the information you're looking for. Your question might be:
-                * Outside the scope of AI policy documents
-                * Too recent (i.e. draft policies) or about the future
-                * Building on my previous answer (I have no memory of previous conversations)
-                * Vague (i.e not affiliated with a specific country)
-                * Asking the model to perform its own assessment of the policies (i.e. What is the best/worst AI policy)
-                You can always try rewording your question and ask again!
-                """,
-        "check_question_prompt": """You are a chatbot answering questions on behalf of the OECD specifically on AI policies.
-Your first job is to determine whether or not a question is valid, and should be answered.
-For a question to be considered valid, it must be related to AI and policies.
-More general questions are not considered valid, even if you might know the response.
-A user will submit a question. Respond 'true' if it is valid, respond 'false' if it is invalid.
-Do not judge the tone of the question. As long as it is relevant to the topic, respond 'true'.
+        "use_reranking": True,  # Reranks documents according to generated answer
+        "validate_documents": False,  # Validates documents using chatGPT (expensive)
+        "answer_validator_cfg": {
+            "unknown_response_templates": [
+                "I cannot answer this question based on the information I have available",
+                "The information I have access to does not address the question",
+            ],
+            "unknown_threshold": 0.84,
+        },
+        "question_validator_cfg": {
+            "invalid_question_response": """Thank you for your question! Unfortunately, I haven't been able to find the information you're looking for. Your question might be:
+                    * Outside the scope of AI policy documents
+                    * Too recent (i.e. draft policies) or about the future
+                    * Building on my previous answer (I have no memory of previous conversations)
+                    * Vague (i.e not affiliated with a specific country)
+                    * Asking the model to perform its own assessment of the policies (i.e. What is the best/worst AI policy)
+                    You can always try rewording your question and ask again!
+                    """,
+            "check_question_prompt": """You are a chatbot answering questions on behalf of the OECD specifically on AI policies.
+    Your first job is to determine whether or not a question is valid, and should be answered.
+    For a question to be considered valid, it must be related to AI and policies.
+    More general questions are not considered valid, even if you might know the response.
+    A user will submit a question. Respond 'true' if it is valid, respond 'false' if it is invalid.
+    Do not judge the tone of the question. As long as it is relevant to the topic, respond 'true'.
 
-For example:
-Q: What policies did countries like Canada put in place with respect to artificial intelligence?
-true
+    For example:
+    Q: What policies did countries like Canada put in place with respect to artificial intelligence?
+    true
 
-Q: What policies are put in place to ensure the wellbeing of agriculture?
-false
+    Q: What policies are put in place to ensure the wellbeing of agriculture?
+    false
 
-Q:
-""",
-        "completion_kwargs": {
-            "model": "gpt-3.5-turbo-0613",
-            "stream": False,
-            "temperature": 0,
+    Q:
+    """,
+            "completion_kwargs": {
+                "model": "gpt-3.5-turbo-0613",
+                "stream": False,
+                "temperature": 0,
+            },
         },
     },
     retriever_cfg={
@@ -199,7 +203,7 @@ def setup_buster(buster_cfg):
         prompt_formatter=PromptFormatter(tokenizer=tokenizer, **buster_cfg.prompt_formatter_cfg),
         **buster_cfg.documents_answerer_cfg,
     )
-    validator: Validator = QuestionAnswerValidator(**buster_cfg.validator_cfg)
+    validator = Validator(**buster_cfg.validator_cfg)
 
     buster: Buster = Buster(retriever=retriever, document_answerer=document_answerer, validator=validator)
     return buster
