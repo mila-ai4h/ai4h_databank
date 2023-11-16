@@ -1,4 +1,5 @@
-buster-doctalk==1.0.25
+# buster-doctalk==1.0.25
+buster @ git+https://github.com/jerpint/buster/pull/152/commits/f3fd964369e7a4f10bc50cbec60f22064a3af387
 gradio==3.50.2
 gunicorn==21.2.0
 joblib>=1.3.2
