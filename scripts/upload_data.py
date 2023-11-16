@@ -4,8 +4,8 @@ from typing import Type
 import pandas as pd
 
 from buster.documents_manager import DocumentsService
+from buster.llm_utils import BM25, get_openai_embedding
 from buster.tokenizers import GPTTokenizer, Tokenizer
-from buster.llm_utils import get_openai_embedding, BM25
 from src.cfg import (
     MONGO_URI,
     PINECONE_API_KEY,
