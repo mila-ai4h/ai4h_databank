@@ -493,7 +493,7 @@ def setup_flag_button():
 
 
 def setup_user_settings(
-    reformulate_question: bool, visible: bool = False, num_sources: int = 3, max_sources: int = 15, min_sources: int = 1
+    reformulate_question: bool, visible: bool, num_sources: int, max_sources: int = 15, min_sources: int = 1
 ) -> dict:
     """Set up user interface elements for frontend user settings in a web application.
 
@@ -504,7 +504,7 @@ def setup_user_settings(
     Args:
     reformulate_question (bool): Initial state of the checkbox for reformulating questions.
     visible (bool, optional): Visibility state of the settings tab. Defaults to False.
-    num_sources (int, optional): Initial value for the number of sources slider. Defaults to 3.
+    num_sources (int): Initial value for the number of sources slider. Defaults to 3.
     max_sources (int, optional): Maximum limit for the number of sources slider. Defaults to 15.
     min_sources (int, optional): Minimum limit for the number of sources slider. Defaults to 1.
 
@@ -580,8 +580,8 @@ with buster_app:
         with gr.Column():
             settings_elems = setup_user_settings(
                 reformulate_question=cfg.reformulate_question,
-                num_sources=cfg.buster_cfg.retriever_cfg["top_k"],
                 visible=cfg.reveal_user_settings,
+                num_sources=cfg.buster_cfg.retriever_cfg["top_k"],
                 max_sources=cfg.max_sources,
             )
             top_k_slider = settings_elems["top_k_slider"]
