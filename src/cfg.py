@@ -8,6 +8,7 @@ from buster.busterbot import Buster, BusterConfig
 from buster.completers import ChatGPTCompleter, DocumentAnswerer
 from buster.formatters.documents import DocumentsFormatterJSON
 from buster.formatters.prompts import PromptFormatter
+from buster.llm_utils import QuestionReformulator
 from buster.retriever import Retriever, ServiceRetriever
 from buster.tokenizers import GPTTokenizer
 from buster.validators import Validator
@@ -64,6 +65,11 @@ data_dir = current_dir.parent / "data"  # ../data
 
 app_name = "SAI ️💬"
 
+# User settings default values
+reveal_user_settings = False  # Wheter to display settings to the user or not
+max_sources = 15  # maximum number of sources that can be set by a user for retrieval
+reformulate_question = False  # Default setting for reformulating a user's question
+
 # sample questions
 example_questions = [
     "Are there any AI policies related to AI adoption in the public sector in the UK?",
@@ -77,6 +83,11 @@ disclaimer = f"""
 
 **Always verify the integrity of {app_name} responses using the sources provided below** 👇
 """
+
+message_before_reformulation = "I reformulated your answer to: '"
+message_after_reformulation = (
+    "'\n\nThis is done automatically to increase performance of the tool. You can disable this in the Settings ⚙️ tab."
+)
 
 buster_cfg = BusterConfig(
     validator_cfg={
@@ -130,7 +141,6 @@ buster_cfg = BusterConfig(
         "mongo_db_name": MONGO_DATABASE_DATA,
         "top_k": 3,
         "thresh": 0.7,
-        "max_tokens": 3000,
         "embedding_model": "text-embedding-ada-002",
     },
     documents_answerer_cfg={
@@ -149,6 +159,16 @@ buster_cfg = BusterConfig(
     documents_formatter_cfg={
         "max_tokens": 3500,
         "columns": ["content", "source", "title"],
+    },
+    question_reformulator_cfg={
+        "completion_kwargs": {
+            "model": "gpt-3.5-turbo",
+            "stream": False,
+            "temperature": 0,
+        },
+        "system_prompt": """
+        Your role is to reformat a user's input into a question that is useful in the context of a semantic retrieval system.
+        Reformulate the question in a way that captures the original essence of the question while also adding more relevant details that can be useful in the context of semantic retrieval.""",
     },
     prompt_formatter_cfg={
         "max_tokens": 4000,
@@ -205,5 +225,12 @@ def setup_buster(buster_cfg):
     )
     validator = Validator(**buster_cfg.validator_cfg)
 
-    buster: Buster = Buster(retriever=retriever, document_answerer=document_answerer, validator=validator)
+    question_reformulator = QuestionReformulator(**buster_cfg.question_reformulator_cfg)
+
+    buster: Buster = Buster(
+        retriever=retriever,
+        document_answerer=document_answerer,
+        validator=validator,
+        question_reformulator=question_reformulator,
+    )
     return buster

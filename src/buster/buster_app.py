@@ -23,7 +23,7 @@ disclaimer = cfg.disclaimer
 mongo_db = cfg.mongo_db
 buster_cfg = copy.deepcopy(cfg.buster_cfg)
 buster = setup_buster(buster_cfg=buster_cfg)
-max_sources = cfg.buster_cfg.retriever_cfg["top_k"]
+max_sources = cfg.max_sources
 data_dir = cfg.data_dir
 
 
@@ -58,7 +58,15 @@ def hide_about_panel(accept_checkbox):
     return {about_panel: gr.update(open=open)}
 
 
-def setup_feedback_form():
+def set_relevant_sources_selection(num_sources: int):
+    relevant_sources_selection = gr.CheckboxGroup(
+        choices=[f"Source {i+1}" for i in range(num_sources)],
+        label="Check all relevant sources (if any)",
+    )
+    return relevant_sources_selection
+
+
+def setup_feedback_form(num_sources: int):
     # Feedback
     feedback_elems = {}
     with gr.Box():
@@ -88,10 +96,7 @@ Your feedback is anonymous and will help us make the tool as useful as possible 
                             relevant_sources = gr.Radio(
                                 choices=["👍", "👎"], label="Were the retrieved sources generally relevant to your query?"
                             )
-                            relevant_sources_selection = gr.CheckboxGroup(
-                                choices=[f"Source {i+1}" for i in range(max_sources)],
-                                label="Check all relevant sources (if any)",
-                            )
+                            relevant_sources_selection = set_relevant_sources_selection(num_sources=num_sources)
                             relevant_sources_order = gr.Radio(
                                 choices=["👍", "👎"],
                                 label="Were the sources ranked appropriately, in order of relevance?",
@@ -201,13 +206,30 @@ def add_user_question(user_question: str, chat_history: Optional[ChatHistory] = 
     return chat_history
 
 
-def chat(chat_history: ChatHistory):
+def chat(chat_history: ChatHistory, reformulate_question: bool, top_k: Optional[int] = None):
     """Answer a user's question using retrieval augmented generation."""
+
+    # Make sure top k is an int between 1 and 15
+    top_k = int(top_k)
+    top_k = max(top_k, 1)
+    top_k = min(top_k, max_sources)
 
     # We assume that the question is the user's last interaction
     user_input = chat_history[-1][0]
 
-    completion = buster.process_input(user_input)
+    completion = buster.process_input(user_input, reformulate_question=reformulate_question, top_k=top_k)
+
+    if completion.question_relevant and not completion.error:
+        if reformulate_question and user_input not in cfg.example_questions:
+            assert completion.user_inputs.reformulated_input is not None
+
+            chat_history.append(
+                [
+                    None,
+                    f"{cfg.message_before_reformulation}{completion.user_inputs.reformulated_input}{cfg.message_after_reformulation}",
+                ]
+            )
+            chat_history.append([None, None])
 
     # Stream tokens one at a time
     chat_history[-1][1] = ""
@@ -470,6 +492,50 @@ def setup_flag_button():
     return flag_button
 
 
+def setup_user_settings(
+    reformulate_question: bool, visible: bool, num_sources: int, max_sources: int = 15, min_sources: int = 1
+) -> dict:
+    """Set up user interface elements for frontend user settings in a web application.
+
+    This function creates an accordion containing a slider and a checkbox to configure
+    the number of sources and the option to reformulate questions, respectively.
+    The values set here will also be the values used by default by the app.
+
+    Args:
+    reformulate_question (bool): Initial state of the checkbox for reformulating questions.
+    visible (bool, optional): Visibility state of the settings tab. Defaults to False.
+    num_sources (int): Initial value for the number of sources slider. Defaults to 3.
+    max_sources (int, optional): Maximum limit for the number of sources slider. Defaults to 15.
+    min_sources (int, optional): Minimum limit for the number of sources slider. Defaults to 1.
+
+    Returns:
+    dict: A dictionary containing the UI elements for the reformulate question checkbox and the sources slider.
+    """
+
+    with gr.Accordion(label=f"Settings ⚙️", open=False, visible=visible):
+        top_k_slider = gr.Slider(
+            minimum=min_sources,
+            maximum=max_sources,
+            interactive=True,
+            value=num_sources,
+            step=1,
+            label="Number of sources",
+            info="Number of documents to pass to the language model during its retrieval.",
+        )
+
+        reformulate_question_cbox = gr.Checkbox(
+            value=reformulate_question,
+            label="Reformulate Question (Beta)",
+            info="Reformulates a user's question to enhance source retrieval.",
+        )
+
+    settings_elems = {
+        "reformulate_question_cbox": reformulate_question_cbox,
+        "top_k_slider": top_k_slider,
+    }
+    return settings_elems
+
+
 buster_app = gr.Blocks(css=css)
 with buster_app:
     # State variables are client-side and are reset every time a client refreshes the page
@@ -512,8 +578,19 @@ with buster_app:
             sources_textboxes = display_sources()
 
         with gr.Column():
-            feedback_elems = setup_feedback_form()
+            settings_elems = setup_user_settings(
+                reformulate_question=cfg.reformulate_question,
+                visible=cfg.reveal_user_settings,
+                num_sources=cfg.buster_cfg.retriever_cfg["top_k"],
+                max_sources=cfg.max_sources,
+            )
+            top_k_slider = settings_elems["top_k_slider"]
+            feedback_elems = setup_feedback_form(top_k_slider.value)
             flag_button = setup_flag_button()
+
+    top_k_slider.change(
+        set_relevant_sources_selection, inputs=top_k_slider, outputs=feedback_elems["relevant_sources_selection"]
+    )
 
     setup_additional_sources()
 
@@ -537,9 +614,7 @@ with buster_app:
         reveal_app,
         outputs=[accept_terms_group, user_input, submit]
     )
-    # fmt: on
 
-    # fmt: off
     gr.on(
         triggers=[submit.click, user_input.submit],
         fn=add_user_question,
@@ -573,7 +648,7 @@ with buster_app:
         ]
     ).then(
         chat,
-        inputs=[chatbot],
+        inputs=[chatbot, settings_elems["reformulate_question_cbox"], settings_elems["top_k_slider"]],
         outputs=[chatbot, last_completion],
     ).then(
         add_disclaimer,
