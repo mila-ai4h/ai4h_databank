@@ -6,7 +6,7 @@ import gradio as gr
 import pandas as pd
 
 import src.cfg as cfg
-from buster.completers import Completion, UserInputs
+from buster.completers import Completion
 from src.app_utils import add_sources, get_session_id, get_utc_time
 from src.cfg import setup_buster
 from src.feedback import FeedbackForm, Interaction
@@ -206,23 +206,6 @@ def add_user_question(user_question: str, chat_history: Optional[ChatHistory] = 
     return chat_history
 
 
-def debug_completion(user_input, reformulate_question):
-    """Generate a debug completion."""
-    user_inputs = UserInputs(original_input=user_input)
-    if reformulate_question:
-        user_inputs.reformulated_input = "This is your reformulated question?"
-
-    completion = Completion(
-        user_inputs=user_inputs,
-        error=False,
-        matched_documents=[],
-        answer_generator="This is the answer you'd expect a User to see.",
-        question_relevant=True,
-        answer_relevant=True,
-    )
-    return completion
-
-
 def chat(chat_history: ChatHistory, reformulate_question: bool, top_k: Optional[int] = None):
     """Answer a user's question using retrieval augmented generation."""
 
@@ -234,10 +217,7 @@ def chat(chat_history: ChatHistory, reformulate_question: bool, top_k: Optional[
     # We assume that the question is the user's last interaction
     user_input = chat_history[-1][0]
 
-    if cfg.DEBUG:
-        completion = debug_completion(user_input, reformulate_question=reformulate_question)
-    else:
-        completion = buster.process_input(user_input, reformulate_question=reformulate_question, top_k=top_k)
+    completion = buster.process_input(user_input, reformulate_question=reformulate_question, top_k=top_k)
 
     if completion.question_relevant and not completion.error:
         if reformulate_question and user_input not in cfg.example_questions:
