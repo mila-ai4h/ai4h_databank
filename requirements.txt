@@ -1,4 +1,5 @@
-buster-doctalk==1.0.24
+# buster-doctalk==1.0.24
+git+https://github.com/jerpint/buster.git@openai-client#egg=buster-doctalk
 gradio==3.50.2
 pymongo==4.6.0
 gunicorn==21.2.0
