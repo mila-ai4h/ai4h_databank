@@ -9,10 +9,10 @@ from buster.completers import ChatGPTCompleter, DocumentAnswerer
 from buster.formatters.documents import DocumentsFormatterJSON
 from buster.formatters.prompts import PromptFormatter
 from buster.llm_utils import QuestionReformulator
+from buster.llm_utils.embeddings import get_openai_embedding_constructor
 from buster.retriever import Retriever, ServiceRetriever
 from buster.tokenizers import GPTTokenizer
 from buster.validators import Validator
-from buster.llm_utils.embeddings import get_openai_embedding_constructor
 from src.app_utils import get_logging_db_name, init_db
 
 logger = logging.getLogger(__name__)
