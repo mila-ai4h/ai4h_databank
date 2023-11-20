@@ -19,6 +19,7 @@ import copy
 import logging
 import random
 
+import numpy as np
 import pandas as pd
 import pytest
 from pinecone.core.exceptions import PineconeProtocolError
@@ -54,9 +55,9 @@ def busterbot(monkeypatch, run_expensive):
 
         # Patch question relevance call
         monkeypatch.setattr(Validator, "check_question_relevance", lambda s, q: (True, "mocked response"))
-        # Patch embedding call to avoid computing embeddings
-        monkeypatch.setattr(
-            ServiceRetriever, "get_embedding", lambda s, x, model: [random.random() for _ in range(EMBEDDING_LENGTH)]
+        # Use a fake embedding function
+        buster_cfg.retriever_cfg["embedding_fn"] = lambda _: np.array(
+            [random.random() for _ in range(EMBEDDING_LENGTH)]
         )
         # set thresh = 1 to be sure that no documents get retrieved
         buster_cfg.retriever_cfg["thresh"] = 1
