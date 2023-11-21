@@ -9,7 +9,6 @@ on:
 jobs:
   tests:
     uses: Mila-AI4H/ai4h_databank/.github/workflows/unit_tests.yaml@main
-    # TODO: Point back to main once merged. Github actions edge case
     secrets:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       OPENAI_ORG_ID: ${{ secrets.OPENAI_ORG_ID }}
