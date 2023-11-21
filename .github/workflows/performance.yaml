@@ -9,12 +9,12 @@ on:
         default: 3
         type: number
       validate_documents:
-        description: "Whether to validate documents using GPT"
+        description: "Validate documents using GPT"
         required: true
         default: false
         type: boolean
       hybrid_retrieval:
-        description: "Whether to use hybrid retrieval"
+        description: "Use hybrid retrieval"
         required: true
         default: false
         type: boolean
