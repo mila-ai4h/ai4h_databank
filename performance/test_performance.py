@@ -40,7 +40,7 @@ from buster.formatters.prompts import PromptFormatter
 from buster.retriever import ServiceRetriever
 from buster.tokenizers import GPTTokenizer
 from buster.validators import Validator
-from src import bm25, cfg
+from src import cfg
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -59,7 +59,7 @@ def busterbot(monkeypatch, run_expensive):
     if os.environ.get("HYBRID_RETRIEVAL", False):
         buster_cfg.retriever_cfg["sparse_embedding_fn"] = None
     else:
-        buster_cfg.retriever_cfg["sparse_embedding_fn"] = bm25.get_sparse_embedding_fn()
+        buster_cfg.retriever_cfg["sparse_embedding_fn"] = cfg.bm25.get_sparse_embedding_fn()
 
     if not run_expensive:
         random.seed(42)
