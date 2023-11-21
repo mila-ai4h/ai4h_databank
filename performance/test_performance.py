@@ -54,7 +54,7 @@ def busterbot(monkeypatch, run_expensive):
     buster_cfg = copy.deepcopy(cfg.buster_cfg)
 
     buster_cfg.validator_cfg["validate_documents"] = os.environ.get("VALIDATE_DOCUMENTS", False)
-    buster_cfg.retriever_cfg["top_k"] = os.environ.get("N_SOURCES", 3)
+    buster_cfg.retriever_cfg["top_k"] = int(os.environ.get("N_SOURCES", 3))
 
     if os.environ.get("HYBRID_RETRIEVAL", False):
         buster_cfg.retriever_cfg["sparse_embedding_fn"] = None
