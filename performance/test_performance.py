@@ -303,6 +303,10 @@ def evaluate_performance(busterbot):
     results = process_questions(busterbot, questions)
 
     markdown_summary = ""
+    markdown_summary += "# Options\n\n"
+    markdown_summary += f"VALIDATE_DOCUMENTS={os.environ.get('VALIDATE_DOCUMENTS', False)}\n"
+    markdown_summary += f"N_SOURCES={os.environ.get('N_SOURCES', 3)}\n"
+    markdown_summary += f"HYBRID_RETRIEVAL={os.environ.get('HYBRID_RETRIEVAL', False)}\n"
     markdown_summary = compute_summary(markdown_summary, results)
     markdown_summary = detect_according_to_the_documentation(markdown_summary, results)
     markdown_summary = measure_robustness(markdown_summary, results)
