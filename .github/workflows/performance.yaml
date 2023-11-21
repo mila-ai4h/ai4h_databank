@@ -1,7 +1,23 @@
 name: performance
 
-on: workflow_dispatch
-
+on: 
+  workflow_dispatch:
+    inputs:
+      n_sources:
+        description: "Number of sources to use"
+        required: true
+        default: 3
+        type: number
+      validate_documents:
+        description: "Whether to validate documents using GPT"
+        required: true
+        default: false
+        type: boolean
+      hybrid_retrieval:
+        description: "Whether to use hybrid retrieval"
+        required: true
+        default: false
+        type: boolean
 jobs:
   performance:
     runs-on: ubuntu-latest
@@ -16,6 +32,9 @@ jobs:
           PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
           INSTANCE_TYPE: dev
           INSTANCE_NAME: github-actions
+          N_SOURCES: ${{ github.event.inputs.n_sources }}
+          VALIDATE_DOCUMENTS: ${{ github.event.inputs.validate_documents }}
+          HYBRID_RETRIEVAL: ${{ github.event.inputs.hybrid_retrieval }}
         run: |
           python3 -m pip install --upgrade pip
           pip install -r requirements.txt

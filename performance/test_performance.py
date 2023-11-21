@@ -17,6 +17,7 @@ As artifacts, we generate two files:
 """
 import copy
 import logging
+import os
 import random
 
 import numpy as np
@@ -39,7 +40,7 @@ from buster.formatters.prompts import PromptFormatter
 from buster.retriever import ServiceRetriever
 from buster.tokenizers import GPTTokenizer
 from buster.validators import Validator
-from src import cfg
+from src import bm25, cfg
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -51,6 +52,15 @@ EMBEDDING_LENGTH = 1536
 @pytest.fixture
 def busterbot(monkeypatch, run_expensive):
     buster_cfg = copy.deepcopy(cfg.buster_cfg)
+
+    buster_cfg.validator_cfg["validate_documents"] = os.environ.get("VALIDATE_DOCUMENTS", False)
+    buster_cfg.retriever_cfg["top_k"] = os.environ.get("N_SOURCES", 3)
+
+    if os.environ.get("HYBRID_RETRIEVAL", False):
+        buster_cfg.retriever_cfg["sparse_embedding_fn"] = None
+    else:
+        buster_cfg.retriever_cfg["sparse_embedding_fn"] = bm25.get_sparse_embedding_fn()
+
     if not run_expensive:
         random.seed(42)
 
