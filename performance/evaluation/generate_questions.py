@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 
 # set openai creds
 openai.api_key = os.getenv("OPENAI_API_KEY")
-openai.organization = None  #  os.getenv("OPENAI_ORG_ID")
+openai.organization = os.getenv("OPENAI_ORG_ID")
 
 
 def split_questions(text: str):
