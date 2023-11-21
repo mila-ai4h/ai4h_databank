@@ -21,7 +21,7 @@ logging.basicConfig(level=logging.INFO)
 # Note: The app will not launch if the environment variables aren't set. This is intentional.
 # Set OpenAI Configurations
 openai.api_key = os.environ["OPENAI_API_KEY"]
-openai.organization = os.environ["OPENAI_ORGANIZATION"]
+openai.organization = os.environ["OPENAI_ORG_ID"]
 
 # the embedding function that will get used throughout the app
 embedding_fn = get_openai_embedding_constructor(
@@ -97,6 +97,8 @@ message_after_reformulation = (
 
 # default client config for OpenAI Completions
 client_kwargs = {
+    "api_key": os.environ["OPENAI_API_KEY"],
+    "organization": os.environ["OPENAI_ORG_ID"],
     "timeout": 10,
     "max_retries": 2,
 }
