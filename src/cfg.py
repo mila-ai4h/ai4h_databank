@@ -169,22 +169,22 @@ buster_cfg = BusterConfig(
     },
     completion_cfg={
         "completion_kwargs": {
-            "model": "gpt-3.5-turbo-0613",
+            "model": "gpt-3.5-turbo-1106",
             "stream": True,
             "temperature": 0,
         },
         "client_kwargs": client_kwargs,
     },
     tokenizer_cfg={
-        "model_name": "gpt-3.5-turbo-0613",
+        "model_name": "gpt-3.5-turbo-1106",
     },
     documents_formatter_cfg={
-        "max_tokens": 3500,
+        "max_tokens": 14500,
         "columns": ["content", "source", "title"],
     },
     question_reformulator_cfg={
         "completion_kwargs": {
-            "model": "gpt-3.5-turbo",
+            "model": "gpt-3.5-turbo-1106",
             "stream": False,
             "temperature": 0,
         },
@@ -193,7 +193,7 @@ buster_cfg = BusterConfig(
         Reformulate the question in a way that captures the original essence of the question while also adding more relevant details that can be useful in the context of semantic retrieval.""",
     },
     prompt_formatter_cfg={
-        "max_tokens": 4000,
+        "max_tokens": 15000,
         "text_before_docs": (
             "You are a chatbot assistant answering questions about artificial intelligence (AI) policies and laws. "
             "You represent the OECD AI Policy Observatory. "
