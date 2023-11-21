@@ -9,6 +9,7 @@ from buster.completers import ChatGPTCompleter, DocumentAnswerer
 from buster.formatters.documents import DocumentsFormatterJSON
 from buster.formatters.prompts import PromptFormatter
 from buster.llm_utils import QuestionReformulator
+from buster.llm_utils.embeddings import get_openai_embedding_constructor
 from buster.retriever import Retriever, ServiceRetriever
 from buster.tokenizers import GPTTokenizer
 from buster.validators import Validator
@@ -21,6 +22,11 @@ logging.basicConfig(level=logging.INFO)
 # Set OpenAI Configurations
 openai.api_key = os.environ["OPENAI_API_KEY"]
 openai.organization = os.environ["OPENAI_ORGANIZATION"]
+
+# the embedding function that will get used throughout the app
+embedding_fn = get_openai_embedding_constructor(
+    model="text-embedding-ada-002", client_kwargs={"timeout": 2, "max_retries": 2}
+)
 
 # Pinecone Configurations
 PINECONE_API_KEY = os.environ["PINECONE_API_KEY"]
@@ -89,6 +95,13 @@ message_after_reformulation = (
     "'\n\nThis is done automatically to increase performance of the tool. You can disable this in the Settings ⚙️ tab."
 )
 
+# default client config for OpenAI Completions
+client_kwargs = {
+    "timeout": 10,
+    "max_retries": 2,
+}
+
+
 buster_cfg = BusterConfig(
     validator_cfg={
         "use_reranking": True,  # Reranks documents according to generated answer
@@ -99,6 +112,7 @@ buster_cfg = BusterConfig(
                 "The information I have access to does not address the question",
             ],
             "unknown_threshold": 0.84,
+            "embedding_fn": embedding_fn,
         },
         "question_validator_cfg": {
             "invalid_question_response": """Thank you for your question! Unfortunately, I haven't been able to find the information you're looking for. Your question might be:
@@ -130,6 +144,7 @@ buster_cfg = BusterConfig(
                 "stream": False,
                 "temperature": 0,
             },
+            "client_kwargs": client_kwargs,
         },
     },
     retriever_cfg={
@@ -141,7 +156,7 @@ buster_cfg = BusterConfig(
         "mongo_db_name": MONGO_DATABASE_DATA,
         "top_k": 3,
         "thresh": 0.7,
-        "embedding_model": "text-embedding-ada-002",
+        "embedding_fn": embedding_fn,
     },
     documents_answerer_cfg={
         "no_documents_message": "No documents are available for this question.",
@@ -152,6 +167,7 @@ buster_cfg = BusterConfig(
             "stream": True,
             "temperature": 0,
         },
+        "client_kwargs": client_kwargs,
     },
     tokenizer_cfg={
         "model_name": "gpt-3.5-turbo-0613",
