@@ -90,7 +90,7 @@ disclaimer = f"""
 **Always verify the integrity of {app_name} responses using the sources provided below** 👇
 """
 
-message_before_reformulation = "I reformulated your answer to: '"
+message_before_reformulation = "I reformulated your question to: '"
 message_after_reformulation = (
     "'\n\nThis is done automatically to increase performance of the tool. You can disable this in the Settings ⚙️ tab."
 )
