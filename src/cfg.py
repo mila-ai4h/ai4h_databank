@@ -72,7 +72,7 @@ data_dir = current_dir.parent / "data"  # ../data
 app_name = "SAI ️💬"
 
 # User settings default values
-reveal_user_settings = False  # Wheter to display settings to the user or not
+reveal_user_settings = True  # Wheter to display settings to the user or not
 max_sources = 15  # maximum number of sources that can be set by a user for retrieval
 reformulate_question = False  # Default setting for reformulating a user's question
 
