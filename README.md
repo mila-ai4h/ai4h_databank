@@ -141,6 +141,9 @@ To manually deploy the app to huggingface spaces, you can use the script in `scr
 sh scripts/deploy_hf_space.sh dev
 ```
 
+#### Automatic evaluation
+
+TODO
 
 ## Configuring the App
 
@@ -152,17 +155,49 @@ Refer to Buster documentation to learn more about customizing and adding feature
 
 The frontend is all powered by Gradio's interface. The app layout is mainly found in `src/buster/buster_app.py`. Note that app development was done using gradio v3. During the latest stages of the app, gradio v4 was released, however it is not backwards compatible and introduced breaking changes in our app. We recommend for the time being to stick to the gradio version pinned in the `requirements.txt` version.
 
-## Chunk Management
+## Data Management
 
-We built our own chunk management service, which combines both pinecone and mongoDB. Pinecone is used exclusively as a vector store, and all metadata associated to vectors (contents, year, links, etc.) are indexed in mongodb.
+SAI requires two services to store the data. MongoDB is used to store the documents as well as their associated metadata (year, country, link, ...). Pinecone is a vector store and is meant only for storing the embeddings associated with each chunk, as well as an identifier to link it back to the correct document in MongoDB. 
 
-### Uploading Vectors to Pinecone
+### Uploading documents
 
-@hbertrand TODO
+Uploading documents is done through the script `script/upload_data.py`. The script expects the name of the MongoDB database to use, the name of the Pinecone namespace to use, and one or more files. It is highly recommended to use the same name for the MongoDB database and the Pinecone namespace, for easier versioning. The current convention is `data-YYYY-MM-DD`.
 
-### Uploading Documents to MongoDB
+The files should be CSV files with tab delimiters. Each row should be a chunk, of no more than 500 tokens. If some chunks are bigger than 500 tokens, they will be cut in smaller chunks at the token level. 
 
-@hbertrand TODO
+The number of words that fit in 500 tokens depends on the alphabet and the language. For english, 500 tokens is around 750 words. For other languages using the latin alphabet, 500 tokens is often a bit less than 750 words. Non-latin alphabets have very different limits.
+
+The minimum expected columns of the files are: content, url, title, source, country, year. They are required because they are used in various ways throughout SAI. Additional columns will be stored as metadata in MongoDB, but ignored otherwise.
+
+The process of uploading documents is as follows:
+- Check that all chunks are less than 500 tokens, and cut them if necessary.
+- Check that all required columns are present.
+- Compute the embeddings.
+- Upload all the chunks to MongoDB, and retrieve their unique identifiers.
+- Upload all the embeddings to Pinecone, with their MongoDB identifiers.
+
+### Deleting documents
+
+Deleting documents is done through the script `scripts/delete_data.py`. The script expects the name of the MongoDB database to use, the name of the Pinecone namespace to use, and either a `--source` argument followed by a name, or the `--all` argument.
+
+If specifying a source, all documents from that source will be deleted, in both MongoDB and Pinecone.
+
+If deleting all documents, the specified Pinecone namespace will be deleted. The specified MongoDB database cannot be deleted automatically through a normal API key, and must be manually deleted on the web UI. The script will remind you of that point.
+
+
+### Switching to a new version of the data
+
+To change the version of the data that is being used, specify the desired `PINECONE_NAMESPACE` and `MONGO_DATABASE_DATA` in `src/cfg.py`.
+
+
+### How to backup a database
+
+Useful commands to make a local backup of a database:
+
+```sh
+mongodump --archive="backup-ai4h-databank-prod-2023-09-29" --db="ai4h-databank-prod" --uri="mongodb+srv://ai4h-databank-dev.m0zt2w2.mongodb.net/" --username miladatabank
+mongorestore --archive="backup-ai4h-databank-prod-2023-09-29" --nsFrom='ai4h-databank-prod.*' --nsTo='backup-ai4h-databank-prod-2023-09-29.*' --uri="mongodb+srv://ai4h-databank-dev.m0zt2w2.mongodb.net/" --username miladatabank
+```
 
 ## Logging and Feedback
 
@@ -198,9 +233,13 @@ On huggingface, system logs are ephemeral. You can view the logs in real time di
 
 On heroku, we use papertrail to capture and store system logs. This needs to be setup for the app directly on heroku using their plugin store.
 
-## How to backup a database
 
-```sh
-mongodump --archive="backup-ai4h-databank-prod-2023-09-29" --db="ai4h-databank-prod" --uri="mongodb+srv://ai4h-databank-dev.m0zt2w2.mongodb.net/" --username miladatabank
-mongorestore --archive="backup-ai4h-databank-prod-2023-09-29" --nsFrom='ai4h-databank-prod.*' --nsTo='backup-ai4h-databank-prod-2023-09-29.*' --uri="mongodb+srv://ai4h-databank-dev.m0zt2w2.mongodb.net/" --username miladatabank
-```
+## Experimental features
+
+TODO
+
+- Question reformulation
+- Documents validation
+- Number of sources
+- Hybrid retrieval
+- Finetuning
