@@ -159,15 +159,19 @@ The frontend is all powered by Gradio's interface. The app layout is mainly foun
 
 SAI requires two services to store the data. MongoDB is used to store the documents as well as their associated metadata (year, country, link, ...). Pinecone is a vector store and is meant only for storing the embeddings associated with each chunk, as well as an identifier to link it back to the correct document in MongoDB. 
 
+The rest of the data (logging, interactions, feedback) is detailed in the section [Logging and Feedback](#logging-and-feedback).
+
 ### Uploading documents
 
 Uploading documents is done through the script `script/upload_data.py`. The script expects the name of the MongoDB database to use, the name of the Pinecone namespace to use, and one or more files. It is highly recommended to use the same name for the MongoDB database and the Pinecone namespace, for easier versioning. The current convention is `data-YYYY-MM-DD`.
 
-The files should be CSV files with tab delimiters. Each row should be a chunk, of no more than 500 tokens. If some chunks are bigger than 500 tokens, they will be cut in smaller chunks at the token level. 
+The files should be CSV files with tab delimiters. Each row should be a chunk, of no more than 1000 tokens. If some chunks are bigger than 1000 tokens, they will be cut in smaller chunks at the token level. 
 
-The number of words that fit in 500 tokens depends on the alphabet and the language. For english, 500 tokens is around 750 words. For other languages using the latin alphabet, 500 tokens is often a bit less than 750 words. Non-latin alphabets have very different limits.
+The number of words that fit in 1000 tokens depends on the alphabet and the language. For english, 1000 tokens is around 1500 words. For other languages using the latin alphabet, 1000 tokens is often a bit less than 1500 words. Non-latin alphabets have very different limits.
 
-The minimum expected columns of the files are: content, url, title, source, country, year. They are required because they are used in various ways throughout SAI. Additional columns will be stored as metadata in MongoDB, but ignored otherwise.
+The token limit can be changed with the `--token_limit_per_chunk` argument.
+
+The minimum expected columns of the files are: content, url, title, source, country, year. They are required because they are used in various ways throughout SAI. Additional columns will be stored as metadata in MongoDB, but ignored otherwise. An example of a valid file is provided in `data/example_chunks.csv`.
 
 The process of uploading documents is as follows:
 - Check that all chunks are less than 500 tokens, and cut them if necessary.
@@ -184,10 +188,28 @@ If specifying a source, all documents from that source will be deleted, in both 
 
 If deleting all documents, the specified Pinecone namespace will be deleted. The specified MongoDB database cannot be deleted automatically through a normal API key, and must be manually deleted on the web UI. The script will remind you of that point.
 
+### Example on how to upload one file, then delete the documents
+
+You will need to have setup the environment properly ([installed the dependencies](#install-the-dependencies) and [setup the environment variables](#environment-variables)).
+
+First, let's upload the example chunks in the Pinecone namespace `data-example` and the MongoDB database `data-example`:
+
+```sh
+python scripts/upload_data.py data-example data-example "data/example_chunks.csv"
+```
+
+If we now want to delete those documents, we can do:
+```sh
+python scripts/delete_data.py data-example data-example --all
+```
+
+This will delete the Pinecone namespace `data-example`. The MongoDB database `data-example` needs to be dropped manually from the web UI.
 
 ### Switching to a new version of the data
 
 To change the version of the data that is being used, specify the desired `PINECONE_NAMESPACE` and `MONGO_DATABASE_DATA` in `src/cfg.py`.
+
+If `PINECONE_NAMESPACE` and `MONGO_DATABASE_DATA` are not identical, a warning is raised when launching the app. 
 
 
 ### How to backup a database
