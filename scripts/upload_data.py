@@ -32,10 +32,10 @@ def upload_data(
     mongo_uri: str,
     mongo_db_data: str,
     dataframe: pd.DataFrame,
+    token_limit_per_chunk: int = 1000,
 ):
     # Make sure the chunks are not too big
     tokenizer = GPTTokenizer(buster_cfg.tokenizer_cfg["model_name"])
-    token_limit_per_chunk = 1000
     dataframe["content"] = dataframe["content"].apply(lambda x: chunk_text(x, tokenizer, token_limit_per_chunk))
     dataframe = dataframe.explode("content", ignore_index=True)
 
@@ -56,22 +56,37 @@ def upload_data(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Upload a CSV file containing chunks of data into the specified Pinecone namespace and Mongo database.\nUsage: python upload_data.py <pinecone_namespace> <mongo_db_name> <filepath>"
+        description="Upload one or more CSV files containing chunks of data into the specified Pinecone namespace and Mongo database.\nUsage: python upload_data.py <pinecone_namespace> <mongo_db_name> <filepaths> --token_limit_per_chunk <token_limit_per_chunk>"
     )
 
     parser.add_argument("pinecone_namespace", type=str, help="Pinecone namespace to use.")
     parser.add_argument("mongo_db_data", type=str, help="Name of the mongo database to store the data.")
     parser.add_argument(
-        "filepath", type=str, help="Path to the csv containing the chunks. Will be loaded as a pandas dataframe."
+        "filepaths",
+        type=str,
+        nargs="+",
+        help="Path to the csv containing the chunks. Will be loaded as a pandas dataframe.",
     )
+    parser.add_argument("--token_limit_per_chunk", type=int, default=1000, help="Token limit per chunk. Default: 1000")
 
     args = parser.parse_args()
 
     # These are the new names
     pinecone_namespace = args.pinecone_namespace
     mongo_db_data = args.mongo_db_data
+    token_limit_per_chunk = args.token_limit_per_chunk
 
     # Read data
-    df = pd.read_csv(args.filepath, delimiter="\t")
+    dataframes = [pd.read_csv(filepath, delimiter="\t") for filepath in args.filepaths]
+    combined_dataframe = pd.concat(dataframes, ignore_index=True)
 
-    upload_data(PINECONE_API_KEY, PINECONE_ENV, PINECONE_INDEX, pinecone_namespace, MONGO_URI, mongo_db_data, df)
+    upload_data(
+        PINECONE_API_KEY,
+        PINECONE_ENV,
+        PINECONE_INDEX,
+        pinecone_namespace,
+        MONGO_URI,
+        mongo_db_data,
+        combined_dataframe,
+        token_limit_per_chunk,
+    )
