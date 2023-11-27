@@ -25,6 +25,7 @@ log_cli = true
 log_cli_level = "INFO"
 addopts = [
     "--import-mode=importlib",
+    "--ignore=performance"
 ]
 
 [tool.hatch.metadata]
