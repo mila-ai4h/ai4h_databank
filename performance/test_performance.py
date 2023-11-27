@@ -22,6 +22,7 @@ import random
 import numpy as np
 import pandas as pd
 import pytest
+from joblib import Parallel, delayed
 from pinecone.core.exceptions import PineconeProtocolError
 from tenacity import (
     retry,
@@ -121,7 +122,10 @@ def process_questions(busterbot, questions: pd.DataFrame) -> pd.DataFrame:
             ],
         )
 
-    results = questions.apply(answer_question, axis=1)
+    results = Parallel(n_jobs=8, prefer="threads")(
+        delayed(answer_question)(question) for _, question in questions.iterrows()
+    )
+    results = pd.DataFrame(results)
     results.reset_index().to_csv("results_detailed.csv", index=False)
 
     return results
