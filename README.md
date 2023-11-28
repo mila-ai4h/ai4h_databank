@@ -153,7 +153,7 @@ The frontend is all powered by Gradio's interface. The app layout is mainly foun
 
 ## Data Management
 
-SAI requires two services to store the data. MongoDB is used to store the documents as well as their associated metadata (year, country, link, ...). Pinecone is a vector store and is meant only for storing the embeddings associated with each chunk, as well as an identifier to link it back to the correct document in MongoDB. 
+SAI requires two services to store the data. MongoDB is used to store the documents as well as their associated metadata (year, country, link, ...). Pinecone is a vector store and is meant only for storing the embeddings associated with each chunk, as well as an identifier to link it back to the correct document in MongoDB.
 
 The rest of the data (logging, interactions, feedback) is detailed in the section [Logging and Feedback](#logging-and-feedback).
 
@@ -161,7 +161,7 @@ The rest of the data (logging, interactions, feedback) is detailed in the sectio
 
 Uploading documents is done through the script `script/upload_data.py`. The script expects the name of the MongoDB database to use, the name of the Pinecone namespace to use, and one or more files. It is highly recommended to use the same name for the MongoDB database and the Pinecone namespace, for easier versioning. The current convention is `data-YYYY-MM-DD`.
 
-The files should be CSV files with tab delimiters. Each row should be a chunk, of no more than 1000 tokens. If some chunks are bigger than 1000 tokens, they will be cut in smaller chunks at the token level. 
+The files should be CSV files with tab delimiters. Each row should be a chunk, of no more than 1000 tokens. If some chunks are bigger than 1000 tokens, they will be cut in smaller chunks at the token level.
 
 The number of words that fit in 1000 tokens depends on the alphabet and the language. For english, 1000 tokens is around 1500 words. For other languages using the latin alphabet, 1000 tokens is often a bit less than 1500 words. Non-latin alphabets have very different limits.
 
@@ -205,7 +205,7 @@ This will delete the Pinecone namespace `data-example`. The MongoDB database `da
 
 To change the version of the data that is being used, specify the desired `PINECONE_NAMESPACE` and `MONGO_DATABASE_DATA` in `src/cfg.py`.
 
-If `PINECONE_NAMESPACE` and `MONGO_DATABASE_DATA` are not identical, a warning is raised when launching the app. 
+If `PINECONE_NAMESPACE` and `MONGO_DATABASE_DATA` are not identical, a warning is raised when launching the app.
 
 
 ### How to backup a database
@@ -289,10 +289,85 @@ Please note that the pipeline makes hundreds of calls to the API and may become 
 
 ## Experimental features
 
-TODO
+We have also built out a series of experimental features in the app that are not currently running in production. Here we describe how to activate some of these features. Here are the available features:
 
-- Question reformulation
-- Documents validation
-- Number of sources
-- Hybrid retrieval
-- Finetuning
+- Question reformulation: When a user asks a question, it gets reformulated to be more "optimized" for retrieval using chatGPT
+- Number of sources: A user can select how many sources to include in a query to chatGPT (default: 3)
+- Documents validation: Given a generated answer, for each source, do an entailment problem to find out which of the sources support the given answer. This is useful to filter out "less relevant" sources but comes at an added cost/latency.
+- Hybrid retrieval: Augment the retrieval process using BM25.
+- Finetuning: We support finetuning of the question validator using the OpenAI API.
+
+
+### Settings tab
+
+For some of these features, it might be useful to allow users to toggle them on/off.
+For that purpose, we have also added an optional 'Settings' tab that can be displayed to users.
+By default, the settings tab is invisible but can be revealed by setting the `reveal_user_settings = True` variable in the `cfg.py` file.
+
+Currently, the settings tab supports 2 features, namely question reformulation (on/off) and number of sources (a slider).
+
+
+### Question Reformulation
+
+Question reformulation can be turned on/off by setting the `reformulate_question = False` variable. This will set the default value in the settings tab. It can then be toggled by the user.
+
+To adapt question reformulation (prompts, model, settings, etc.), adapt the following in the `buster_cfg`:
+
+
+```python
+question_reformulator_cfg={
+    "completion_kwargs": {
+        "model": "gpt-3.5-turbo",
+        "stream": False,
+        "temperature": 0,
+    },
+    "system_prompt": """
+    Your role is to reformat a user's input into a question that is useful in the context of a semantic retrieval system.
+    Reformulate the question in a way that captures the original essence of the question while also adding more relevant details that can be useful in the context of semantic retrieval.""",
+},
+```
+
+In the app, when the feature is set to on, an additional message will get printed showing the question reformulation. You can edit this message by setting the variables in `cfg.py`:
+
+```python
+message_before_reformulation = "I reformulated your answer to: '"
+message_after_reformulation = (
+    "'\n\nThis is done automatically to increase performance of the tool. You can disable this in the Settings ⚙️ tab."
+)
+```
+
+### Number of sources
+
+We support passing an arbitrary number of sources in the retrieval process. However, note that the number of sources combined into the prompt must not exceed the allowed token count. Be sure to properly account for the number of tokens and adjust the parameters for generation accordingly. By default, we support 3 sources. This value can be adjusted in the `top_k` setting in the `buster_cfg.retriever_cfg`
+
+### Documents validation
+
+Retrieval always selects `top_k` sources, and while we set a threshold for cosine similarity, it is a value which tends to allow for a lot of false positives. In some circumstances, it might be useful to identify which sources support the generated answer. To do so, we've implemented a validation check where a call is made for each source to ChatGPT to obtain a boolean of relevance. To enable it, set:
+
+```python
+validator_cfg={
+    "validate_documents": True,  # Validates documents using chatGPT (expensive). Off by default
+}
+```
+
+Note that this will increase cost and latency to the response.
+Also note that while you can enable this feature, currently it will only perform the computation, but not act on it.
+To access the result of the computation, you can access it in the `completion.matched_documents['relevant']` column (`matched_documents` is a pandas dataframe and relevant is the column with the computed boolean).
+You must then implement logic to decide how to act on this information (e.g. filtering out only relevant sources.)
+
+### Finetuning
+
+Note that it is possible to finetune models using the OpenAI API. A great use-case for this is for the `question_validator`, where we can collect user questions and annotate them as 'relevant', 'not relevant' and run a finetune on that.
+
+To replace the model for the finetuned one, simply adapt the `completion_kwargs`:
+
+```
+{
+    'model': FINETUNED_MODEL
+}
+```
+
+
+### Hybrid retrieval
+
+TODO @hbertrand
