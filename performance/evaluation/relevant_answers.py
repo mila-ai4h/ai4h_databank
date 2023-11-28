@@ -12,7 +12,7 @@ from src import cfg
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-openai.organization = os.getenv("OPENAI_ORGANIZATION")
+openai.organization = os.getenv("OPENAI_ORG_ID")
 
 # for iterating over df
 tqdm.pandas()

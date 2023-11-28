@@ -19,8 +19,10 @@ import copy
 import logging
 import random
 
+import numpy as np
 import pandas as pd
 import pytest
+from joblib import Parallel, delayed
 from pinecone.core.exceptions import PineconeProtocolError
 from tenacity import (
     retry,
@@ -54,9 +56,9 @@ def busterbot(monkeypatch, run_expensive):
 
         # Patch question relevance call
         monkeypatch.setattr(Validator, "check_question_relevance", lambda s, q: (True, "mocked response"))
-        # Patch embedding call to avoid computing embeddings
-        monkeypatch.setattr(
-            ServiceRetriever, "get_embedding", lambda s, x, model: [random.random() for _ in range(EMBEDDING_LENGTH)]
+        # Use a fake embedding function
+        buster_cfg.retriever_cfg["embedding_fn"] = lambda _: np.array(
+            [random.random() for _ in range(EMBEDDING_LENGTH)]
         )
         # set thresh = 1 to be sure that no documents get retrieved
         buster_cfg.retriever_cfg["thresh"] = 1
@@ -120,7 +122,10 @@ def process_questions(busterbot, questions: pd.DataFrame) -> pd.DataFrame:
             ],
         )
 
-    results = questions.apply(answer_question, axis=1)
+    results = Parallel(n_jobs=8, prefer="threads")(
+        delayed(answer_question)(question) for _, question in questions.iterrows()
+    )
+    results = pd.DataFrame(results)
     results.reset_index().to_csv("results_detailed.csv", index=False)
 
     return results

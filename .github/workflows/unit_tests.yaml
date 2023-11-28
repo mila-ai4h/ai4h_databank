@@ -10,7 +10,7 @@ on:
     secrets:
       OPENAI_API_KEY:
         required: true
-      OPENAI_ORGANIZATION:
+      OPENAI_ORG_ID:
         required: true
       HF_TOKEN:
         required: true
@@ -39,7 +39,7 @@ jobs:
       - name: unit tests
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_ORGANIZATION: ${{ secrets.OPENAI_ORGANIZATION }}
+          OPENAI_ORG_ID: ${{ secrets.OPENAI_ORG_ID }}
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           MONGO_URI: ${{ secrets.MONGO_URI }}
           INSTANCE_TYPE: test

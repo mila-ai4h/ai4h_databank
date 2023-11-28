@@ -8,6 +8,8 @@ from buster.busterbot import Buster, BusterConfig
 from buster.completers import ChatGPTCompleter, DocumentAnswerer
 from buster.formatters.documents import DocumentsFormatterJSON
 from buster.formatters.prompts import PromptFormatter
+from buster.llm_utils import QuestionReformulator
+from buster.llm_utils.embeddings import get_openai_embedding_constructor
 from buster.retriever import Retriever, ServiceRetriever
 from buster.tokenizers import GPTTokenizer
 from buster.validators import Validator
@@ -19,7 +21,12 @@ logging.basicConfig(level=logging.INFO)
 # Note: The app will not launch if the environment variables aren't set. This is intentional.
 # Set OpenAI Configurations
 openai.api_key = os.environ["OPENAI_API_KEY"]
-openai.organization = os.environ["OPENAI_ORGANIZATION"]
+openai.organization = os.environ["OPENAI_ORG_ID"]
+
+# the embedding function that will get used throughout the app
+embedding_fn = get_openai_embedding_constructor(
+    model="text-embedding-ada-002", client_kwargs={"timeout": 2, "max_retries": 2}
+)
 
 # Pinecone Configurations
 PINECONE_API_KEY = os.environ["PINECONE_API_KEY"]
@@ -64,6 +71,11 @@ data_dir = current_dir.parent / "data"  # ../data
 
 app_name = "SAI ️💬"
 
+# User settings default values
+reveal_user_settings = False  # Wheter to display settings to the user or not
+max_sources = 15  # maximum number of sources that can be set by a user for retrieval
+reformulate_question = False  # Default setting for reformulating a user's question
+
 # sample questions
 example_questions = [
     "Are there any AI policies related to AI adoption in the public sector in the UK?",
@@ -78,6 +90,20 @@ disclaimer = f"""
 **Always verify the integrity of {app_name} responses using the sources provided below** 👇
 """
 
+message_before_reformulation = "I reformulated your answer to: '"
+message_after_reformulation = (
+    "'\n\nThis is done automatically to increase performance of the tool. You can disable this in the Settings ⚙️ tab."
+)
+
+# default client config for OpenAI Completions
+client_kwargs = {
+    "api_key": os.environ["OPENAI_API_KEY"],
+    "organization": os.environ["OPENAI_ORG_ID"],
+    "timeout": 10,
+    "max_retries": 2,
+}
+
+
 buster_cfg = BusterConfig(
     validator_cfg={
         "use_reranking": True,  # Reranks documents according to generated answer
@@ -88,6 +114,7 @@ buster_cfg = BusterConfig(
                 "The information I have access to does not address the question",
             ],
             "unknown_threshold": 0.84,
+            "embedding_fn": embedding_fn,
         },
         "question_validator_cfg": {
             "invalid_question_response": """Thank you for your question! Unfortunately, I haven't been able to find the information you're looking for. Your question might be:
@@ -119,6 +146,7 @@ buster_cfg = BusterConfig(
                 "stream": False,
                 "temperature": 0,
             },
+            "client_kwargs": client_kwargs,
         },
     },
     retriever_cfg={
@@ -130,8 +158,7 @@ buster_cfg = BusterConfig(
         "mongo_db_name": MONGO_DATABASE_DATA,
         "top_k": 3,
         "thresh": 0.7,
-        "max_tokens": 3000,
-        "embedding_model": "text-embedding-ada-002",
+        "embedding_fn": embedding_fn,
     },
     documents_answerer_cfg={
         "no_documents_message": "No documents are available for this question.",
@@ -142,6 +169,7 @@ buster_cfg = BusterConfig(
             "stream": True,
             "temperature": 0,
         },
+        "client_kwargs": client_kwargs,
     },
     tokenizer_cfg={
         "model_name": "gpt-3.5-turbo-0613",
@@ -149,6 +177,16 @@ buster_cfg = BusterConfig(
     documents_formatter_cfg={
         "max_tokens": 3500,
         "columns": ["content", "source", "title"],
+    },
+    question_reformulator_cfg={
+        "completion_kwargs": {
+            "model": "gpt-3.5-turbo",
+            "stream": False,
+            "temperature": 0,
+        },
+        "system_prompt": """
+        Your role is to reformat a user's input into a question that is useful in the context of a semantic retrieval system.
+        Reformulate the question in a way that captures the original essence of the question while also adding more relevant details that can be useful in the context of semantic retrieval.""",
     },
     prompt_formatter_cfg={
         "max_tokens": 4000,
@@ -205,5 +243,12 @@ def setup_buster(buster_cfg):
     )
     validator = Validator(**buster_cfg.validator_cfg)
 
-    buster: Buster = Buster(retriever=retriever, document_answerer=document_answerer, validator=validator)
+    question_reformulator = QuestionReformulator(**buster_cfg.question_reformulator_cfg)
+
+    buster: Buster = Buster(
+        retriever=retriever,
+        document_answerer=document_answerer,
+        validator=validator,
+        question_reformulator=question_reformulator,
+    )
     return buster

@@ -9,6 +9,7 @@ import pandas as pd
 import pymongo
 from pymongo import MongoClient
 
+from buster.completers import Completion, UserInputs
 from buster.tokenizers import Tokenizer
 
 logger = logging.getLogger(__name__)
@@ -171,3 +172,20 @@ def add_sources(completion, max_sources: int):
         t = gr.Markdown(source, latex_delimiters=[], elem_classes="source", visible=visible)
         sources_textboxes.append(t)
     return sources_textboxes
+
+
+def debug_completion(user_input, reformulate_question):
+    """Generate a debug completion."""
+    user_inputs = UserInputs(original_input=user_input)
+    if reformulate_question:
+        user_inputs.reformulated_input = "This is your reformulated question?"
+
+    completion = Completion(
+        user_inputs=user_inputs,
+        error=False,
+        matched_documents=[],
+        answer_generator="This is the answer you'd expect a User to see.",
+        question_relevant=True,
+        answer_relevant=True,
+    )
+    return completion
