@@ -7,7 +7,7 @@ import pandas as pd
 import tiktoken
 from openai import OpenAI
 
-client = OpenAI(organization=os.environ["OPENAI_ORGANIZATION"])
+client = OpenAI()
 
 encoding = tiktoken.get_encoding("cl100k_base")
 
