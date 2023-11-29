@@ -142,7 +142,7 @@ buster_cfg = BusterConfig(
     Q:
     """,
             "completion_kwargs": {
-                "model": "gpt-3.5-turbo-0613",
+                "model": "ft:gpt-3.5-turbo-0613:oecd-ai:first-finetune:8LEyi8pG",
                 "stream": False,
                 "temperature": 0,
             },
