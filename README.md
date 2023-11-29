@@ -375,6 +375,8 @@ To replace the model for the finetuned one, simply adapt the `completion_kwargs`
 },
 ```
 
+Note that you need to be a member of the oecd-ai org to have access to the finetuned model.
+
 Evaluating it on the validation set shows the following results:
 
 ```
