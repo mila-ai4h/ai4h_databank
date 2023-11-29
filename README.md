@@ -256,11 +256,11 @@ On heroku, we use papertrail to capture and store system logs. This needs to be 
 
 ### Overview
 
-Some evaluations can be run automatically. A list of human validated questions is provided in `data/sample_questions.csv`, and an augmented list of questions is provided in `data/sample_questions_variants.csv`. 
+Some evaluations can be run automatically. A list of human validated questions is provided in `data/sample_questions.csv`, and an augmented list of questions is provided in `data/sample_questions_variants.csv`.
 
 The automated performance evaluation will provide some statistics on each category of question. The evaluation is only partial. The current version of the model performs very well on it. As such, it is useful to make sure performance of the system does not degrade when changing the model or features of the system. It is not enough to evaluate improvements. Human evaluation is necessary for this.
 
-#### Relevant 
+#### Relevant
 
 Questions that would be realistically asked by policy makers and lawyers, and whose answer should be in our knowledge base. Both the question and the answer should be relevant.
 
@@ -359,12 +359,27 @@ You must then implement logic to decide how to act on this information (e.g. fil
 
 Note that it is possible to finetune models using the OpenAI API. A great use-case for this is for the `question_validator`, where we can collect user questions and annotate them as 'relevant', 'not relevant' and run a finetune on that.
 
+We've included helper functions and sample data to help finetune  models on real user data.
+
+This can be found in the `src/finetuning/` folder.
+
+We've also already finetuned a model on the openai platform.
+
 To replace the model for the finetuned one, simply adapt the `completion_kwargs`:
 
+```python
+"completion_kwargs": {
+    "model": "ft:gpt-3.5-turbo-0613:oecd-ai:first-finetune:8LEyi8pG",
+    "stream": False,
+    "temperature": 0,
+},
 ```
-{
-    'model': FINETUNED_MODEL
-}
+
+Evaluating it on the validation set shows the following results:
+
+```
+Accuracy using vanilla gpt: 81.63%
+Accuracy using finetuned gpt: 89.80%
 ```
 
 
