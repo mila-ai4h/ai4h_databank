@@ -72,36 +72,34 @@ Q:
     },
 }
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
+    # Load the test dataset
+    df = parse_jsonl_to_dataframe("test_dataset.jsonl")
+    print(f"Number of test sampels: {len(df)}")
 
-# Load the test dataset
-df = parse_jsonl_to_dataframe("test_dataset.jsonl")
-print(f"Number of test sampels: {len(df)}")
+    # Load the finetuned model
+    cfg_ft = deepcopy(question_validator_cfg)
+    cfg_ft["completion_kwargs"]["model"] = "ft:gpt-3.5-turbo-0613:oecd-ai:first-finetune:8LEyi8pG"
+    qv_ft = QuestionValidator(**cfg_ft)
 
-# Load the finetuned model
-cfg_ft = deepcopy(question_validator_cfg)
-cfg_ft["completion_kwargs"]["model"] = "ft:gpt-3.5-turbo-0613:oecd-ai:first-finetune:8LEyi8pG"
-qv_ft = QuestionValidator(**cfg_ft)
+    # Load the original model
+    cfg_orig = deepcopy(question_validator_cfg)
+    cfg_orig["completion_kwargs"]["model"] = "gpt-3.5-turbo-0613"
+    qv_orig = QuestionValidator(**cfg_orig)
 
-# Load the original model
-cfg_orig = deepcopy(question_validator_cfg)
-cfg_orig["completion_kwargs"]["model"] = "gpt-3.5-turbo-0613"
-qv_orig = QuestionValidator(**cfg_orig)
+    # Compute predictions of original model
+    outputs = thread_map(qv_orig.check_question_relevance, df.user_input.to_list(), max_workers=4)
+    preds = [output[0] for output in outputs]  # Extract results
+    df["prediction_orig"] = preds
 
+    # Compute predictions of finetuned model
+    outputs = thread_map(qv_ft.check_question_relevance, df.user_input.to_list(), max_workers=4)
+    preds = [output[0] for output in outputs]  # Extract results
+    df["prediction_ft"] = preds
 
-# Compute predictions of original model
-outputs = thread_map(qv_orig.check_question_relevance, df.user_input.to_list(), max_workers=4)
-preds = [output[0] for output in outputs]  # Extract results
-df["prediction_orig"] = preds
+    # Compute accuracy
+    acc_orig = sum(df.prediction_orig == df.annotation) / len(df)
+    acc_ft = sum(df.prediction_ft == df.annotation) / len(df)
 
-# Compute predictions of finetuned model
-outputs = thread_map(qv_ft.check_question_relevance, df.user_input.to_list(), max_workers=4)
-preds = [output[0] for output in outputs]  # Extract results
-df["prediction_ft"] = preds
-
-# Compute accuracy
-acc_orig = sum(df.prediction_orig == df.annotation) / len(df)
-acc_ft = sum(df.prediction_ft == df.annotation) / len(df)
-
-print(f"Accuracy using vanilla gpt: {acc_orig:2.2%}")
-print(f"Accuracy using finetuned gpt: {acc_ft:2.2%}")
+    print(f"Accuracy using vanilla gpt: {acc_orig:2.2%}")
+    print(f"Accuracy using finetuned gpt: {acc_ft:2.2%}")
