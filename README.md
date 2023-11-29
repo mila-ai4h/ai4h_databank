@@ -378,7 +378,7 @@ To replace the model for the finetuned one, simply adapt the `completion_kwargs`
 Evaluating it on the validation set shows the following results:
 
 ```
-Accuracy using vanilla gpt: 81.63%
+Accuracy using vanilla gpt: 83.67%
 Accuracy using finetuned gpt: 89.80%
 ```
 
