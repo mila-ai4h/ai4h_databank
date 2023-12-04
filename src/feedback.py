@@ -193,7 +193,6 @@ def read_collection(
             flattened_interaction = Interaction.from_dict(interaction, feedback_cls=feedback_cls).flatten()
             flattened_interactions.append(flattened_interaction)
         except Exception as err:
-
             skipped_interactions.append(interaction)
 
     logger.info(f"Retrieved {len(flattened_interactions)} entries. Skipped {len(skipped_interactions)} entries")
