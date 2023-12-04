@@ -9,8 +9,8 @@ import pymongo
 from fastapi.encoders import jsonable_encoder
 from pyparsing import Optional
 
-from buster.completers.base import Completion
 from buster.completers import UserInputs
+from buster.completers.base import Completion
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -183,12 +183,12 @@ def read_collection(
     interactions = mongo_db[collection].find(filters)
     for interaction in interactions:
         try:
-            if user_input := interaction['user_completions'][0].get('user_input'):
+            if user_input := interaction["user_completions"][0].get("user_input"):
                 # We used to only have a single key for user input
                 # This changed when we introduced question reformulation.
                 # Only useful to maintain backwards compatibility with data collected previously
-                interaction['user_completions'][0]['user_inputs'] = UserInputs(user_input)
-                del interaction['user_completions'][0]['user_input']
+                interaction["user_completions"][0]["user_inputs"] = UserInputs(user_input)
+                del interaction["user_completions"][0]["user_input"]
 
             flattened_interaction = Interaction.from_dict(interaction, feedback_cls=feedback_cls).flatten()
             flattened_interactions.append(flattened_interaction)
