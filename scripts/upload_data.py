@@ -34,6 +34,7 @@ def upload_data(
     mongo_db_data: str,
     dataframe: pd.DataFrame,
     token_limit_per_chunk: int = 1000,
+    use_sparse_embeddings: bool = False,
 ):
     # Make sure the chunks are not too big
     tokenizer = GPTTokenizer(buster_cfg.tokenizer_cfg["model_name"])
@@ -43,12 +44,15 @@ def upload_data(
     # Rename link to url
     dataframe.rename(columns={"link": "url"}, inplace=True)
 
-    # Initialize BM25
-    bm25 = BM25()
-    bm25.fit(dataframe)
-    bm25.dump_params("bm25_params.json")
+    if use_sparse_embeddings:
+        # Initialize BM25
+        bm25 = BM25()
+        bm25.fit(dataframe)
+        bm25.dump_params("bm25_params.json")
 
-    sparse_embedding_fn = bm25.get_sparse_embedding_fn()
+        sparse_embedding_fn = bm25.get_sparse_embedding_fn()
+    else:
+        sparse_embedding_fn = None
 
     # Add the embeddings
     manager = DocumentsService(
