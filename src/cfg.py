@@ -31,8 +31,8 @@ embedding_fn = get_openai_embedding_constructor(
 # Pinecone Configurations
 PINECONE_API_KEY = os.environ["PINECONE_API_KEY"]
 PINECONE_ENV = "asia-southeast1-gcp"
-PINECONE_INDEX = "oecd-sparse"
-PINECONE_NAMESPACE = "data-2023-11-13"
+PINECONE_INDEX = "oecd"
+PINECONE_NAMESPACE = "data-2023-11-02"
 
 # MongoDB Configurations
 MONGO_URI = os.environ["MONGO_URI"]
@@ -43,7 +43,7 @@ INSTANCE_TYPE = os.environ["INSTANCE_TYPE"]  # e.g. ["dev", "prod", "local"]
 
 # MongoDB Databases
 MONGO_DATABASE_LOGGING = get_logging_db_name(INSTANCE_TYPE)  # Where all interactions will be stored
-MONGO_DATABASE_DATA = "data-2023-11-13"  # Where documents are stored
+MONGO_DATABASE_DATA = "data-2023-11-02"  # Where documents are stored
 
 # Check that data chunks are aligned on Mongo and Pinecone
 if MONGO_DATABASE_DATA != PINECONE_NAMESPACE:
@@ -64,9 +64,17 @@ MONGO_COLLECTION_FLAGGED = "flagged"  # Flagged interactions
 # Make the connections to the databases
 mongo_db = init_db(mongo_uri=MONGO_URI, db_name=MONGO_DATABASE_LOGGING)
 
+# To use hybrid retrieval, set HYBRID_RETRIEVAL = True
+# Update the pinecone index and namespace to the hybrid retrieval index
+# Update the mongo database to the hybrid retrieval database
+HYBRID_RETRIEVAL = False
 
-# Prepare BM25
-bm25 = BM25("bm25_params.json")
+# Get sparse embedding function
+if HYBRID_RETRIEVAL:
+    bm25 = BM25("src/bm25_params.json")
+    sparse_embedding_fn = bm25.get_sparse_embedding_fn()
+else:
+    sparse_embedding_fn = None
 
 # Set relative path to data dir
 current_dir = Path(__file__).resolve().parent
@@ -162,7 +170,7 @@ buster_cfg = BusterConfig(
         "top_k": 3,
         "thresh": 0.7,
         "embedding_fn": embedding_fn,
-        "sparse_embedding_fn": bm25.get_sparse_embedding_fn(),
+        "sparse_embedding_fn": sparse_embedding_fn,
     },
     documents_answerer_cfg={
         "no_documents_message": "No documents are available for this question.",
@@ -179,7 +187,7 @@ buster_cfg = BusterConfig(
         "model_name": "gpt-3.5-turbo-1106",
     },
     documents_formatter_cfg={
-        "max_tokens": 14500,
+        "max_tokens": 3500,
         "columns": ["content", "source", "title"],
     },
     question_reformulator_cfg={
@@ -193,7 +201,7 @@ buster_cfg = BusterConfig(
         Reformulate the question in a way that captures the original essence of the question while also adding more relevant details that can be useful in the context of semantic retrieval.""",
     },
     prompt_formatter_cfg={
-        "max_tokens": 15000,
+        "max_tokens": 4000,
         "text_before_docs": (
             "You are a chatbot assistant answering questions about artificial intelligence (AI) policies and laws. "
             "You represent the OECD AI Policy Observatory. "
