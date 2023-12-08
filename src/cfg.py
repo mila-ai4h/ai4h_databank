@@ -70,8 +70,8 @@ mongo_db = init_db(mongo_uri=MONGO_URI, db_name=MONGO_DATABASE_LOGGING)
 HYBRID_RETRIEVAL = False
 
 # Get sparse embedding function
+bm25 = BM25("src/bm25_params.json")
 if HYBRID_RETRIEVAL:
-    bm25 = BM25("src/bm25_params.json")
     sparse_embedding_fn = bm25.get_sparse_embedding_fn()
 else:
     sparse_embedding_fn = None
