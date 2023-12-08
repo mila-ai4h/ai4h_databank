@@ -57,9 +57,9 @@ def busterbot(monkeypatch, run_expensive):
     buster_cfg.retriever_cfg["top_k"] = int(os.environ.get("N_SOURCES", 3))
 
     if os.environ.get("HYBRID_RETRIEVAL", False):
-        buster_cfg.retriever_cfg["sparse_embedding_fn"] = None
-    else:
         buster_cfg.retriever_cfg["sparse_embedding_fn"] = cfg.bm25.get_sparse_embedding_fn()
+    else:
+        buster_cfg.retriever_cfg["sparse_embedding_fn"] = None
 
     if not run_expensive:
         random.seed(42)
