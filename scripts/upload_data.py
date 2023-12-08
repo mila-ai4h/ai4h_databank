@@ -4,6 +4,7 @@ from typing import Type
 import pandas as pd
 
 from buster.documents_manager import DocumentsService
+from buster.llm_utils import BM25, get_openai_embedding
 from buster.tokenizers import GPTTokenizer, Tokenizer
 from src.cfg import (
     MONGO_URI,
@@ -33,6 +34,7 @@ def upload_data(
     mongo_db_data: str,
     dataframe: pd.DataFrame,
     token_limit_per_chunk: int = 1000,
+    use_sparse_embeddings: bool = False,
 ):
     # Make sure the chunks are not too big
     tokenizer = GPTTokenizer(buster_cfg.tokenizer_cfg["model_name"])
@@ -42,6 +44,17 @@ def upload_data(
     # Rename link to url
     dataframe.rename(columns={"link": "url"}, inplace=True)
 
+    if use_sparse_embeddings:
+        # Initialize BM25
+        bm25 = BM25()
+        bm25.fit(dataframe)
+        bm25.dump_params("bm25_params.json")
+
+        sparse_embedding_fn = bm25.get_sparse_embedding_fn()
+    else:
+        sparse_embedding_fn = None
+
+    # Add the embeddings
     manager = DocumentsService(
         pinecone_api_key,
         pinecone_env,
@@ -51,7 +64,7 @@ def upload_data(
         mongo_db_data,
         required_columns=["content", "url", "title", "source", "country", "year"],
     )
-    manager.batch_add(dataframe)
+    manager.batch_add(dataframe, embedding_fn=get_openai_embedding, sparse_embedding_fn=sparse_embedding_fn)
 
 
 if __name__ == "__main__":

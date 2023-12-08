@@ -9,7 +9,7 @@ from buster.completers import ChatGPTCompleter, DocumentAnswerer
 from buster.formatters.documents import DocumentsFormatterJSON
 from buster.formatters.prompts import PromptFormatter
 from buster.llm_utils import QuestionReformulator
-from buster.llm_utils.embeddings import get_openai_embedding_constructor
+from buster.llm_utils.embeddings import BM25, get_openai_embedding_constructor
 from buster.retriever import Retriever, ServiceRetriever
 from buster.tokenizers import GPTTokenizer
 from buster.validators import Validator
@@ -64,6 +64,17 @@ MONGO_COLLECTION_FLAGGED = "flagged"  # Flagged interactions
 # Make the connections to the databases
 mongo_db = init_db(mongo_uri=MONGO_URI, db_name=MONGO_DATABASE_LOGGING)
 
+# To use hybrid retrieval, set HYBRID_RETRIEVAL = True
+# Update the pinecone index and namespace to the hybrid retrieval index
+# Update the mongo database to the hybrid retrieval database
+HYBRID_RETRIEVAL = False
+
+# Get sparse embedding function
+bm25 = BM25("src/bm25_params.json")
+if HYBRID_RETRIEVAL:
+    sparse_embedding_fn = bm25.get_sparse_embedding_fn()
+else:
+    sparse_embedding_fn = None
 
 # Set relative path to data dir
 current_dir = Path(__file__).resolve().parent
@@ -72,7 +83,7 @@ data_dir = current_dir.parent / "data"  # ../data
 app_name = "SAI ️💬"
 
 # User settings default values
-reveal_user_settings = False  # Wheter to display settings to the user or not
+reveal_user_settings = False  # Whether to display settings to the user or not
 max_sources = 15  # maximum number of sources that can be set by a user for retrieval
 reformulate_question = False  # Default setting for reformulating a user's question
 
@@ -159,20 +170,21 @@ buster_cfg = BusterConfig(
         "top_k": 3,
         "thresh": 0.7,
         "embedding_fn": embedding_fn,
+        "sparse_embedding_fn": sparse_embedding_fn,
     },
     documents_answerer_cfg={
         "no_documents_message": "No documents are available for this question.",
     },
     completion_cfg={
         "completion_kwargs": {
-            "model": "gpt-3.5-turbo-0613",
+            "model": "gpt-3.5-turbo-1106",
             "stream": True,
             "temperature": 0,
         },
         "client_kwargs": client_kwargs,
     },
     tokenizer_cfg={
-        "model_name": "gpt-3.5-turbo-0613",
+        "model_name": "gpt-3.5-turbo-1106",
     },
     documents_formatter_cfg={
         "max_tokens": 3500,
@@ -180,7 +192,7 @@ buster_cfg = BusterConfig(
     },
     question_reformulator_cfg={
         "completion_kwargs": {
-            "model": "gpt-3.5-turbo",
+            "model": "gpt-3.5-turbo-1106",
             "stream": False,
             "temperature": 0,
         },

@@ -17,6 +17,7 @@ As artifacts, we generate two files:
 """
 import copy
 import logging
+import os
 import random
 
 import numpy as np
@@ -51,6 +52,15 @@ EMBEDDING_LENGTH = 1536
 @pytest.fixture
 def busterbot(monkeypatch, run_expensive):
     buster_cfg = copy.deepcopy(cfg.buster_cfg)
+
+    buster_cfg.validator_cfg["validate_documents"] = os.environ.get("VALIDATE_DOCUMENTS", False)
+    buster_cfg.retriever_cfg["top_k"] = int(os.environ.get("N_SOURCES", 3))
+
+    if os.environ.get("HYBRID_RETRIEVAL", False):
+        buster_cfg.retriever_cfg["sparse_embedding_fn"] = cfg.bm25.get_sparse_embedding_fn()
+    else:
+        buster_cfg.retriever_cfg["sparse_embedding_fn"] = None
+
     if not run_expensive:
         random.seed(42)
 
@@ -293,6 +303,10 @@ def evaluate_performance(busterbot):
     results = process_questions(busterbot, questions)
 
     markdown_summary = ""
+    markdown_summary += "# Options\n\n"
+    markdown_summary += f"VALIDATE_DOCUMENTS={os.environ.get('VALIDATE_DOCUMENTS', False)}\n"
+    markdown_summary += f"N_SOURCES={os.environ.get('N_SOURCES', 3)}\n"
+    markdown_summary += f"HYBRID_RETRIEVAL={os.environ.get('HYBRID_RETRIEVAL', False)}\n"
     markdown_summary = compute_summary(markdown_summary, results)
     markdown_summary = detect_according_to_the_documentation(markdown_summary, results)
     markdown_summary = measure_robustness(markdown_summary, results)
