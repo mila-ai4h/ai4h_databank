@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 
 import openai
+from huggingface_hub import hf_hub_download
 
 from buster.busterbot import Buster, BusterConfig
 from buster.completers import ChatGPTCompleter, DocumentAnswerer
@@ -10,8 +11,9 @@ from buster.formatters.documents import DocumentsFormatterJSON
 from buster.formatters.prompts import PromptFormatter
 from buster.llm_utils import QuestionReformulator
 from buster.llm_utils.embeddings import get_openai_embedding_constructor
-from buster.retriever import Retriever, ServiceRetriever, DeepLakeRetriever
+from buster.retriever import DeepLakeRetriever, Retriever, ServiceRetriever
 from buster.tokenizers import GPTTokenizer
+from buster.utils import extract_zip
 from buster.validators import Validator
 from src.app_utils import get_logging_db_name, init_db
 
@@ -38,6 +40,24 @@ CHUNKS_VERSION = "data-2023-11-02"
 # Deeplake configuration
 deeplake_dir = current_dir.parent / "deeplake_data"  # ../data
 DEEPLAKE_VECTOR_STORE_PATH = os.path.join(deeplake_dir, CHUNKS_VERSION)
+HF_TOKEN = os.environ["HF_TOKEN"]
+HF_DATASET_REPO_ID = "mila-quebec/sai-data"
+HF_VECTOR_STORE_PATH = CHUNKS_VERSION + ".zip"
+
+
+def download_deeplake_vector_store():
+    """Downloads the vector store stored on the huggingface dataset."""
+
+    hf_hub_download(
+        repo_id=HF_DATASET_REPO_ID,
+        repo_type="dataset",
+        filename=HF_VECTOR_STORE_PATH,
+        local_dir=".",
+        local_dir_use_symlinks=False,
+    )
+
+    extract_zip(HF_VECTOR_STORE_PATH, DEEPLAKE_VECTOR_STORE_PATH)
+
 
 # Pinecone Configurations
 PINECONE_API_KEY = os.environ["PINECONE_API_KEY"]
@@ -248,6 +268,8 @@ buster_cfg = BusterConfig(
 
 
 def setup_buster(buster_cfg):
+
+    download_deeplake_vector_store()
     # retriever: Retriever = ServiceRetriever(**buster_cfg.retriever_cfg)
     retriever: Retriever = DeepLakeRetriever(**buster_cfg.retriever_cfg)
     tokenizer = GPTTokenizer(**buster_cfg.tokenizer_cfg)

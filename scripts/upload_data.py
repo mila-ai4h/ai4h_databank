@@ -3,19 +3,41 @@ import os
 from typing import Type
 
 import pandas as pd
+from huggingface_hub import HfApi
 
-from buster.documents_manager import DocumentsService, DeepLakeDocumentsManager
+from buster.documents_manager import DeepLakeDocumentsManager, DocumentsService
+from buster.llm_utils.embeddings import get_openai_embedding_constructor
 from buster.tokenizers import GPTTokenizer, Tokenizer
 from src.cfg import (
+    DEEPLAKE_VECTOR_STORE_PATH,
+    HF_DATASET_REPO_ID,
+    HF_TOKEN,
+    HF_VECTOR_STORE_PATH,
+    MONGO_DATABASE_DATA,
     MONGO_URI,
     PINECONE_API_KEY,
     PINECONE_ENV,
     PINECONE_INDEX,
-    DEEPLAKE_VECTOR_STORE_PATH,
     PINECONE_NAMESPACE,
-    MONGO_DATABASE_DATA,
     buster_cfg,
 )
+
+# the embedding function that will get used to embed documents the app
+embedding_fn = get_openai_embedding_constructor(model="text-embedding-ada-002", client_kwargs={"max_retries": 10})
+
+
+def upload_to_hf(path_or_fileobj):
+
+    print(f"Uploading {path_or_fileobj} to huggingface dataset {HF_DATASET_REPO_ID}")
+    api = HfApi()
+    api.create_repo(repo_id=HF_DATASET_REPO_ID, private=True, repo_type="dataset", token=HF_TOKEN, exist_ok=True)
+    api.upload_file(
+        repo_id=HF_DATASET_REPO_ID,
+        repo_type="dataset",
+        path_or_fileobj=path_or_fileobj,
+        path_in_repo=HF_VECTOR_STORE_PATH,
+        token=HF_TOKEN,
+    )
 
 
 def get_user_confirmation() -> bool:
@@ -60,12 +82,6 @@ def get_files_with_extensions(directory: str, extensions: list[str]) -> list[str
     return matching_files
 
 
-# Example usage
-# directory_to_search = "path/to/your/directory"
-# extensions_to_search = [".txt", ".csv"]
-# files = get_files_with_extensions(directory_to_search, extensions_to_search
-
-
 def chunk_text(text: str, tokenizer: Type[Tokenizer], token_limit: int) -> list[str]:
     tokens = tokenizer.encode(text)
     chunks = []
@@ -89,7 +105,11 @@ def upload_data(
     # Rename link to url
     dataframe.rename(columns={"link": "url"}, inplace=True)
 
-    manager.batch_add(dataframe)
+    manager.batch_add(
+        df=dataframe,
+        batch_size=2900,
+        embedding_fn=embedding_fn,
+    )
 
 
 def main():
@@ -124,17 +144,20 @@ def main():
 
     files_to_upload = get_files_to_upload(filepaths=args.filepaths, directory=args.directory)
 
+    # Read data
+    dataframes = [pd.read_csv(f, delimiter="\t") for f in files_to_upload]
+    combined_dataframe = pd.concat(dataframes, ignore_index=True)
+
     print(f"Files to be uploaded: {files_to_upload}")
+    print(
+        f"Total number of documents that will be computed: {len(combined_dataframe)}. Note that this number is approximate and might change based on 'token_limit_per_chunk'"
+    )
 
     confirmation = get_user_confirmation()
 
     if not confirmation:
         print("Aborted by user.")
         return
-
-    # Read data
-    dataframes = [pd.read_csv(f, delimiter="\t") for f in files_to_upload]
-    combined_dataframe = pd.concat(dataframes, ignore_index=True)
 
     if args.document_manager == "service":
         document_manager = DocumentsService(
@@ -174,13 +197,17 @@ def main():
             required_columns=["content", "url", "title", "source", "country", "year"],
         )
 
-        upload_data(
-            manager=document_manager,
-            dataframe=combined_dataframe,
-            token_limit_per_chunk=token_limit_per_chunk,
-        )
+        # upload_data(
+        #     manager=document_manager,
+        #     dataframe=combined_dataframe,
+        #     token_limit_per_chunk=token_limit_per_chunk,
+        # )
 
-        # Upload to huggingface data space?
+        zip_fname = document_manager.to_zip()
+
+        # Upload to huggingface data space
+        upload_to_hf(zip_fname)
+
     else:
         raise ValueError(f"document_manager must be one of ['deeplake', 'service']. Provided: {args.document_manager}")
 
