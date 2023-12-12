@@ -268,7 +268,6 @@ buster_cfg = BusterConfig(
 
 
 def setup_buster(buster_cfg):
-
     download_deeplake_vector_store()
     # retriever: Retriever = ServiceRetriever(**buster_cfg.retriever_cfg)
     retriever: Retriever = DeepLakeRetriever(**buster_cfg.retriever_cfg)

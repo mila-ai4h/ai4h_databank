@@ -27,7 +27,6 @@ embedding_fn = get_openai_embedding_constructor(model="text-embedding-ada-002", 
 
 
 def upload_to_hf(path_or_fileobj):
-
     print(f"Uploading {path_or_fileobj} to huggingface dataset {HF_DATASET_REPO_ID}")
     api = HfApi()
     api.create_repo(repo_id=HF_DATASET_REPO_ID, private=True, repo_type="dataset", token=HF_TOKEN, exist_ok=True)
