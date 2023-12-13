@@ -73,6 +73,8 @@ if RETRIEVER_TYPE == "deeplake":
     HF_VECTOR_STORE_PATH = CHUNKS_VERSION + ".zip"
 
     # Downloads the vector store from the huggingface dataset
+    # Note: Comment out the hf_hub_download and extract_zip when uploading data for the first time.
+    # Otherwise, the dataset/data will not exist yet and raise an error.
     hf_hub_download(
         repo_id=HF_DATASET_REPO_ID,
         repo_type="dataset",
