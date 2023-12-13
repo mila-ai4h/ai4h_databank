@@ -31,7 +31,5 @@ addopts = [
 [tool.hatch.metadata]
 allow-direct-references = true
 
-[tool.hatch.build.targets.sdist]
-include = [
-  "*.py",
-]
+[tool.hatch.build.targets.wheel]
+packages = ["src/"]
