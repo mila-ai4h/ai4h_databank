@@ -95,6 +95,9 @@ MONGO_COLLECTION_FLAGGED = "flagged"  # Flagged interactions
 # Make the connections to the databases
 mongo_db = init_db(mongo_uri=MONGO_URI, db_name=MONGO_DATABASE_LOGGING)
 
+# Fetch the deeplake vector store
+# Note: if it wasn't yet created, comment this out or it will raise an error...
+download_deeplake_vector_store()
 
 app_name = "SAI ️💬"
 
@@ -268,7 +271,6 @@ buster_cfg = BusterConfig(
 
 
 def setup_buster(buster_cfg):
-    download_deeplake_vector_store()
     # retriever: Retriever = ServiceRetriever(**buster_cfg.retriever_cfg)
     retriever: Retriever = DeepLakeRetriever(**buster_cfg.retriever_cfg)
     tokenizer = GPTTokenizer(**buster_cfg.tokenizer_cfg)
