@@ -8,25 +8,16 @@ from huggingface_hub import HfApi
 from buster.documents_manager import DeepLakeDocumentsManager, DocumentsService
 from buster.llm_utils.embeddings import get_openai_embedding_constructor
 from buster.tokenizers import GPTTokenizer, Tokenizer
-from src.cfg import (
-    DEEPLAKE_VECTOR_STORE_PATH,
-    HF_DATASET_REPO_ID,
-    HF_TOKEN,
-    HF_VECTOR_STORE_PATH,
-    MONGO_DATABASE_DATA,
-    MONGO_URI,
-    PINECONE_API_KEY,
-    PINECONE_ENV,
-    PINECONE_INDEX,
-    PINECONE_NAMESPACE,
-    buster_cfg,
-)
+from src.cfg import buster_cfg
 
 # the embedding function that will get used to embed documents the app
 embedding_fn = get_openai_embedding_constructor(model="text-embedding-ada-002", client_kwargs={"max_retries": 10})
 
 
 def upload_to_hf(path_or_fileobj):
+    # Get the details specified in cfg.py
+    from src.cfg import HF_DATASET_REPO_ID, HF_TOKEN, HF_VECTOR_STORE_PATH
+
     print(f"Uploading {path_or_fileobj} to huggingface dataset {HF_DATASET_REPO_ID}")
     api = HfApi()
     api.create_repo(repo_id=HF_DATASET_REPO_ID, private=True, repo_type="dataset", token=HF_TOKEN, exist_ok=True)
@@ -159,6 +150,16 @@ def main():
         return
 
     if args.document_manager == "service":
+        from src.cfg import (
+            DEEPLAKE_VECTOR_STORE_PATH,
+            MONGO_DATABASE_DATA,
+            MONGO_URI,
+            PINECONE_API_KEY,
+            PINECONE_ENV,
+            PINECONE_INDEX,
+            PINECONE_NAMESPACE,
+        )
+
         document_manager = DocumentsService(
             pinecone_api_key=PINECONE_API_KEY,
             pinecone_env=PINECONE_ENV,
