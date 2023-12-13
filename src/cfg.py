@@ -41,21 +41,6 @@ CHUNKS_VERSION = "data-2023-11-02"
 # Set to deeplake by default, can be overridden in env. variables
 RETRIEVER_TYPE = os.getenv("RETRIEVER_TYPE", "service")
 
-
-def download_deeplake_vector_store():
-    """Downloads the vector store stored on the huggingface dataset."""
-
-    hf_hub_download(
-        repo_id=HF_DATASET_REPO_ID,
-        repo_type="dataset",
-        filename=HF_VECTOR_STORE_PATH,
-        local_dir=".",
-        local_dir_use_symlinks=False,
-    )
-
-    extract_zip(HF_VECTOR_STORE_PATH, DEEPLAKE_VECTOR_STORE_PATH)
-
-
 # MongoDB Configurations
 MONGO_URI = os.environ["MONGO_URI"]
 
@@ -77,15 +62,29 @@ mongo_db = init_db(mongo_uri=MONGO_URI, db_name=MONGO_DATABASE_LOGGING)
 
 
 if RETRIEVER_TYPE == "deeplake":
-    # Deeplake configuration
+    # The class we will use to instantiate the retriever
+    retriever_cls = DeepLakeRetriever
+
+    # Deeplake Configurations
     deeplake_dir = current_dir.parent / "deeplake_data"  # ../data
     DEEPLAKE_VECTOR_STORE_PATH = os.path.join(deeplake_dir, CHUNKS_VERSION)
     HF_TOKEN = os.environ["HF_TOKEN"]
     HF_DATASET_REPO_ID = "mila-quebec/sai-data"
     HF_VECTOR_STORE_PATH = CHUNKS_VERSION + ".zip"
 
-    download_deeplake_vector_store()
+    # Downloads the vector store from the huggingface dataset
+    hf_hub_download(
+        repo_id=HF_DATASET_REPO_ID,
+        repo_type="dataset",
+        filename=HF_VECTOR_STORE_PATH,
+        local_dir=".",
+        local_dir_use_symlinks=False,
+    )
 
+    # extracts the deeplake dataset to the specified path
+    extract_zip(HF_VECTOR_STORE_PATH, DEEPLAKE_VECTOR_STORE_PATH)
+
+    # Configuration for buster_cfg
     retriever_cfg = {
         # deeplake cfg
         "path": DEEPLAKE_VECTOR_STORE_PATH,
@@ -94,9 +93,9 @@ if RETRIEVER_TYPE == "deeplake":
         "embedding_fn": embedding_fn,
     }
 
-    retriever_cls = DeepLakeRetriever
 
 elif RETRIEVER_TYPE == "service":
+    # The class we will use to instantiate the retriever
     retriever_cls = ServiceRetriever
 
     # Pinecone Configurations
@@ -118,6 +117,7 @@ elif RETRIEVER_TYPE == "service":
             """
         )
 
+    # Configuration for buster_cfg
     retriever_cfg = {
         # service retriever cfg
         "pinecone_api_key": PINECONE_API_KEY,
@@ -134,9 +134,6 @@ elif RETRIEVER_TYPE == "service":
 else:
     raise ValueError(f"RETRIEVER_TYPE must be in ['deeplake', 'service']. Provided: {RETRIEVER_TYPE}")
 
-
-# Fetch the deeplake vector store
-# Note: if it wasn't yet created, comment this out or it will raise an error...
 
 app_name = "SAI ️💬"
 
