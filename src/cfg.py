@@ -37,12 +37,9 @@ embedding_fn = get_openai_embedding_constructor(
 
 CHUNKS_VERSION = "data-2023-11-02"
 
-# Deeplake configuration
-deeplake_dir = current_dir.parent / "deeplake_data"  # ../data
-DEEPLAKE_VECTOR_STORE_PATH = os.path.join(deeplake_dir, CHUNKS_VERSION)
-HF_TOKEN = os.environ["HF_TOKEN"]
-HF_DATASET_REPO_ID = "mila-quebec/sai-data"
-HF_VECTOR_STORE_PATH = CHUNKS_VERSION + ".zip"
+# One of "deeplake", "service" , service == pinecone/mongodb retriever
+# Set to deeplake by default, can be overridden in env. variables
+RETRIEVER_TYPE = os.getenv("RETRIEVER_TYPE", "service")
 
 
 def download_deeplake_vector_store():
@@ -59,12 +56,6 @@ def download_deeplake_vector_store():
     extract_zip(HF_VECTOR_STORE_PATH, DEEPLAKE_VECTOR_STORE_PATH)
 
 
-# Pinecone Configurations
-PINECONE_API_KEY = os.environ["PINECONE_API_KEY"]
-PINECONE_ENV = "asia-southeast1-gcp"
-PINECONE_INDEX = "oecd"
-PINECONE_NAMESPACE = CHUNKS_VERSION
-
 # MongoDB Configurations
 MONGO_URI = os.environ["MONGO_URI"]
 
@@ -74,17 +65,6 @@ INSTANCE_TYPE = os.environ["INSTANCE_TYPE"]  # e.g. ["dev", "prod", "local"]
 
 # MongoDB Databases
 MONGO_DATABASE_LOGGING = get_logging_db_name(INSTANCE_TYPE)  # Where all interactions will be stored
-MONGO_DATABASE_DATA = CHUNKS_VERSION  # Where documents are stored
-
-# Check that data chunks are aligned on Mongo and Pinecone
-if MONGO_DATABASE_DATA != PINECONE_NAMESPACE:
-    logger.warning(
-        f"""The collection is different on pinecone and Mongo, is this expected?
-
-        {MONGO_DATABASE_DATA=}
-        {PINECONE_NAMESPACE=}
-        """
-    )
 
 # MongoDB Collections
 # Naming convention: Collection name followed by purpose.
@@ -95,9 +75,68 @@ MONGO_COLLECTION_FLAGGED = "flagged"  # Flagged interactions
 # Make the connections to the databases
 mongo_db = init_db(mongo_uri=MONGO_URI, db_name=MONGO_DATABASE_LOGGING)
 
+
+if RETRIEVER_TYPE == "deeplake":
+    # Deeplake configuration
+    deeplake_dir = current_dir.parent / "deeplake_data"  # ../data
+    DEEPLAKE_VECTOR_STORE_PATH = os.path.join(deeplake_dir, CHUNKS_VERSION)
+    HF_TOKEN = os.environ["HF_TOKEN"]
+    HF_DATASET_REPO_ID = "mila-quebec/sai-data"
+    HF_VECTOR_STORE_PATH = CHUNKS_VERSION + ".zip"
+
+    download_deeplake_vector_store()
+
+    retriever_cfg = {
+        # deeplake cfg
+        "path": DEEPLAKE_VECTOR_STORE_PATH,
+        "top_k": 3,
+        "thresh": 0.7,
+        "embedding_fn": embedding_fn,
+    }
+
+    retriever_cls = DeepLakeRetriever
+
+elif RETRIEVER_TYPE == "service":
+    retriever_cls = ServiceRetriever
+
+    # Pinecone Configurations
+    PINECONE_API_KEY = os.environ["PINECONE_API_KEY"]
+    PINECONE_ENV = "asia-southeast1-gcp"
+    PINECONE_INDEX = "oecd"
+    PINECONE_NAMESPACE = CHUNKS_VERSION
+
+    # Where chunk metadata is stored on Mongodb
+    MONGO_DATABASE_DATA = CHUNKS_VERSION  # Where documents are stored
+
+    # Check that data chunks are aligned on Mongo and Pinecone
+    if MONGO_DATABASE_DATA != PINECONE_NAMESPACE:
+        logger.warning(
+            f"""The collection is different on pinecone and Mongo, is this expected?
+
+            {MONGO_DATABASE_DATA=}
+            {PINECONE_NAMESPACE=}
+            """
+        )
+
+    retriever_cfg = {
+        # service retriever cfg
+        "pinecone_api_key": PINECONE_API_KEY,
+        "pinecone_env": PINECONE_ENV,
+        "pinecone_index": PINECONE_INDEX,
+        "pinecone_namespace": PINECONE_NAMESPACE,
+        "mongo_uri": MONGO_URI,
+        "mongo_db_name": MONGO_DATABASE_DATA,
+        "top_k": 3,
+        "thresh": 0.7,
+        "embedding_fn": embedding_fn,
+    }
+
+else:
+    raise ValueError(f"RETRIEVER_TYPE must be in ['deeplake', 'service']. Provided: {RETRIEVER_TYPE}")
+
+
 # Fetch the deeplake vector store
 # Note: if it wasn't yet created, comment this out or it will raise an error...
-download_deeplake_vector_store()
 
 app_name = "SAI ️💬"
 
@@ -179,25 +218,7 @@ buster_cfg = BusterConfig(
             "client_kwargs": client_kwargs,
         },
     },
-    retriever_cfg={
-        # deeplake cfg
-        "path": DEEPLAKE_VECTOR_STORE_PATH,
-        "top_k": 3,
-        "thresh": 0.7,
-        "embedding_fn": embedding_fn,
-    },
-    # retriever_cfg={
-    #     # service retriever cfg
-    #     "pinecone_api_key": PINECONE_API_KEY,
-    #     "pinecone_env": PINECONE_ENV,
-    #     "pinecone_index": PINECONE_INDEX,
-    #     "pinecone_namespace": PINECONE_NAMESPACE,
-    #     "mongo_uri": MONGO_URI,
-    #     "mongo_db_name": MONGO_DATABASE_DATA,
-    #     "top_k": 3,
-    #     "thresh": 0.7,
-    #     "embedding_fn": embedding_fn,
-    # },
+    retriever_cfg=retriever_cfg,
     documents_answerer_cfg={
         "no_documents_message": "No documents are available for this question.",
     },
@@ -271,8 +292,7 @@ buster_cfg = BusterConfig(
 
 
 def setup_buster(buster_cfg):
-    # retriever: Retriever = ServiceRetriever(**buster_cfg.retriever_cfg)
-    retriever: Retriever = DeepLakeRetriever(**buster_cfg.retriever_cfg)
+    retriever: Retriever = retriever_cls(**buster_cfg.retriever_cfg)
     tokenizer = GPTTokenizer(**buster_cfg.tokenizer_cfg)
     document_answerer: DocumentAnswerer = DocumentAnswerer(
         completer=ChatGPTCompleter(**buster_cfg.completion_cfg),
