@@ -196,11 +196,11 @@ def main():
             required_columns=["content", "url", "title", "source", "country", "year"],
         )
 
-        # upload_data(
-        #     manager=document_manager,
-        #     dataframe=combined_dataframe,
-        #     token_limit_per_chunk=token_limit_per_chunk,
-        # )
+        upload_data(
+            manager=document_manager,
+            dataframe=combined_dataframe,
+            token_limit_per_chunk=token_limit_per_chunk,
+        )
 
         zip_fname = document_manager.to_zip()
 
