@@ -278,7 +278,7 @@ def log_completion(
         session_id=session_id,
         instance_name=instance_name,
         instance_type=instance_type,
-        data_version=cfg.MONGO_DATABASE_DATA,
+        data_version=cfg.CHUNKS_VERSION,
     )
     interaction.send(mongo_db, collection=collection)
 
