@@ -8,7 +8,7 @@ from huggingface_hub import HfApi
 from buster.documents_manager import DeepLakeDocumentsManager, DocumentsService
 from buster.llm_utils.embeddings import get_openai_embedding_constructor
 from buster.tokenizers import GPTTokenizer, Tokenizer
-from src.cfg import buster_cfg
+from src.cfg import RETRIEVER_TYPE, buster_cfg
 
 # the embedding function that will get used to embed documents in the app
 embedding_fn = get_openai_embedding_constructor(model="text-embedding-ada-002", client_kwargs={"max_retries": 10})
@@ -153,12 +153,6 @@ def main():
         default=None,
     )
     parser.add_argument("--token_limit_per_chunk", type=int, default=1000, help="Token limit per chunk. Default: 1000")
-    parser.add_argument(
-        "--document-manager",
-        type=str,
-        help="Which manager to use; Pinecone+MongoDB ('service')  or DeepLake ('deeplake')",
-        default="deeplake",
-    )
 
     args = parser.parse_args()
 
@@ -181,7 +175,7 @@ def main():
         print("Aborted by user.")
         return
 
-    if args.document_manager == "service":
+    if RETRIEVER_TYPE == "service":
         from src.cfg import (
             MONGO_DATABASE_DATA,
             MONGO_URI,
@@ -206,7 +200,7 @@ def main():
             dataframe=combined_dataframe,
             token_limit_per_chunk=token_limit_per_chunk,
         )
-    elif args.document_manager == "deeplake":
+    elif RETRIEVER_TYPE == "deeplake":
         from src.cfg import DEEPLAKE_VECTOR_STORE_PATH
 
         if os.path.exists(DEEPLAKE_VECTOR_STORE_PATH):
