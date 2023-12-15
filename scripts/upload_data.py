@@ -183,7 +183,6 @@ def main():
 
     if args.document_manager == "service":
         from src.cfg import (
-            DEEPLAKE_VECTOR_STORE_PATH,
             MONGO_DATABASE_DATA,
             MONGO_URI,
             PINECONE_API_KEY,
