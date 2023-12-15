@@ -104,7 +104,7 @@ def upload_data(
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Upload one or more CSV files containing chunks of data into the specified Pinecone namespace and Mongo database.\nUsage: python upload_data.py <pinecone_namespace> <mongo_db_name> <filepaths> --token_limit_per_chunk <token_limit_per_chunk>"
+        description="Upload one or more CSV files containing chunks of data using the specified document-manager (supports deeplake and pinecone/mongodb). \nUsage: python upload_data.py --args ..."
     )
 
     parser.add_argument(
@@ -192,6 +192,7 @@ def main():
             if not confirmation:
                 return
 
+        print(f"Deeplake dataset will be saved to {DEEPLAKE_VECTOR_STORE_PATH}.")
         document_manager = DeepLakeDocumentsManager(
             vector_store_path=DEEPLAKE_VECTOR_STORE_PATH,
             required_columns=["content", "url", "title", "source", "country", "year"],
@@ -204,6 +205,7 @@ def main():
         )
 
         zip_fname = document_manager.to_zip()
+        print(f"Successfully zipped the deeplake dataset to {zip_fname}")
 
         # Upload to huggingface data space
         upload_to_hf(zip_fname)
