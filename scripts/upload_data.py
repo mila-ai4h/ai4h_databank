@@ -1,6 +1,6 @@
 import argparse
 import os
-from typing import List, Type
+from typing import Type
 
 import pandas as pd
 from huggingface_hub import HfApi
@@ -47,7 +47,7 @@ def get_user_confirmation() -> bool:
     return user_input == "y"
 
 
-def get_files_to_upload(filepaths: List[str] = None, directory: str = None) -> List[str]:
+def get_files_to_upload(filepaths: list[str] = None, directory: str = None) -> list[str]:
     """Returns a list of files to upload.
 
     Args:
@@ -67,7 +67,7 @@ def get_files_to_upload(filepaths: List[str] = None, directory: str = None) -> L
     return files_to_upload
 
 
-def get_files_with_extensions(directory: str, extensions: List[str]) -> List[str]:
+def get_files_with_extensions(directory: str, extensions: list[str]) -> list[str]:
     """Recursively searches for files with specific extensions in a directory.
 
     Args:
@@ -85,7 +85,7 @@ def get_files_with_extensions(directory: str, extensions: List[str]) -> List[str
     return matching_files
 
 
-def chunk_text(text: str, tokenizer: Type[Tokenizer], token_limit: int) -> List[str]:
+def chunk_text(text: str, tokenizer: Type[Tokenizer], token_limit: int) -> list[str]:
     """Chunks a given text into tokens with a specified token limit.
 
     Args:
