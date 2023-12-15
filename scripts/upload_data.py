@@ -14,7 +14,7 @@ from src.cfg import buster_cfg
 embedding_fn = get_openai_embedding_constructor(model="text-embedding-ada-002", client_kwargs={"max_retries": 10})
 
 
-def upload_to_hf(path_or_fileobj):
+def upload_to_hf(path_or_fileobj, repo_id: str = None, path_in_repo: str = None):
     """Uploads a file or object to the Huggingface dataset.
 
     Args:
@@ -23,14 +23,20 @@ def upload_to_hf(path_or_fileobj):
     # Get the details specified in cfg.py
     from src.cfg import HF_DATASET_REPO_ID, HF_TOKEN, HF_VECTOR_STORE_PATH
 
-    print(f"Uploading {path_or_fileobj} to Huggingface dataset {HF_DATASET_REPO_ID}")
+    if repo_id is None:
+        repo_id = HF_DATASET_REPO_ID
+
+    if path_in_repo is None:
+        path_in_repo = HF_VECTOR_STORE_PATH
+
+    print(f"Uploading {path_or_fileobj} to Huggingface dataset {repo_id} as {path_in_repo}")
     api = HfApi()
     api.create_repo(repo_id=HF_DATASET_REPO_ID, private=True, repo_type="dataset", token=HF_TOKEN, exist_ok=True)
     api.upload_file(
-        repo_id=HF_DATASET_REPO_ID,
+        repo_id=repo_id,
         repo_type="dataset",
         path_or_fileobj=path_or_fileobj,
-        path_in_repo=HF_VECTOR_STORE_PATH,
+        path_in_repo=path_in_repo,
         token=HF_TOKEN,
     )
 
@@ -234,7 +240,7 @@ def main():
         print(f"Successfully zipped the DeepLake dataset to {zip_fname}")
 
         # Upload to Huggingface data space
-        upload_to_hf(zip_fname)
+        upload_to_hf(path_or_fileobj=zip_fname)
 
     else:
         raise ValueError(f"document_manager must be one of ['deeplake', 'service']. Provided: {args.document_manager}")
