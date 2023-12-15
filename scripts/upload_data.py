@@ -208,6 +208,8 @@ def main():
             token_limit_per_chunk=token_limit_per_chunk,
         )
     elif args.document_manager == "deeplake":
+        from src.cfg import DEEPLAKE_VECTOR_STORE_PATH
+
         if os.path.exists(DEEPLAKE_VECTOR_STORE_PATH):
             print(
                 f"""
