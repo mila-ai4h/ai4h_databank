@@ -3,7 +3,6 @@ import os
 from pathlib import Path
 
 import openai
-from huggingface_hub import hf_hub_download
 
 from buster.busterbot import Buster, BusterConfig
 from buster.completers import ChatGPTCompleter, DocumentAnswerer
@@ -13,7 +12,6 @@ from buster.llm_utils import QuestionReformulator
 from buster.llm_utils.embeddings import get_openai_embedding_constructor
 from buster.retriever import DeepLakeRetriever, Retriever, ServiceRetriever
 from buster.tokenizers import GPTTokenizer
-from buster.utils import extract_zip
 from buster.validators import Validator
 from src.app_utils import get_logging_db_name, init_db
 
@@ -40,6 +38,7 @@ CHUNKS_VERSION = "data-2023-11-02"
 # One of "deeplake", "service" , service == pinecone/mongodb retriever
 # Set to deeplake by default, can be overridden in env. variables
 RETRIEVER_TYPE = os.getenv("RETRIEVER_TYPE", "service")
+logger.info(f"Specified retriever: {RETRIEVER_TYPE}")
 
 # MongoDB Configurations
 MONGO_URI = os.environ["MONGO_URI"]
@@ -71,20 +70,6 @@ if RETRIEVER_TYPE == "deeplake":
     HF_TOKEN = os.environ["HF_TOKEN"]
     HF_DATASET_REPO_ID = "mila-quebec/sai-data"
     HF_VECTOR_STORE_PATH = CHUNKS_VERSION + ".zip"
-
-    # Downloads the vector store from the huggingface dataset
-    # Note: Comment out the hf_hub_download and extract_zip when uploading data for the first time.
-    # Otherwise, the dataset/data will not exist yet and raise an error.
-    hf_hub_download(
-        repo_id=HF_DATASET_REPO_ID,
-        repo_type="dataset",
-        filename=HF_VECTOR_STORE_PATH,
-        local_dir=".",
-        local_dir_use_symlinks=False,
-    )
-
-    # extracts the deeplake dataset to the specified path
-    extract_zip(HF_VECTOR_STORE_PATH, DEEPLAKE_VECTOR_STORE_PATH)
 
     # Configuration for buster_cfg
     retriever_cfg = {
