@@ -1,6 +1,6 @@
 import argparse
 import os
-from typing import Type
+from typing import List, Type
 
 import pandas as pd
 from huggingface_hub import HfApi
@@ -10,15 +10,20 @@ from buster.llm_utils.embeddings import get_openai_embedding_constructor
 from buster.tokenizers import GPTTokenizer, Tokenizer
 from src.cfg import buster_cfg
 
-# the embedding function that will get used to embed documents the app
+# the embedding function that will get used to embed documents in the app
 embedding_fn = get_openai_embedding_constructor(model="text-embedding-ada-002", client_kwargs={"max_retries": 10})
 
 
 def upload_to_hf(path_or_fileobj):
+    """Uploads a file or object to the Huggingface dataset.
+
+    Args:
+        path_or_fileobj: The path to the file or file-like object to upload.
+    """
     # Get the details specified in cfg.py
     from src.cfg import HF_DATASET_REPO_ID, HF_TOKEN, HF_VECTOR_STORE_PATH
 
-    print(f"Uploading {path_or_fileobj} to huggingface dataset {HF_DATASET_REPO_ID}")
+    print(f"Uploading {path_or_fileobj} to Huggingface dataset {HF_DATASET_REPO_ID}")
     api = HfApi()
     api.create_repo(repo_id=HF_DATASET_REPO_ID, private=True, repo_type="dataset", token=HF_TOKEN, exist_ok=True)
     api.upload_file(
@@ -31,18 +36,21 @@ def upload_to_hf(path_or_fileobj):
 
 
 def get_user_confirmation() -> bool:
-    """
-    Asks the user for a confirmation to proceed. Only continues if 'y' is entered.
-
-    Returns:
-    bool: True if the user enters 'y', otherwise False.
-    """
+    """Asks the user for confirmation to proceed. Returns True if 'y' is entered, otherwise False."""
     user_input = input("Do you want to continue? (y/[n]): ").strip().lower()
     return user_input == "y"
 
 
-def get_files_to_upload(filepaths: list[str] = None, directory: str = None):
-    # Get all files to upload
+def get_files_to_upload(filepaths: List[str] = None, directory: str = None) -> List[str]:
+    """Returns a list of files to upload.
+
+    Args:
+        filepaths: A list of file paths to upload.
+        directory: The directory where files can be found.
+
+    Returns:
+        A list of file paths to upload.
+    """
     files_to_upload = []
     if filepaths is not None:
         files_to_upload.extend(filepaths)
@@ -53,16 +61,15 @@ def get_files_to_upload(filepaths: list[str] = None, directory: str = None):
     return files_to_upload
 
 
-def get_files_with_extensions(directory: str, extensions: list[str]) -> list[str]:
-    """
-    Recursively searches for files with specific extensions in a directory.
+def get_files_with_extensions(directory: str, extensions: List[str]) -> List[str]:
+    """Recursively searches for files with specific extensions in a directory.
 
     Args:
-    directory (str): The directory path to search in.
-    extensions (List[str]): A list of file extensions to look for.
+        directory: The directory path to search in.
+        extensions: A list of file extensions to look for.
 
     Returns:
-    List[str]: A list of file paths matching the specified extensions.
+        A list of file paths matching the specified extensions.
     """
     matching_files = []
     for root, dirs, files in os.walk(directory):
@@ -72,7 +79,17 @@ def get_files_with_extensions(directory: str, extensions: list[str]) -> list[str
     return matching_files
 
 
-def chunk_text(text: str, tokenizer: Type[Tokenizer], token_limit: int) -> list[str]:
+def chunk_text(text: str, tokenizer: Type[Tokenizer], token_limit: int) -> List[str]:
+    """Chunks a given text into tokens with a specified token limit.
+
+    Args:
+        text: The text to chunk.
+        tokenizer: The tokenizer to use.
+        token_limit: The maximum number of tokens per chunk.
+
+    Returns:
+        A list of text chunks.
+    """
     tokens = tokenizer.encode(text)
     chunks = []
 
@@ -87,6 +104,13 @@ def upload_data(
     dataframe: pd.DataFrame,
     token_limit_per_chunk: int = 1000,
 ):
+    """Uploads data to the document manager.
+
+    Args:
+        manager: The document manager.
+        dataframe: The data to upload.
+        token_limit_per_chunk: The token limit per chunk.
+    """
     # Make sure the chunks are not too big
     tokenizer = GPTTokenizer(buster_cfg.tokenizer_cfg["model_name"])
     dataframe["content"] = dataframe["content"].apply(lambda x: chunk_text(x, tokenizer, token_limit_per_chunk))
@@ -103,15 +127,17 @@ def upload_data(
 
 
 def main():
+    """Uploads one or more CSV files containing chunks of data using the specified document manager
+    (supports DeepLake and Pinecone/MongoDB)."""
     parser = argparse.ArgumentParser(
-        description="Upload one or more CSV files containing chunks of data using the specified document-manager (supports deeplake and pinecone/mongodb). \nUsage: python upload_data.py --args ..."
+        description="Upload one or more CSV files containing chunks of data using the specified document manager (supports DeepLake and Pinecone/MongoDB). \nUsage: python upload_data.py --args ..."
     )
 
     parser.add_argument(
         "--filepaths",
         type=str,
         nargs="+",
-        help="Path to the csv containing the chunks. Will be loaded as a pandas dataframe. Specify files one at a time.",
+        help="Path to the CSV containing the chunks. Will be loaded as a pandas dataframe. Specify files one at a time.",
         default=None,
     )
     parser.add_argument(
@@ -124,7 +150,7 @@ def main():
     parser.add_argument(
         "--document-manager",
         type=str,
-        help="Which manager to use; pinecone+mongo ('service')  or deeplake ('deeplake')",
+        help="Which manager to use; Pinecone+MongoDB ('service')  or DeepLake ('deeplake')",
         default="deeplake",
     )
 
@@ -179,7 +205,7 @@ def main():
         if os.path.exists(DEEPLAKE_VECTOR_STORE_PATH):
             print(
                 f"""
-                WARNING: found existing deeplake vector store at {DEEPLAKE_VECTOR_STORE_PATH}.
+                WARNING: found existing DeepLake vector store at {DEEPLAKE_VECTOR_STORE_PATH}.
                 This will duplicate embeddings if they've already been passed.
                 Consider specifying a new documents version or deleting the previous version.
                 You can safely ignore this message if adding additional embeddings.
@@ -192,7 +218,7 @@ def main():
             if not confirmation:
                 return
 
-        print(f"Deeplake dataset will be saved to {DEEPLAKE_VECTOR_STORE_PATH}.")
+        print(f"DeepLake dataset will be saved to {DEEPLAKE_VECTOR_STORE_PATH}.")
         document_manager = DeepLakeDocumentsManager(
             vector_store_path=DEEPLAKE_VECTOR_STORE_PATH,
             required_columns=["content", "url", "title", "source", "country", "year"],
@@ -205,9 +231,9 @@ def main():
         )
 
         zip_fname = document_manager.to_zip()
-        print(f"Successfully zipped the deeplake dataset to {zip_fname}")
+        print(f"Successfully zipped the DeepLake dataset to {zip_fname}")
 
-        # Upload to huggingface data space
+        # Upload to Huggingface data space
         upload_to_hf(zip_fname)
 
     else:
