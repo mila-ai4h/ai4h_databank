@@ -159,18 +159,25 @@ The rest of the data (logging, interactions, feedback) is detailed in the sectio
 
 ### Uploading documents
 
-Uploading documents is done through the script `script/upload_data.py`. The script expects the name of the MongoDB database to use, the name of the Pinecone namespace to use, and one or more files. It is highly recommended to use the same name for the MongoDB database and the Pinecone namespace, for easier versioning. The current convention is `data-YYYY-MM-DD`.
+Uploading documents is done through the script `script/upload_data.py`.
+Note that some of the configuration should be handled in the `cfg.py` file, in order to ensure that both the document-manager and retriever are aligned afterwards in the buster app.
 
-The files should be CSV files with tab delimiters. Each row should be a chunk, of no more than 1000 tokens. If some chunks are bigger than 1000 tokens, they will be cut in smaller chunks at the token level.
+We currently support 2 different vector stores in SAI:
+* `service`: This is a combination of pinecone and mongodb. Pinecone is used exclusively as a vector store, and aligned with a document uid in mongodb where the text and metadata are stored. This solution is custom build and cloud-based and might incur associated costs.
+* `deeplake`: We support the [deeplake vector store](https://docs.activeloop.ai/quickstart). They have an open-source version which runs locally and we recommend using for vector databases with <100k vectors.
+
+You can specify which vector store to use by setting the `RETRIEVER_TYPE` variable in `src/cfg.py` (You can also set it as an env. variable). By default, `service` is used.
+
+The chunk files should be .CSV or .txt files with tab delimiters. Each row should be a chunk, of no more than 1000 tokens. If some chunks are bigger than 1000 tokens, they will be cut in smaller chunks at the token level. You can specify where to look for files by using both the `--filepaths` argument (list of files) and/or the `--directory` argument (When a directory is specified, it will recursively look for .csv and .txt) files. If both are specified, the union of identified files are selected. An example of a valid file is provided in `data/example_chunks.csv`.
 
 The number of words that fit in 1000 tokens depends on the alphabet and the language. For english, 1000 tokens is around 1500 words. For other languages using the latin alphabet, 1000 tokens is often a bit less than 1500 words. Non-latin alphabets have very different limits.
 
 The token limit can be changed with the `--token_limit_per_chunk` argument.
 
-The minimum expected columns of the files are: content, url, title, source, country, year. They are required because they are used in various ways throughout SAI. Additional columns will be stored as metadata in MongoDB, but ignored otherwise. An example of a valid file is provided in `data/example_chunks.csv`.
+The minimum expected columns of the files are: `[content, url, title, source, country, year]`. They are required because they are used in various ways throughout SAI. Additional columns will be stored as metadata, but ignored otherwise. An example of a valid file is provided in `data/example_chunks.csv`.
 
 The process of uploading documents is as follows:
-- Check that all chunks are less than 500 tokens, and cut them if necessary.
+- Check that all chunks are less than MAX_TOKEN tokens, and cuts them if necessary.
 - Check that all required columns are present.
 - Compute the embeddings.
 - Upload all the chunks to MongoDB, and retrieve their unique identifiers.
@@ -178,22 +185,30 @@ The process of uploading documents is as follows:
 
 ### Deleting documents
 
+> NOTE: Deleting documents is only supported for the 'service' document manager.
+
 Deleting documents is done through the script `scripts/delete_data.py`. The script expects the name of the MongoDB database to use, the name of the Pinecone namespace to use, and either a `--source` argument followed by a name, or the `--all` argument.
 
 If specifying a source, all documents from that source will be deleted, in both MongoDB and Pinecone.
 
 If deleting all documents, the specified Pinecone namespace will be deleted. The specified MongoDB database cannot be deleted automatically through a normal API key, and must be manually deleted on the web UI. The script will remind you of that point.
 
-### Example on how to upload one file, then delete the documents
+### Example on how to upload one file
 
 You will need to have setup the environment properly ([installed the dependencies](#install-the-dependencies) and [setup the environment variables](#environment-variables)).
 
-First, let's upload the example chunks in the Pinecone namespace `data-example` and the MongoDB database `data-example`:
+To upload the example chunks provided, update `cfg.py` such that:
 
-```sh
-python scripts/upload_data.py data-example data-example "data/example_chunks.csv"
-```
+    CHUNKS_VERSION = "example-chunks"
 
+and run:
+
+    python scripts/upload_data.py --filepaths data/example_chunks.csv
+
+If you specified `RETRIEVER_TYPE` as "deeplake", this will upload it to the specified huggingface dataset in cfg.py. If "service" was specified, the chunks will be uploaded accordingly on pinecone/mongodb.
+
+
+### Example on how to delete the documents
 If we now want to delete those documents, we can do:
 ```sh
 python scripts/delete_data.py data-example data-example --all
@@ -203,10 +218,9 @@ This will delete the Pinecone namespace `data-example`. The MongoDB database `da
 
 ### Switching to a new version of the data
 
-To change the version of the data that is being used, specify the desired `PINECONE_NAMESPACE` and `MONGO_DATABASE_DATA` in `src/cfg.py`.
+To change the version of the data that is being used, specify the desired `CHUNKS_VERSION` in `src/cfg.py`.
 
-If `PINECONE_NAMESPACE` and `MONGO_DATABASE_DATA` are not identical, a warning is raised when launching the app.
-
+This will automatically set `PINECONE_NAMESPACE` and `MONGO_DATABASE_DATA` variables (you can overwrite this but a warning will be raised).
 
 ### How to backup a database
 

@@ -33,12 +33,13 @@ embedding_fn = get_openai_embedding_constructor(
     model="text-embedding-ada-002", client_kwargs={"timeout": 2, "max_retries": 2}
 )
 
+# Reference name of the vector store that will be used (e.d. data-2023-11-02)
 CHUNKS_VERSION = "data-2023-11-02"
 
 # One of "deeplake", "service" , service == pinecone/mongodb retriever
 # Set to deeplake by default, can be overridden in env. variables
 RETRIEVER_TYPE = os.getenv("RETRIEVER_TYPE", "service")
-logger.info(f"Specified retriever: {RETRIEVER_TYPE}")
+logger.info(f"Specified retriever: {RETRIEVER_TYPE} and chunk version {CHUNKS_VERSION}")
 
 # MongoDB Configurations
 MONGO_URI = os.environ["MONGO_URI"]
