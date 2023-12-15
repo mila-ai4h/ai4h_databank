@@ -30,10 +30,13 @@ if cfg.RETRIEVER_TYPE == "deeplake":
     )
 
     # Downloads the vector store from the huggingface dataset
+    repo_id = HF_DATASET_REPO_ID
+    filename = HF_VECTOR_STORE_PATH
+    logger.info(f"Fetching {filename=} from huggingface {repo_id=}")
     hf_hub_download(
-        repo_id=HF_DATASET_REPO_ID,
+        repo_id=repo_id,
         repo_type="dataset",
-        filename=HF_VECTOR_STORE_PATH,
+        filename=filename,
         local_dir=".",
         local_dir_use_symlinks=False,
         token=HF_TOKEN,
@@ -41,6 +44,8 @@ if cfg.RETRIEVER_TYPE == "deeplake":
 
     # extracts the deeplake dataset to the specified path
     extract_zip(HF_VECTOR_STORE_PATH, DEEPLAKE_VECTOR_STORE_PATH)
+
+    logger.info(f"Deeplake Dataset extracted to {DEEPLAKE_VECTOR_STORE_PATH}")
 
 
 app_name = cfg.app_name
