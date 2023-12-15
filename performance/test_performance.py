@@ -36,7 +36,6 @@ from buster.busterbot import Buster
 from buster.completers import ChatGPTCompleter, DocumentAnswerer
 from buster.formatters.documents import DocumentsFormatterJSON
 from buster.formatters.prompts import PromptFormatter
-from buster.retriever import ServiceRetriever
 from buster.tokenizers import GPTTokenizer
 from buster.validators import Validator
 from src import cfg
@@ -63,7 +62,7 @@ def busterbot(monkeypatch, run_expensive):
         # set thresh = 1 to be sure that no documents get retrieved
         buster_cfg.retriever_cfg["thresh"] = 1
 
-    retriever = ServiceRetriever(**buster_cfg.retriever_cfg)
+    retriever = cfg.retriever_cls(**buster_cfg.retriever_cfg)
 
     tokenizer = GPTTokenizer(**buster_cfg.tokenizer_cfg)
     document_answerer: DocumentAnswerer = DocumentAnswerer(

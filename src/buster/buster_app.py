@@ -4,9 +4,11 @@ from typing import Optional, Union
 
 import gradio as gr
 import pandas as pd
+from huggingface_hub import hf_hub_download
 
 import src.cfg as cfg
 from buster.completers import Completion
+from buster.utils import extract_zip
 from src.app_utils import add_sources, get_session_id, get_utc_time
 from src.cfg import setup_buster
 from src.feedback import FeedbackForm, Interaction
@@ -16,6 +18,35 @@ logging.basicConfig(level=logging.INFO)
 
 # Typehint for chatbot history
 ChatHistory = list[list[Optional[str], Optional[str]]]
+
+
+# If using Deeplake, we first need to download the vector store locally
+if cfg.RETRIEVER_TYPE == "deeplake":
+    from src.cfg import (
+        DEEPLAKE_VECTOR_STORE_PATH,
+        HF_DATASET_REPO_ID,
+        HF_TOKEN,
+        HF_VECTOR_STORE_PATH,
+    )
+
+    # Downloads the vector store from the huggingface dataset
+    repo_id = HF_DATASET_REPO_ID
+    filename = HF_VECTOR_STORE_PATH
+    logger.info(f"Fetching {filename=} from huggingface {repo_id=}")
+    hf_hub_download(
+        repo_id=repo_id,
+        repo_type="dataset",
+        filename=filename,
+        local_dir=".",
+        local_dir_use_symlinks=False,
+        token=HF_TOKEN,
+    )
+
+    # extracts the deeplake dataset to the specified path
+    extract_zip(HF_VECTOR_STORE_PATH, DEEPLAKE_VECTOR_STORE_PATH)
+
+    logger.info(f"Deeplake Dataset extracted to {DEEPLAKE_VECTOR_STORE_PATH}")
+
 
 app_name = cfg.app_name
 example_questions = cfg.example_questions
@@ -278,7 +309,7 @@ def log_completion(
         session_id=session_id,
         instance_name=instance_name,
         instance_type=instance_type,
-        data_version=cfg.MONGO_DATABASE_DATA,
+        data_version=cfg.CHUNKS_VERSION,
     )
     interaction.send(mongo_db, collection=collection)
 
