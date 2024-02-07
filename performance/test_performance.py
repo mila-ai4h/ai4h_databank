@@ -15,6 +15,7 @@ As artifacts, we generate two files:
 - results_detailed.csv: contains the questions, the answers and whether it was judged relevant or not.
 - results_summary.csv: aggregated results per category.
 """
+
 import copy
 import logging
 import random
@@ -23,7 +24,6 @@ import numpy as np
 import pandas as pd
 import pytest
 from joblib import Parallel, delayed
-from pinecone.core.exceptions import PineconeProtocolError
 from tenacity import (
     retry,
     retry_if_exception_type,
@@ -86,7 +86,7 @@ def process_questions(busterbot, questions: pd.DataFrame) -> pd.DataFrame:
     @retry(
         wait=wait_exponential(multiplier=1, min=4, max=10),
         stop=stop_after_attempt(5),
-        retry=(retry_if_result(is_unable_to_process) | retry_if_exception_type(PineconeProtocolError)),
+        retry=retry_if_result(is_unable_to_process),
     )
     def answer_question(question):
         completion = busterbot.process_input(question.question)

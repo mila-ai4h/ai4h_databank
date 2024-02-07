@@ -94,7 +94,8 @@ Your feedback is anonymous and will help us make the tool as useful as possible 
                             )
                             accurate_answer = gr.Radio(choices=["👍", "👎"], label="Was the generated answer accurate?")
                             relevant_sources = gr.Radio(
-                                choices=["👍", "👎"], label="Were the retrieved sources generally relevant to your query?"
+                                choices=["👍", "👎"],
+                                label="Were the retrieved sources generally relevant to your query?",
                             )
                             relevant_sources_selection = set_relevant_sources_selection(num_sources=num_sources)
                             relevant_sources_order = gr.Radio(
@@ -116,7 +117,9 @@ Your feedback is anonymous and will help us make the tool as useful as possible 
 
                     submit_feedback_btn = gr.Button("Submit feedback", variant="primary", interactive=True)
                     with gr.Column(visible=False) as submitted_message:
-                        gr.Markdown("Feedback recorded, thank you 📝! You can now ask a new question in the search bar.")
+                        gr.Markdown(
+                            "Feedback recorded, thank you 📝! You can now ask a new question in the search bar."
+                        )
 
     # fmt: off
     submit_feedback_btn.click(
