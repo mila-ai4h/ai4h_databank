@@ -15,6 +15,7 @@ As artifacts, we generate two files:
 - results_detailed.csv: contains the questions, the answers and whether it was judged relevant or not.
 - results_summary.csv: aggregated results per category.
 """
+
 import copy
 import logging
 import random
