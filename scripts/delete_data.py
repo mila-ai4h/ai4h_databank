@@ -1,12 +1,11 @@
 import argparse
 
 from buster.documents_manager import DocumentsService
-from src.cfg import MONGO_URI, PINECONE_API_KEY, PINECONE_ENV, PINECONE_INDEX
+from src.cfg import MONGO_URI, PINECONE_API_KEY, PINECONE_INDEX
 
 
 def delete_data(
     pinecone_api_key: str,
-    pinecone_env: str,
     pinecone_index: str,
     pinecone_namespace: str,
     mongo_uri: str,
@@ -16,7 +15,6 @@ def delete_data(
 ):
     manager = DocumentsService(
         pinecone_api_key,
-        pinecone_env,
         pinecone_index,
         pinecone_namespace,
         mongo_uri,
@@ -49,7 +47,6 @@ if __name__ == "__main__":
 
     delete_data(
         PINECONE_API_KEY,
-        PINECONE_ENV,
         PINECONE_INDEX,
         args.pinecone_namespace,
         MONGO_URI,

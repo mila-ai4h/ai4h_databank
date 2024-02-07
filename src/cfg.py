@@ -30,9 +30,8 @@ embedding_fn = get_openai_embedding_constructor(
 
 # Pinecone Configurations
 PINECONE_API_KEY = os.environ["PINECONE_API_KEY"]
-PINECONE_ENV = "asia-southeast1-gcp"
-PINECONE_INDEX = "oecd"
-PINECONE_NAMESPACE = "data-2023-11-02"
+PINECONE_INDEX = "sai-hf"
+PINECONE_NAMESPACE = "data-2024-02-07"
 
 # MongoDB Configurations
 MONGO_URI = os.environ["MONGO_URI"]
@@ -43,7 +42,7 @@ INSTANCE_TYPE = os.environ["INSTANCE_TYPE"]  # e.g. ["dev", "prod", "local"]
 
 # MongoDB Databases
 MONGO_DATABASE_LOGGING = get_logging_db_name(INSTANCE_TYPE)  # Where all interactions will be stored
-MONGO_DATABASE_DATA = "data-2023-11-02"  # Where documents are stored
+MONGO_DATABASE_DATA = "data-2024-02-07"  # Where documents are stored
 
 # Check that data chunks are aligned on Mongo and Pinecone
 if MONGO_DATABASE_DATA != PINECONE_NAMESPACE:
@@ -151,7 +150,6 @@ buster_cfg = BusterConfig(
     },
     retriever_cfg={
         "pinecone_api_key": PINECONE_API_KEY,
-        "pinecone_env": PINECONE_ENV,
         "pinecone_index": PINECONE_INDEX,
         "pinecone_namespace": PINECONE_NAMESPACE,
         "mongo_uri": MONGO_URI,

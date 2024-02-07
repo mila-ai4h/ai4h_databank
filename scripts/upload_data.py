@@ -5,13 +5,7 @@ import pandas as pd
 
 from buster.documents_manager import DocumentsService
 from buster.tokenizers import GPTTokenizer, Tokenizer
-from src.cfg import (
-    MONGO_URI,
-    PINECONE_API_KEY,
-    PINECONE_ENV,
-    PINECONE_INDEX,
-    buster_cfg,
-)
+from src.cfg import MONGO_URI, PINECONE_API_KEY, PINECONE_INDEX, buster_cfg
 
 
 def chunk_text(text: str, tokenizer: Type[Tokenizer], token_limit: int) -> list[str]:
@@ -26,7 +20,6 @@ def chunk_text(text: str, tokenizer: Type[Tokenizer], token_limit: int) -> list[
 
 def upload_data(
     pinecone_api_key: str,
-    pinecone_env: str,
     pinecone_index: str,
     pinecone_namespace: str,
     mongo_uri: str,
@@ -44,7 +37,6 @@ def upload_data(
 
     manager = DocumentsService(
         pinecone_api_key,
-        pinecone_env,
         pinecone_index,
         pinecone_namespace,
         mongo_uri,
@@ -82,7 +74,6 @@ if __name__ == "__main__":
 
     upload_data(
         PINECONE_API_KEY,
-        PINECONE_ENV,
         PINECONE_INDEX,
         pinecone_namespace,
         MONGO_URI,
