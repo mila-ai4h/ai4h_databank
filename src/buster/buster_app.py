@@ -117,9 +117,7 @@ Your feedback is anonymous and will help us make the tool as useful as possible 
 
                     submit_feedback_btn = gr.Button("Submit feedback", variant="primary", interactive=True)
                     with gr.Column(visible=False) as submitted_message:
-                        gr.Markdown(
-                            "Feedback recorded, thank you 📝! You can now ask a new question in the search bar."
-                        )
+                        gr.Markdown("Feedback recorded, thank you 📝! You can now ask a new question in the search bar.")
 
     # fmt: off
     submit_feedback_btn.click(
