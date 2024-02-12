@@ -24,13 +24,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from joblib import Parallel, delayed
-from tenacity import (
-    retry,
-    retry_if_exception_type,
-    retry_if_result,
-    stop_after_attempt,
-    wait_exponential,
-)
+from tenacity import retry, retry_if_result, stop_after_attempt, wait_exponential
 
 from buster.busterbot import Buster
 from buster.completers import ChatGPTCompleter, DocumentAnswerer

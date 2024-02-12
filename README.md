@@ -32,7 +32,12 @@ Where `$USERNAME` can be any username, ideally used to identify who is using the
 
 Here is an overview of our tech stack:
 
-![image](assets/tech_stack.png)
+- Frontend: Gradio
+- Documents store: Pinecone for the vectors, MongoDB for the text
+- Backend: OpenAI API + [Buster](https://github.com/jerpint/buster)
+- Deployment: Huggingface
+- CI/CD: GitHub Actions
+- Logging: MongoDB
 
 
 ## How to run locally
@@ -294,7 +299,6 @@ We have also built out a series of experimental features in the app that are not
 - Question reformulation: When a user asks a question, it gets reformulated to be more "optimized" for retrieval using chatGPT
 - Number of sources: A user can select how many sources to include in a query to chatGPT (default: 3)
 - Documents validation: Given a generated answer, for each source, do an entailment problem to find out which of the sources support the given answer. This is useful to filter out "less relevant" sources but comes at an added cost/latency.
-- Hybrid retrieval: Augment the retrieval process using BM25.
 - Finetuning: We support finetuning of the question validator using the OpenAI API.
 
 
@@ -383,8 +387,3 @@ Evaluating it on the validation set shows the following results:
 Accuracy using vanilla gpt: 83.67%
 Accuracy using finetuned gpt: 89.80%
 ```
-
-
-### Hybrid retrieval
-
-TODO @hbertrand
