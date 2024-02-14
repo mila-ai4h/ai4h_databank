@@ -10,9 +10,9 @@ TMP_DEPLOY_DIR=${2:-"deploy"}
 GRADIO_SDK_VERSION=$(awk -F'==' '/gradio/ {print $2}' requirements.txt)
 
 # SPACE URLS
-STAGING_URL="https://$HF_USERNAME:$HF_TOKEN@huggingface.co/spaces/mila-quebec/SAI-staging"
-DEV_URL="https://$HF_USERNAME:$HF_TOKEN@huggingface.co/spaces/mila-quebec/SAI-dev"
-PROD_URL="https://$HF_USERNAME:$HF_TOKEN@huggingface.co/spaces/mila-quebec/SAI"
+STAGING_URL="https://$HF_USERNAME:$HF_TOKEN@huggingface.co/spaces/mila-ai4h/SAI-staging"
+DEV_URL="https://$HF_USERNAME:$HF_TOKEN@huggingface.co/spaces/mila-ai4h/SAI-dev"
+PROD_URL="https://$HF_USERNAME:$HF_TOKEN@huggingface.co/spaces/mila-ai4h/SAI"
 
 # Authenticate to huggingface for push
 huggingface-cli login --token $HF_TOKEN
