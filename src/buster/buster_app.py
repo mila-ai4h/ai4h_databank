@@ -548,7 +548,7 @@ with buster_app:
     # A unique identifier that resets every time a page is refreshed
     session_id = gr.State(get_session_id)
 
-    gr.Markdown(f"<h1><center>SAI: Search engine for AI policy</center></h1>")
+    gr.Markdown(f"<h1><center>AIR: Q&A tool for AI Policy</center></h1>")
 
     about_panel = setup_about_panel()
 
