@@ -73,11 +73,11 @@ prepare_deploy_dir() {
 # Create README for Hugging Face space
 create_readme() {
   if [ "$DEPLOY_TYPE" = "dev" ]; then
-    TITLE="SAI 💬 (Dev)"
+    TITLE="AIR 💬 (Dev)"
   elif [ "$DEPLOY_TYPE" = "staging" ]; then
-    TITLE="SAI 💬 (Staging)"
+    TITLE="AIR 💬 (Staging)"
   else
-    TITLE="SAI 💬"
+    TITLE="AIR 💬"
   fi
 
   echo "---

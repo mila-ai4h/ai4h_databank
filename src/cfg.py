@@ -68,7 +68,7 @@ mongo_db = init_db(mongo_uri=MONGO_URI, db_name=MONGO_DATABASE_LOGGING)
 current_dir = Path(__file__).resolve().parent
 data_dir = current_dir.parent / "data"  # ../data
 
-app_name = "SAI ️💬"
+app_name = "AIR ️💬"
 
 # User settings default values
 reveal_user_settings = False  # Wheter to display settings to the user or not

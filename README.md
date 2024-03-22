@@ -1,6 +1,6 @@
-# SAI ️💬
+# AIR ️💬
 
-SAI ️💬 is a Q&A search engine designed to provide relevant and high quality information about curated AI policy documents.
+AIR ️💬 is a Q&A search engine designed to provide relevant and high quality information about curated AI policy documents.
 
 This project is a collaboration between the OECD and Mila.
 
@@ -48,7 +48,7 @@ pip install -e .
 ```
 
 
-Note that SAI requires python>=3.10
+Note that AIR requires python>=3.10
 
 
 ### Environment variables
@@ -73,7 +73,7 @@ Note that if any of the environment variables are missing, the app might not lau
 
 There are currently 2 ways of running the gradio apps, via `gradio` or as a mounted app.
 
-Note that in the context of this project we have 2 separate apps, the main buster app (SAI) and a separate arena app to evaluate different models and parameters in a blind test. We present 2 different options to run the apps here:
+Note that in the context of this project we have 2 separate apps, the main buster app (AIR) and a separate arena app to evaluate different models and parameters in a blind test. We present 2 different options to run the apps here:
 
 #### Gradio (Recommended)
 
@@ -81,13 +81,13 @@ In this setup, only one app is run at a time.
 Go to the folder of the app and simply run the app from there:
 This setup is recommended for deploying on huggingface.
 
-To launch the SAI app:
+To launch the AIR app:
 ```sh
 cd src/buster
 gradio gradio_app.py buster_app
 ```
 
-This will launch the SAI app locally. Then go to the localhost link to see the deployed app.
+This will launch the AIR app locally. Then go to the localhost link to see the deployed app.
 
 To launch the arena app:
 ```sh
@@ -149,7 +149,7 @@ The frontend is all powered by Gradio's interface. The app layout is mainly foun
 
 ## Data Management
 
-SAI requires two services to store the data. MongoDB is used to store the documents as well as their associated metadata (year, country, link, ...). Pinecone is a vector store and is meant only for storing the embeddings associated with each chunk, as well as an identifier to link it back to the correct document in MongoDB.
+AIR requires two services to store the data. MongoDB is used to store the documents as well as their associated metadata (year, country, link, ...). Pinecone is a vector store and is meant only for storing the embeddings associated with each chunk, as well as an identifier to link it back to the correct document in MongoDB.
 
 The rest of the data (logging, interactions, feedback) is detailed in the section [Logging and Feedback](#logging-and-feedback).
 
@@ -163,7 +163,7 @@ The number of words that fit in 1000 tokens depends on the alphabet and the lang
 
 The token limit can be changed with the `--token_limit_per_chunk` argument.
 
-The minimum expected columns of the files are: content, url, title, source, country, year. They are required because they are used in various ways throughout SAI. Additional columns will be stored as metadata in MongoDB, but ignored otherwise. An example of a valid file is provided in `data/example_chunks.csv`.
+The minimum expected columns of the files are: content, url, title, source, country, year. They are required because they are used in various ways throughout AIR. Additional columns will be stored as metadata in MongoDB, but ignored otherwise. An example of a valid file is provided in `data/example_chunks.csv`.
 
 The process of uploading documents is as follows:
 - Check that all chunks are less than 500 tokens, and cut them if necessary.
@@ -223,7 +223,7 @@ The `INSTANCE_TYPE` env. variable determines which database to log to (one of `[
 
 We record 3 different types of user interactions:
 
-* `interaction`: After a user asks a question and SAI answers it, both the user's question, SAI's answer, cited sources, and other relevant information (parameters, models, etc.) are collected in MongoDB in the `interaction` collection.
+* `interaction`: After a user asks a question and AIR answers it, both the user's question, AIR's answer, cited sources, and other relevant information (parameters, models, etc.) are collected in MongoDB in the `interaction` collection.
 * `feedback`: A feedback form is available for users to fill in the app. Every time a user submits a feedback form, the entire app state is recorded and logged in mongodb. This includes the form filled out by the user, as well as the question asked, the sources, the response, parameters, etc.
 * `flagged`: A flagged button is available on the app to monitor for any kind of harmful content. This records the app state in a separate mongo table.
 
