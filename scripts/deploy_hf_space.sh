@@ -6,8 +6,8 @@ set -e
 DEPLOY_TYPE=$1
 TMP_DEPLOY_DIR=${2:-"deploy"}
 
-# Extract Gradio SDK version from requirements.txt
-GRADIO_SDK_VERSION=$(awk -F'==' '/gradio/ {print $2}' requirements.txt)
+# Extract Gradio SDK version from requirements.txt (exit only after first match)
+GRADIO_SDK_VERSION=$(awk -F'==' '/gradio/ {print $2; exit}' requirements.txt)
 
 # SPACE URLS
 STAGING_URL="https://$HF_USERNAME:$HF_TOKEN@huggingface.co/spaces/mila-ai4h/SAI-staging"
