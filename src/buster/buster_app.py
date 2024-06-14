@@ -470,7 +470,7 @@ def setup_additional_sources():
 def raise_flagging_message():
     """Raises a red banner indicating that the content has been flagged."""
     gr.Info(
-        "Thank you for flagging the content. Our moderation team will look closely at these samples. We appologize for any harm this might have caused you."
+        "Thank you for flagging the content. Our moderation team will look closely at these samples. We apologize for any harm this might have caused you."
     )
 
 
