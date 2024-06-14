@@ -336,7 +336,7 @@ def toggle_interactivity(interactive: bool):
 
 def clear_user_input():
     """Clears the contents of the user_input box."""
-    return gr.update(value="")
+    return gr.Textbox(value="")
 
 
 def clear_sources():
@@ -361,7 +361,7 @@ def clear_feedback_form():
 def reveal_app(choice: gr.SelectData):
     return (
         gr.Group(visible=False),
-        gr.Textbox(interactive=True, placeholder="Ask your AI policy question here…"),
+        gr.Textbox(interactive=True, value=""),
         gr.Button(interactive=True),
     )
 
@@ -555,9 +555,10 @@ with buster_app:
                 with gr.Column(scale=20):
                     user_input = gr.Textbox(
                         label="",
-                        placeholder="⚠️ Accept the terms and conditions to use the app",
+                        placeholder="Ask your AI policy questions here...",
+                        value="⚠️ Accept the terms and conditions to use the app",
                         lines=1,
-                        interactive=False,
+                        interactive=True,
                     )
                 submit = gr.Button(value="Ask", variant="primary", size="lg", interactive=False)
 
