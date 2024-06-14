@@ -69,57 +69,51 @@ def set_relevant_sources_selection(num_sources: int):
 def setup_feedback_form(num_sources: int):
     # Feedback
     feedback_elems = {}
-    with gr.Box():
-        with gr.Row():
-            with gr.Box():
-                with gr.Column():
-                    gr.Markdown(
-                        f""" ## We would love your feedback!
+    with gr.Row():
+        with gr.Column():
+            gr.Markdown(
+                f""" ## We would love your feedback!
 Please submit feedback for each question asked.
 
 Your feedback is anonymous and will help us make the tool as useful as possible for the community!
 """
+            )
+            with gr.Row():
+                overall_experience = gr.Radio(choices=["👍", "👎"], label=f"Did {app_name} help answer your question?")
+
+            # Currently, we show all feedback, but also support having a small portion of it display at first
+            show_additional_feedback = gr.Group(visible=True)
+            with show_additional_feedback:
+                with gr.Column():
+                    clear_answer = gr.Radio(
+                        choices=["👍", "👎"], label="Was the generated answer clear and understandable?"
                     )
-                    with gr.Row():
-                        overall_experience = gr.Radio(
-                            choices=["👍", "👎"], label=f"Did {app_name} help answer your question?"
-                        )
+                    accurate_answer = gr.Radio(choices=["👍", "👎"], label="Was the generated answer accurate?")
+                    relevant_sources = gr.Radio(
+                        choices=["👍", "👎"],
+                        label="Were the retrieved sources generally relevant to your query?",
+                    )
+                    relevant_sources_selection = set_relevant_sources_selection(num_sources=num_sources)
+                    relevant_sources_order = gr.Radio(
+                        choices=["👍", "👎"],
+                        label="Were the sources ranked appropriately, in order of relevance?",
+                    )
 
-                    # Currently, we show all feedback, but also support having a small portion of it display at first
-                    show_additional_feedback = gr.Group(visible=True)
-                    with show_additional_feedback:
-                        with gr.Column():
-                            clear_answer = gr.Radio(
-                                choices=["👍", "👎"], label="Was the generated answer clear and understandable?"
-                            )
-                            accurate_answer = gr.Radio(choices=["👍", "👎"], label="Was the generated answer accurate?")
-                            relevant_sources = gr.Radio(
-                                choices=["👍", "👎"],
-                                label="Were the retrieved sources generally relevant to your query?",
-                            )
-                            relevant_sources_selection = set_relevant_sources_selection(num_sources=num_sources)
-                            relevant_sources_order = gr.Radio(
-                                choices=["👍", "👎"],
-                                label="Were the sources ranked appropriately, in order of relevance?",
-                            )
+                    extra_info = gr.Textbox(
+                        label="Any other comments?",
+                        lines=3,
+                        placeholder="Please enter other feedback for improvement here...",
+                    )
 
-                            extra_info = gr.Textbox(
-                                label="Any other comments?",
-                                lines=3,
-                                placeholder="Please enter other feedback for improvement here...",
-                            )
+                    expertise = gr.Radio(
+                        choices=["Beginner", "Intermediate", "Expert"],
+                        label="How would you rate your knowledge of AI policy",
+                        interactive=True,
+                    )
 
-                            expertise = gr.Radio(
-                                choices=["Beginner", "Intermediate", "Expert"],
-                                label="How would you rate your knowledge of AI policy",
-                                interactive=True,
-                            )
-
-                    submit_feedback_btn = gr.Button("Submit feedback", variant="primary", interactive=True)
-                    with gr.Column(visible=False) as submitted_message:
-                        gr.Markdown(
-                            "Feedback recorded, thank you 📝! You can now ask a new question in the search bar."
-                        )
+            submit_feedback_btn = gr.Button("Submit feedback", variant="primary", interactive=True)
+            with gr.Column(visible=False) as submitted_message:
+                gr.Markdown("Feedback recorded, thank you 📝! You can now ask a new question in the search bar.")
 
     # fmt: off
     submit_feedback_btn.click(
@@ -366,9 +360,9 @@ def clear_feedback_form():
 
 def reveal_app(choice: gr.SelectData):
     return (
-        gr.Group.update(visible=False),
-        gr.update(interactive=True, placeholder="Ask your AI policy question here…"),
-        gr.update(interactive=True),
+        gr.Group(visible=False),
+        gr.Textbox(interactive=True, placeholder="Ask your AI policy question here…"),
+        gr.Button(interactive=True),
     )
 
 
@@ -389,9 +383,8 @@ def display_sources():
 def setup_about_panel():
     with gr.Accordion(label=f"About {app_name}", open=False) as about_panel:
         with gr.Row(variant="panel"):
-            with gr.Box():
-                gr.Markdown(
-                    f"""
+            gr.Markdown(
+                f"""
 
                 ## Welcome
                 Artificial intelligence is a field that's developing fast! In response, policy makers from around the world are creating guidelines, rules and regulations to keep up.
@@ -410,11 +403,10 @@ def setup_about_panel():
 
                 For more information about the tool's strengths and limitations, please see our website [here](https://mila.quebec/en/project/sai/).
                 """
-                )
+            )
 
-            with gr.Box():
-                gr.Markdown(
-                    f"""
+            gr.Markdown(
+                f"""
                 ## Risks
 
                 We have done our best to make sure that the AI algorithms are __only__ taking information from what is available in the OECD AI Observatory's Database; but, of course, Large Language Models (LLMs) are prone to fabrication. This means LLMs can make things up and present this made up information as if it were real, making it seem as if the information was found in a policy document. We therefore advise you to check the sources provided by the model to validate that the answer is in fact true. If you'd like to know exactly which documents the model can reference in its response, please see below.
@@ -433,7 +425,7 @@ def setup_about_panel():
                 We are looking to create a tool that is as inclusive as possible.
                 While currently the tool only works with English language questions and documents we will continue assessing {app_name}'s capacity to perform as intended for users with different levels of fluency in English and plan to expand the functionality to ensure accessibility and impact across countries and user groups.
                 """
-                )
+            )
 
     return about_panel
 
@@ -452,28 +444,27 @@ def setup_terms_and_conditions():
 
 def setup_additional_sources():
     # Display additional sources
-    with gr.Box():
-        gr.Markdown(f"")
+    gr.Markdown(f"")
 
-        gr.Markdown(
-            f"""## 📚 Available sources
+    gr.Markdown(
+        f"""## 📚 Available sources
         {app_name} has access to dozens of AI policy documents from various sources.
         Below we list all of the sources that {app_name} has access to.
         """
-        )
-        with gr.Accordion(open=False, label="Click to list all available sources 📚"):
-            with gr.Column():
-                # Display the sources using a dataframe table
-                documents_metadata["Report"] = documents_metadata.apply(
-                    lambda row: to_md_link(row["Title"], row["Link"]), axis=1
-                )
-                sub_df = documents_metadata[["Country", "Year", "Report"]]
-                gr.DataFrame(
-                    sub_df, headers=list(sub_df.columns), interactive=False, datatype=["number", "str", "markdown"]
-                )
+    )
+    with gr.Accordion(open=False, label="Click to list all available sources 📚"):
+        with gr.Column():
+            # Display the sources using a dataframe table
+            documents_metadata["Report"] = documents_metadata.apply(
+                lambda row: to_md_link(row["Title"], row["Link"]), axis=1
+            )
+            sub_df = documents_metadata[["Country", "Year", "Report"]]
+            gr.DataFrame(
+                sub_df, headers=list(sub_df.columns), interactive=False, datatype=["number", "str", "markdown"]
+            )
 
-                # Uncomment to display the sources instead as a simple markdown table
-                # gr.Markdown(get_metadata_markdown(documents_metadata))
+            # Uncomment to display the sources instead as a simple markdown table
+            # gr.Markdown(get_metadata_markdown(documents_metadata))
 
 
 def raise_flagging_message():
@@ -486,12 +477,11 @@ def raise_flagging_message():
 def setup_flag_button():
     """Sets up a flag button with some accompanying text explaining why we have it."""
     with gr.Column(variant="compact"):
-        with gr.Box():
-            gr.Markdown(
-                """# Report bugs and harmful content
+        gr.Markdown(
+            """# Report bugs and harmful content
     While we took many steps to ensure the tool is safe, we still rely on third parties for some of the model's capabilities. Please let us know if any harmful content shows up by clicking the button below and sending screenshots/concerns to mila.databank@gmail.com"""
-            )
-            flag_button = gr.Button(value="Flag content 🚩")
+        )
+        flag_button = gr.Button(value="Flag content 🚩")
     return flag_button
 
 

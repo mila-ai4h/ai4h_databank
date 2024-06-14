@@ -2,7 +2,6 @@ import os
 
 from src.buster.buster_app import buster_app
 
-concurrency_count = int(os.getenv("CONCURRENCY_COUNT", 32))
-
-buster_app.queue(concurrency_count=concurrency_count, api_open=False)
-buster_app.launch(share=False, show_api=False)
+if __name__ == "__main__":
+    buster_app.queue(api_open=False)
+    buster_app.launch(share=False, show_api=False, debug=True)
