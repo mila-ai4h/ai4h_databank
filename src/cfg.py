@@ -141,7 +141,7 @@ buster_cfg = BusterConfig(
     Q:
     """,
             "completion_kwargs": {
-                "model": "gpt-3.5-turbo-0613",
+                "model": "gpt-4o-mini",
                 "stream": False,
                 "temperature": 0,
             },
@@ -163,14 +163,14 @@ buster_cfg = BusterConfig(
     },
     completion_cfg={
         "completion_kwargs": {
-            "model": "gpt-3.5-turbo-0613",
+            "model": "gpt-4o-mini",
             "stream": True,
             "temperature": 0,
         },
         "client_kwargs": client_kwargs,
     },
     tokenizer_cfg={
-        "model_name": "gpt-3.5-turbo-0613",
+        "model_name": "gpt-4",
     },
     documents_formatter_cfg={
         "max_tokens": 3500,
@@ -178,7 +178,7 @@ buster_cfg = BusterConfig(
     },
     question_reformulator_cfg={
         "completion_kwargs": {
-            "model": "gpt-3.5-turbo",
+            "model": "gpt-4o-mini",
             "stream": False,
             "temperature": 0,
         },
