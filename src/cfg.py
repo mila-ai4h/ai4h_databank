@@ -170,7 +170,7 @@ buster_cfg = BusterConfig(
         "client_kwargs": client_kwargs,
     },
     tokenizer_cfg={
-        "model_name": "gpt-4o-mini",
+        "model_name": "gpt-4",
     },
     documents_formatter_cfg={
         "max_tokens": 3500,
