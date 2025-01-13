@@ -1,4 +1,4 @@
---no-deps buster-doctalk==1.0.28
+buster-doctalk==1.0.28
 pinecone-client>=3.0.2
 pinecone-text>=0.6.0
 gradio==5.12.0
