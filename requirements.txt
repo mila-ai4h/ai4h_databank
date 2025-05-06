@@ -1,5 +1,5 @@
 buster-doctalk==1.0.28
-pinecone-client>=3.0.2
+pinecone>=3.0.2
 pinecone-text>=0.6.0
 gradio==5.12.0
 gradio-client==1.5.4
